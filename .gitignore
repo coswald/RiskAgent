@@ -1,5 +1,7 @@
 bin/
-src/com/sillysoft/
+src/com/sillysoft/**
+src/org/**
+sources
 *.class
 
 # Mobile Tools for Java (J2ME)
