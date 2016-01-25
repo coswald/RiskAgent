@@ -1,0 +1,2 @@
+# RiskAgent
+Our Intelligent Systems group will design an implement an artificially intelligent method to play the table-top game called Risk. The project will be complete once the described agent can play Risk well and/or better than an expert player. We are doing this for those Risk players who feel that the AI's out there are not a real challenge and for those who want to play a challenging Risk game.
