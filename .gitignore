@@ -1,6 +1,6 @@
 bin/
-src/com/sillysoft/**
-src/org/**
+src/**/sillysoft
+src/**/org
 sources
 *.class
 
