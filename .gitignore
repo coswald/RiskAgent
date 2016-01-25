@@ -1,6 +1,5 @@
 /bin/
-/src/com/sillysoft/
-/src/org/
+/src/
 sources
 *.class
 
