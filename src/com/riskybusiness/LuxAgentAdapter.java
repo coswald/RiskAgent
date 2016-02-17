@@ -1,6 +1,6 @@
-/**
+/*
  * Copyright (C) 2016  Coved Oswald, Kaleb Luse, and Weston Miller
-
+ *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,7 +25,7 @@ import com.sillysoft.lux.agent.LuxAgent;
  * <p>&nbsp&nbsp&nbsp&nbspThe {@code LuxAgentAdapter} allows further
  * agents to implement the methods they need to without worrying
  * about gathering data from the game itself.</p>
- * @author Coved Oswald
+ * @author Coved W Oswald
  * @author Kaleb Luse
  * @author Weston Miller
  * @version 1.0
@@ -94,7 +94,7 @@ public abstract class LuxAgentAdapter implements LuxAgent
     @Override
     public String name()
     {
-	return this.getClass().getName();
+	return this.getClass().getSimpleName();
     }
     
     /**

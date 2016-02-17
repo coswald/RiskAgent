@@ -1,3 +1,22 @@
+/* 
+ * Copyright (C) 2016  Coved Oswald, Kaleb Luse, and Weston Miller
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package com.riskybusiness.neural;
+
 import java.io.Serializable;
 import java.lang.Comparable;
 import java.lang.Math;
@@ -6,14 +25,79 @@ import java.lang.Object;
 //http://natureofcode.com/book/chapter-10-neural-networks/
 //*TO-DO Implement momentum: http://stats.stackexchange.com/questions/70101/neural-networks-weight-change-momentum-and-weight-decay
 
+/**
+ * <p>&nbsp&nbsp&nbsp&nbspThis class represents a single artificial
+ * cell in a network of said cells that recieves input, processes
+ * those inputs, and generates an output. This model was described by
+ * Warren S. McCulloch and Walter Pitts in 1943, and is now prevalent
+ * in the form of a Perceptron. It is this model that is implemented
+ * here, meant for the purpose of playing a RISK game.</p>
+ * <p>&nbsp&nbsp&nbsp&nbspHowever, this class could be used for other
+ * purposes. The implementation for training is called
+ * backpropogation, and is used by many neural networks. This is not
+ * standard to NEAT, the algorithm implemented to play RISK. This
+ * implementation was left in as a tribute to allow other types of
+ * non-NEAT neural networks to play RISK as well. In NEAT, however,
+ * a {@code Neuron} is described by a {@code NeuronGene}, and is
+ * formed in the genome by the {@code NeuronGene}.</p>
+ * <p>&nbsp&nbsp&nbsp&nbspOf course, a perceptron is described by
+ * certain characteristics that allows it to be a perceptron. These
+ * characteristics include weights for each synapse comming into the
+ * {@code Neuron}. This is described in the
+ * {@link com.riskybusiness.neural.Neuron#weights} object. For
+ * traditional training, the {@code Neuron} implements a
+ * {@link com.riskybusiness.neural.Neuron#learningRate} float that
+ * will allow the {@code Neuron} to be trained at different speeds.
+ * This class is abstract because there are many different
+ * activation functions possible for the {@code Neuron}. This
+ * functionality was left out for future classes to implement.</p>
+ * <p>&nbsp&nbsp&nbsp&nbspEach {@code Neuron} allows for two methods
+ * of input and output. The first allows for the {@code Neuron} to 
+ * send input statically; that is to say, input is sent into the
+ * {@code Neuron} all at once. This is implemented in the method
+ * {@link com.riskybusiness.neural.Neuron#fire()}. The second allows
+ * for sending input dynamically. The input is saved to the
+ * {@code Neuron} until the {@code Neuron} can fire. These two
+ * methods allow the {@code Neuron} to act as a stand alone entity
+ * as well as a functional part of a neural network.</p>
+ * @author Coved W Oswald
+ * @author Kaleb Luse
+ * @author Weston Miller
+ * @version 1.0
+ * @see java.io.Serializable
+ * @see java.lang.Comparable
+ * @since 1.6
+ */
 public abstract class Neuron extends Object implements Serializable, Comparable<Neuron>
 {
 	private static final long serialVersionUID = 37641900214726419L;
 	
+	/**
+	 * <p>The inputs that are saved for the {@code Neuron} until
+	 * it can fire.</p>
+	 */
 	protected float[] inputs;
+	
+	/**
+	 * <p>The weights for each input of the {@code Neuron}.
+	 * These weights line up according to the order in which
+	 * the inputs were received.</p>
+	 */
 	protected float[] weights;
+	
+	/**
+ 	 * <p>The rate at which the weights are adjusted while
+	 * in the training phase.</p>
+	 */
 	protected float learningRate;
 	
+	/**
+	 * <p>Constructs a {@code Neuron} which uses the
+	 * learning rate and weights given as starting points.</p>
+	 * @param learningRate The learning rate to adjust the
+	 * 		       weights by.
+	 * @param weights The initial weights for each input.
+	 */
 	public Neuron(float learningRate, float... weights)
 	{
 		this.weights = weights;
@@ -66,13 +150,13 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 		return true;
 	}
 	
-	public void addToInputs(int index, float output) throws ExceededNeuronInputException, InvalidNeuronInputException
+	public void addToInput(int index, float output) throws ExceededNeuronInputException, InvalidNeuronInputException
 	{
 		if(this.canFire())
 			throw new ExceededNeuronInputException("The amount of given inputs is already at its maximum!");
 		
 		if(this.inputs[index] >= 0)
-			throw new InvalidNeuronInputException("The input " + index + " on neuron " + this.toString() + "cannot be overriden!")
+			throw new InvalidNeuronInputException("The input " + index + " on neuron " + this.toString() + "cannot be overriden!");
 		
 		this.inputs[index] = output;
 	}
