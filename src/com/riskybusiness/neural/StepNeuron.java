@@ -19,6 +19,7 @@ package com.riskybusiness.neural;
 
 public class StepNeuron extends Neuron
 {
+	
 	private static final long serialVersionUID = 607098269654808303L;
 	
 	protected float threshold;

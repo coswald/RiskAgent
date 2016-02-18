@@ -21,6 +21,7 @@ import java.lang.Math;
 
 public class SigmoidNeuron extends Neuron
 {
+	
 	private static final long serialVersionUID = 6203772663984140533L;
 	
 	private float summationDivisor;

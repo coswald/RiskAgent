@@ -22,6 +22,7 @@ import java.lang.Object;
 
 public class Synapse extends Object implements Serializable
 {
+	
 	private static final long serialVersionUID = 3646014859697821258L;
 	
 	private int neuronIndex;

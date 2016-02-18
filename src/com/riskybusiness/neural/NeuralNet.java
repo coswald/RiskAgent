@@ -23,6 +23,7 @@ import java.lang.Object;
 
 public class NeuralNet extends Object implements Serializable
 {
+	
 	private static final long serialVersionUID = 7382374626520742474L;
 	
 	protected Synapse[] synapses;
