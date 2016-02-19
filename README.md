@@ -5,7 +5,7 @@ Risky Business will design and implement an artificially intelligent method to p
 ## Motivation
 We felt that the current AI methods out there were not hard enough. This is due to the fact that they are all strategie based; given enough time and resources, one could predict how any given algorithm was to behave. We also felt that new players who do not have the time or friends to play with a group needed a good way to learn good strategies. In this endevaur we decided it best to implement our own AI in Risk.
 ## Installation
-***TODO***
+To install RiskAgent, you must purchase or already own the full version of the LuxDelux© software. This can be found at [SillySoft™'s website](http://sillysoft.net/lux/). Once obtained, installation is simple. Download and extract the zip or tarball into a temporary directory. Then copy the contents of the *bin* folder and move it to LuxDelux©'s *Agent* directory, found under the *SupportFolder* directory. More information on this and how Risk AI's work can be found at [Writing Your Own AI](http://sillysoft.net/wiki/?WritingYourOwnAI). Once this is completed, you can start LuxDelux©. If it was already running, you must restart LuxDelux©.
 ## Tests
 ***TODO***
 ## Contributors
