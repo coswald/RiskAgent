@@ -48,6 +48,16 @@ public class Synapse extends Object implements Serializable
 		receiver.addToInput(neuronIndex, sender.fire());
 	}
 	
+	public Neuron getSender()
+	{
+		return this.sender;
+	}
+
+	public Neuron getReciever()
+	{
+		return this.receiver;
+	}
+	
 	@Override
 	public String toString()
 	{
