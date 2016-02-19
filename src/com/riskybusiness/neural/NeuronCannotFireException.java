@@ -17,7 +17,7 @@
 
 package com.riskybusiness.neural;
 
-import java.lang.Exception;
+import java.lang.RuntimeException;
 
 /**
  * <p>&nbsp&nbsp&nbsp&nbspA basic {@code Exception} that tells us that
@@ -31,7 +31,7 @@ import java.lang.Exception;
  * @since 1.6
  * @see java.lang.Exception
  */
-public class NeuronCannotFireException extends Exception
+public class NeuronCannotFireException extends RuntimeException
 {
 						     
 	private static final long serialVersionUID = 8175957964354386068L;

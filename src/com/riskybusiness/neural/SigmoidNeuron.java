@@ -29,7 +29,7 @@ public class SigmoidNeuron extends Neuron
 	public SigmoidNeuron(float summationDivisor, int inputNum)
 	{
 		super(inputNum);
-		this.setSummationDivisor(p);
+		this.setSummationDivisor(summationDivisor);
 	}
 	
 	public SigmoidNeuron(int inputNum)

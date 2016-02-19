@@ -17,6 +17,9 @@
 
 package com.riskybusiness.neural;
 
+import com.riskybusiness.neural.Neuron;
+import com.riskybusiness.neural.Synapse;
+
 import java.io.Serializable;
 import java.lang.Integer;
 import java.lang.Object;
@@ -80,5 +83,67 @@ public class NeuralNet extends Object implements Serializable
 				k++;
 			} 
 		}
+	}
+	
+	public Neuron[] getNeurons()
+	{
+		return this.neurons;
+	}
+	
+	public Synapse[] getSynapses()
+	{
+		return this.synapses;
+	}
+	
+	public float[] fire(float[][] inputs) throws InvalidNeuronInputException
+	{
+		if(inputs.length > neurons.length)
+			throw new InvalidNeuronInputException("The amount of inputs given are greater than the amount of neurons!");
+		
+		//Go through the inputs and fire them. If suddenly a Neuron can fire, that means all
+		//of the Synapses for the input layer have been exhausted, meaning the amount of
+		//inputs exceeds that of the amount given in the input layer.
+		for(int i = 0; i < inputs.length; i++)
+		{
+			if(this.neurons[i].canFire())
+			{
+				for(Neuron n : this.neurons)
+					n.clearInputs();
+				throw new InvalidNeuronInputException("The amount of inputs given are greater than that of the input layer!");
+			}
+			else
+				this.synapses[i].feedForward(inputs[i]);
+		}
+		
+		//Fires the rest of the synapses.
+		for(int i = inputs.length; i < this.synapses.length; i++)
+			this.synapses[i].feedForward();
+		
+		//Finds the first output neuron and saves it's position
+		//in the size variable.
+		float[] output;
+		int size = 0;
+		for(int i = 0; i < this.neurons.length; i++)
+		{
+			if(this.neurons[i].canFire())
+			{
+				size = i;
+				break;
+			}
+		}
+		
+		//Computes how many output neurons there are and
+		//then fires them all, saving those values to 
+		//the output variable.
+		output = new float[this.neurons.length - size + 1];
+		for(int i = size; i < this.neurons.length; i++)
+			output[i - size] = this.neurons[i].fire();
+		
+		return output;
+	}
+	
+	public void train(float[] desired, float[][] inputs)
+	{
+		float[] error = this.fire(inputs);
 	}
 }
