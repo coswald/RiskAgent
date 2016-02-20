@@ -51,11 +51,6 @@ public class LinkGene implements Serializable
         return bEnabled;
     }
     
-    //Disables link
-    public void disableLink()
-    {
-        this.bEnabled = false;
-    } 
     
     //Re-enables a link
     //Is this possible??
@@ -69,21 +64,15 @@ public class LinkGene implements Serializable
      * like this method(s) for legacy reasons
      * -C
      */
-    public void enableLink()
+    public void setLink(boolean enabled)
     {
-        this.bEnabled = true;
+        this.bEnabled = enabled;
     }
     
-    //Disable the recurrency of the link
-    public void disableRecurrency()
+    //Set the link to be either recurrent or not
+    public void setRecurrency(boolean recur)
     {
-        this.bRecurrent = false;
-    }
-    
-    //Enables the recurrency of the link
-    public void enableRecurrency()
-    {
-        this.bRecurrent = true;
+        this.bRecurrent = recur;
     }
     
     //Set the weight of the link

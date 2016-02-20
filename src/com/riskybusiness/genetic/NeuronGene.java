@@ -96,15 +96,9 @@ public class NeuronGene implements Serializable
      * class; do with it what you will.
      */
     //Disable the recurrency of the neuron
-    public void disableRecurrency()
+    public void setRecurrency(boolean recur)
     {
-        this.bRecurrent = false; //make sure lowercase
-    }
-    
-    //Enables the recurrency of the neuron
-    public void enableRecurrency()
-    {
-        this.bRecurrent = true;
+        this.bRecurrent = recur;
     }
     
     //Get the activation response of the neuron

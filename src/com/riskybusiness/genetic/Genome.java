@@ -20,7 +20,8 @@ package com.riskybusiness.genetic;
 import com.riskybusiness.neural.Neuron;
 import com.riskybusiness.neural.Synapse;
 import java.io.Serializable;
-import java.util.*; //NOTE: I HATE this. But that's okay.
+import java.util.*; //NOTE: I HATE this. But that's okay. -C
+//Whats the proper way, I just saw it on a website and it worked. -K
 
 public class Genome implements Serializable
 {
