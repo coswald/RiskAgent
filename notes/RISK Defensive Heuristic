@@ -1,0 +1,143 @@
+if (OpponentCanAttack)
+{
+  if (PlayerID == 0)
+  {
+
+    if (OwnTroops == EnemyTroops)
+    {
+      if (OwnTroops <= 5)
+      {
+        if (OwnLastCountry)
+        {
+          if ((OwnCards + EnemyCards) >= 5)
+          {
+            Fitness += 4;
+          }
+          else if (EnemyReinforcementsPerTurn <= OwnReinforcementsPerTurn)
+          {
+            Fitness += 6;
+          }
+          else
+          {
+            Fitness += 8;
+          }
+        }
+        else if (BreakContinentBonus)
+        {
+          Fitness += 3;
+        }
+
+        else
+        {
+          Fitness += 5;
+        }
+      }
+
+      else if (OwnTroops <= 15)
+      {
+        Fitness += 6;
+      }
+
+      else
+      {
+        Fitness += 4;
+      }
+    }
+
+
+
+    else if (OwnTroops > EnemyTroops)
+    {
+      if ((OwnTroops - EnemyTroops) >= 10)
+      {
+        Fitness += 10;
+      }
+
+      else if ((OwnTroops - EnemyTroops) >= 6)
+      {
+        Fitness += 8;
+      }
+
+      else if ((OwnTroops - EnemyTroops) >= 2)
+      {
+        Fitness += 6;
+      }
+
+      else
+      {
+        if (OwnLastCountry)
+        {
+          if ((OwnCards + EnemyCards) >= 5)
+          {
+            Fitness += 4;
+          }
+          else if (EnemyReinforcementsPerTurn <= OwnReinforcementsPerTurn)
+          {
+            Fitness += 5;
+          }
+          else
+          {
+            Fitness += 5;
+          }
+        }
+
+        else if (BreakContinentBonus)
+        {
+          Fitness += 4;
+        }
+
+        else
+        {
+          Fitness += 6;
+        }
+      }
+    }
+
+    else
+    {
+      if ((EnemyTroops - OwnTroops) >= 2)
+      {
+        if (EnemyTroops >= 20)
+        {
+          Fitness += 3;
+        }
+
+        else if (EnemyTroops >= 13)
+        {
+          if (OwnLastCountry)
+          {
+            if ((OwnCards + EnemyCards) >= 5)
+            {
+              Fitness += 2;
+            }
+
+            else if (EnemyReinforcementsPerTurn <= OwnReinforcementsPerTurn)
+            {
+              Fitness += 5;
+            }
+
+            else
+            {
+              Fitness += 6;
+            }
+          }
+
+          else if (BreakContinentBonus)
+          {
+            Fitness += 4;
+          }
+
+          else
+          {
+            Fitness += 5;
+          }
+        }
+      }
+
+      else
+      {
+        Fitness += 9;
+      }
+    }
+  }
+}
