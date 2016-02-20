@@ -28,9 +28,9 @@ public class LinkGene implements Serializable
     
     private int fromNeuron;
     private int toNeuron;
-    private double dWeight;
-    private boolean bEnabled;
-    private boolean bRecurrent;
+    private double linkWeight;
+    private boolean linkEnabledh;
+    private boolean linkRecurrent;
     private int innovationID;
     
     //Create a LinkGene
@@ -38,9 +38,9 @@ public class LinkGene implements Serializable
     {
         fromNeuron = fNeuron;
         toNeuron = tNeuron;
-        dWeight = weight;
-        bEnabled = true; //lowercase
-        bRecurrent = recur;
+        linkWeight = weight;
+        linkEnabled = true; //lowercase
+        linkRecurrent = recur;
         //I have no clue what to do with the innovationID. -K
         //Neither do I! -C
     }
@@ -48,7 +48,7 @@ public class LinkGene implements Serializable
     //Return whether the link is enabled
     public boolean getEnabled()
     {
-        return bEnabled;
+        return linkEnabled;
     }
     
     
@@ -66,25 +66,25 @@ public class LinkGene implements Serializable
      */
     public void setLink(boolean enabled)
     {
-        this.bEnabled = enabled;
+        this.linkEnabled = enabled;
     }
     
     //Set the link to be either recurrent or not
     public void setRecurrency(boolean recur)
     {
-        this.bRecurrent = recur;
+        this.linkRecurrent = recur;
     }
     
     //Set the weight of the link
     public void setWeight(double weight)
     {
-        this.dWeight = weight;
+        this.linkWeight = weight;
     }
     
     //Get the weight of the link
     public double getWeight()
     {
-        return dWeight;
+        return linkWeight;
     }
     
     public void setToNeuron(int neuron)
@@ -120,6 +120,7 @@ public class LinkGene implements Serializable
          * we'll do this, but I don't see a huge problem, just little phinicky things.
          */
         return new Synapse(this.innovationID, new com.riskybusiness.neural.SigmoidNeuron(this.fromNeuron), new com.riskybusiness.neural.SigmoidNeuron(this.toNeuron)); //make neurons with inputs for now.
+        
     }
 
 }

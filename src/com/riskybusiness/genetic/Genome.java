@@ -36,9 +36,8 @@ public class Genome implements Serializable
      * type of the elements inside the ArrayList. So
      * i'll change it for you.
      */
-    private ArrayList<Neuron> m_vecNeurons;
-    private ArrayList<Synapse> m_vecLinks;
-    //Phenotype?
+    private ArrayList<NeuronGene> m_vecNeurons;
+    private ArrayList<LinkGene> m_vecLinks;
     private double m_dFitness;
     private double m_dAdjustedFitness;
     private double m_dAmountToSpawn;
@@ -70,6 +69,38 @@ public class Genome implements Serializable
          return true;
      }
 
+    public Neuron createNeuron(NeuronGene neuron)
+    {
+        //Need to figure out a way to determine amount of inputs. If I know my ID I
+        //may be able to look and see how many active links point to me but we would 
+        //have to account for links not yet created so maybe create neurons last.
+        if (neuron.getNeuronType() == "Sigmoid")
+        {
+            return new com.riskybusiness.neural.SigmoidNeuron (neuron.getActivationResponse(), 5);
+        }
+        else if (neuron.getNeuronType() == "Step") 
+        {
+            return new com.riskybusiness.neural.StepNeuron (neuron.getActivationResponse(), 5);
+        }
+    }
+
+    public Synapse createSynapse(LinkGene link)
+    {
+
+        private Neuron toNeuron;
+        private Neuron fromNeuron;
+
+        if (neuron.getNeuronType() == "Sigmoid")
+        {
+            toNeuron = new com.riskybusiness.neural.SigmoidNeuron (neuron.getActivationResponse(), 5);
+        }
+        else if (neuron.getNeuronType() == "Step") 
+        {
+            toNeuron = new com.riskybusiness.neural.StepNeuron (neuron.getActivationResponse(), 5);
+        }
+
+        
+    }
      //We'll talk about these -C
      
      //This constructor creates a genome from a vector of SLinkGenes a vector of SNeuronGenes and an ID number

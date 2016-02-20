@@ -26,10 +26,10 @@ public class NeuronGene implements Serializable
     private static final long serialVersionUID = 1L;
     
     //I apologize for anything I have changed that will offend you.
-    private int iId;
-    private String neuronType;
-    private boolean bRecurrent;
-    private double dActivationResponse;
+    private int neuronID;
+    private String neuronType; 
+    private boolean neuronRecurrent;
+    private double neuronActivationResponse;
 
     public NeuronGene(int id, String type, boolean recur, double activate)
     {
@@ -41,8 +41,8 @@ public class NeuronGene implements Serializable
          * persnicity, and as you can see in the NeuralNet class, this can lead to some problems.
          * -C
          */
-        iId = id;
-        neuronType = type; //input, hidden, bias, output, none -K
+        neuronID = id;
+        neuronType = type; //Sigmoid, Step
          
         //Do we want to add something to signify whether it is a step or sigmoid
         /*
@@ -55,7 +55,7 @@ public class NeuronGene implements Serializable
          */
         
         //As for this sucker, I'm getting there. See the doc for the NeuralNet -C
-        bRecurrent = recur;
+        neuronRecurrent = recur;
         
         //What is this for? -C
         /*
@@ -63,13 +63,13 @@ public class NeuronGene implements Serializable
          * This, with my current understanding, is either the threshold for the StepNeuron
          * or the divisor for the SigmoidNeuron. It makes sense.
          */
-        dActivationResponse = activate;
+        neuronActivationResponse = activate;
     }
 
     //Get the id of the neuron
     public int getID()
     {
-        return iId;
+        return neuronID;
     }
 
     //Get the neuron type
@@ -87,7 +87,7 @@ public class NeuronGene implements Serializable
     //Return whether the link is recurrent
     public boolean isRecurrent()
     {
-        return bRecurrent;
+        return neuronRecurrent;
     }
     
     /*
@@ -98,31 +98,45 @@ public class NeuronGene implements Serializable
     //Disable the recurrency of the neuron
     public void setRecurrency(boolean recur)
     {
-        this.bRecurrent = recur;
+        this.neuronRecurrent = recur;
     }
     
     //Get the activation response of the neuron
     public double getActivationResponse()
     {
-        return dActivationResponse;
+        return neuronActivationResponse;
     }
     
     //Set the activation response of the neuron
     public void setActivationResponse(double activate)
     {
-        this.dActivationResponse = activate;
+        this.neuronActivationResponse = activate;
     }
     
     //Make it return a Neuron
     public Neuron createNeuron()
     {
+        //Need to figure out a way to determine amount of inputs. If I know my ID I
+        //may be able to look and see how many active links point to me but we would 
+        //have to account for links not yet created so maybe create neurons last.
+        if (neuronType == "Sigmoid")
+        {
+            return new SigmoidNeuron(this.neuronActivationResponse, 5);
+        }
+        else if (neuronType == "Step") 
+        {
+            return new StepNeuron(this.neuronActivationResponse, 5);
+        }
+
+
+        
         //I'm not sure if this is correct -K
         //Let's make it right! -C
         //com.riskybusiness.neural.SigmoidNeuron(/*Possible issues with double vs float*/
-                                                   //this.dActivationResponse,
-                                                  /*We don't currently have anything to express num inputs in the gene*/
-                                                  //5);
-        Neuron n;
+                                                 //this.neuronActivationResponse,
+                                                 /*We don't currently have anything to express num inputs in the gene*/
+                                                 //5);
+        /*Neuron n;
         //loops through all of the constructors for the given class and finds one with a float and int parameter combo.
         try
         {
@@ -137,7 +151,7 @@ public class NeuronGene implements Serializable
                    break;
                 }
             }
-            n = new com.riskybusiness.neural.SigmoidNeuron(4); //(Class.forName(neuronType)).cast(obj.newInstance(new Float(this.dActivationResponse), new Integer(5)));
+            n = new com.riskybusiness.neural.SigmoidNeuron(4); //(Class.forName(neuronType)).cast(obj.newInstance(new Float(this.neuronActivationResponse), new Integer(5)));
             //I tried to implement this over 2 hours...I tried.
             return n;
         }
@@ -145,7 +159,7 @@ public class NeuronGene implements Serializable
         {
             roe.printStackTrace();
             return null;
-        }
+        }*/
 
     }
     
