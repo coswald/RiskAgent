@@ -354,7 +354,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	/**
 	 * <p>Sets the weights associated with
 	 * this {@code Neuron}.</p>
-	 * @param The list containing all of the
+	 * @param weights The list containing all of the
 	 * 				weights.
 	 * @see com.riskybusiness.neural.Neuron#weights
 	 */
