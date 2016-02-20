@@ -33,7 +33,7 @@ if (CanAttack)
           }
           else
           {
-            // Don't Attack- not worth the RISK... .... ... Or is it?
+            DoNothing(); // Don't Attack- not worth the RISK... .... ... Or is it?
             Fitness += 4;
           }
         }
@@ -46,14 +46,14 @@ if (CanAttack)
 
         else // Save your troops and build up
         {
-          // Don't Attack
+          DoNothing(); // Don't Attack
           Fitness += 5;
         }
       }
 
       else // Odds of victory are in favor of defender
       {
-        // Don't Attack
+        DoNothing(); // Don't Attack
         Fitness += 6;
       }
     }
@@ -102,7 +102,7 @@ if (CanAttack)
           }
           else
           {
-            // Don't Attack- not worth the RISK... .... ... Or is it?
+            DoNothing(); // Don't Attack- not worth the RISK... .... ... Or is it?
             Fitness += 3;
           }
         }
@@ -115,7 +115,7 @@ if (CanAttack)
 
         else // Save and build up troops
         {
-          // Don't Attack
+          DoNothing(); // Don't Attack
           Fitness += 2;
         }
       }
@@ -156,7 +156,7 @@ if (CanAttack)
 
             else
             {
-              // Don't Attack- not worth the RISK... .... ... Or is it?
+              DoNothing(); // Don't Attack- not worth the RISK... .... ... Or is it?
               Fitness += 4;
             }
           }
@@ -169,7 +169,7 @@ if (CanAttack)
 
           else // Save and build up troops
           {
-            // Don't Attack
+            DoNothing(); // Don't Attack
             Fitness += 5;
           }
         }
@@ -177,7 +177,7 @@ if (CanAttack)
 
       else // The odds are almost never in your favor
       {
-        // Don't Attack for your own sake...
+        DoNothing(); // Don't Attack for your own sake...
         Fitness += 9;
       }
     }
