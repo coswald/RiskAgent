@@ -20,7 +20,8 @@ package com.riskybusiness.neural;
 import java.lang.Object;
 
 /**
- * <p>An independent {@code Object} that may be used to help train a
+ * <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;An independent {@code Object} that
+  * may be used to help train a
  * {@link com.riskybusiness.neural.NeuralNet} or an individual
  * {@link com.riskybusiness.neural.Neuron}.</p>
  * @author Coved W Oswald
