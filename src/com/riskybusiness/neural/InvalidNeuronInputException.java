@@ -19,7 +19,7 @@ package com.riskybusiness.neural;
 import java.lang.ArrayIndexOutOfBoundsException;
 
 /**
- * <p>&nbsp&nbsp&nbsp&nbspA type of {@code Exception} that states that
+ * <p>&nbsp;&nbsp;&nbsp;&nbsp;A type of {@code Exception} that states that
  * a given {@code Neuron} cannot take the given type of input. This
  * could also mean that the {@code Neuron} cannot receive the amount
  * of inputs given or that the input has already been filled.</p>

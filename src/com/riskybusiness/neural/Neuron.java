@@ -17,6 +17,9 @@
 
 package com.riskybusiness.neural;
 
+import com.riskybusiness.neural.ExceededNeuronInputException;
+import com.riskybusiness.neural.InvalidNeuronInputException;
+
 import java.io.Serializable;
 import java.lang.Comparable;
 import java.lang.Math;
@@ -26,13 +29,13 @@ import java.lang.Object;
 //*TO-DO Implement momentum: http://stats.stackexchange.com/questions/70101/neural-networks-weight-change-momentum-and-weight-decay
 
 /**
- * <p>&nbsp&nbsp&nbsp&nbspThis class represents a single artificial
+ * <p>&nbsp;&nbsp;&nbsp;&nbsp;This class represents a single artificial
  * cell in a network of said cells that recieves input, processes
  * those inputs, and generates an output. This model was described by
  * Warren S. McCulloch and Walter Pitts in 1943, and is now prevalent
  * in the form of a Perceptron. It is this model that is implemented
  * here, meant for the purpose of playing a RISK game.</p>
- * <p>&nbsp&nbsp&nbsp&nbspHowever, this class could be used for other
+ * <p>&nbsp;&nbsp;&nbsp;&nbsp;However, this class could be used for other
  * purposes. The implementation for training is called
  * backpropogation, and is used by many neural networks. This is not
  * standard to NEAT, the algorithm implemented to play RISK. This
@@ -40,7 +43,7 @@ import java.lang.Object;
  * non-NEAT neural networks to play RISK as well. In NEAT, however,
  * a {@code Neuron} is described by a {@code NeuronGene}, and is
  * formed in the genome by the {@code NeuronGene}.</p>
- * <p>&nbsp&nbsp&nbsp&nbspOf course, a perceptron is described by
+ * <p>&nbsp;&nbsp;&nbsp;&nbsp;Of course, a perceptron is described by
  * certain characteristics that allows it to be a perceptron. These
  * characteristics include weights for each synapse comming into the
  * {@code Neuron}. This is described in the
@@ -51,7 +54,7 @@ import java.lang.Object;
  * This class is abstract because there are many different
  * activation functions possible for the {@code Neuron}. This
  * functionality was left out for future classes to implement.</p>
- * <p>&nbsp&nbsp&nbsp&nbspEach {@code Neuron} allows for two methods
+ * <p>&nbsp;&nbsp;&nbsp;&nbsp;Each {@code Neuron} allows for two methods
  * of input and output. The first allows for the {@code Neuron} to 
  * send input statically; that is to say, input is sent into the
  * {@code Neuron} all at once. This is implemented in the method
@@ -75,7 +78,8 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	
 	/**
 	 * <p>The inputs that are saved for the {@code Neuron} until
-	 * it can fire.</p>
+	 * it can fire. All inputs in this implementation must be
+     * positive.</p>
 	 */
 	protected float[] inputs;
 	
@@ -110,7 +114,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	/**
 	 * <p>Constructs a {@code Neuron} which uses the
 	 * weights given and a learning rate of 1.0.</p>
-	 * @param wights The initial weights for each input.
+	 * @param weights The initial weights for each input.
 	 * @see com.riskybusiness.neural.Neuron#Neuron(float[])
 	 */
 	public Neuron(float... weights)
@@ -176,7 +180,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	 * making all of the values in the
 	 * {@link com.riskybusiness.neural.Neuron#inputs}
 	 * list -1.</p>
-	 * @see com.riskybusiness.neural.Neuron#input
+	 * @see com.riskybusiness.neural.Neuron#inputs
 	 */
 	public void clearInputs()
 	{
@@ -193,7 +197,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	 * list is full.</p>
 	 * @return {@code true} if the input list is full,
 	 *				{@code false} otherwise.
-	 * @see com.riskybusiness.neural.Neuron#input
+	 * @see com.riskybusiness.neural.Neuron#inputs
 	 */
 	public boolean canFire()
 	{
@@ -210,7 +214,11 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	 * list.</p>
 	 * @param index The spot to add the output to.
 	 * @param output The float to add to the input list.
-	 * @see com.riskybusiness.neural.Neuron#input
+     * @throws ExceededNeuronInputException When the amount
+     *              of inputs has already been met.
+     * @throws InvalidNeuronInputException When the index
+     *              has already been populated.
+	 * @see com.riskybusiness.neural.Neuron#inputs
 	 */
 	public void addToInput(int index, float output) throws ExceededNeuronInputException, InvalidNeuronInputException
 	{
@@ -243,7 +251,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	 * 		of this {@code Neuron} was greater, 0
 	 * 		if they were equal, and -1 if the other
 	 * 		output was greater.
-	 * @see java.lang.Comparable#compareTo(T)
+	 * @see java.lang.Comparable#compareTo(Object)
 	 */
 	 @Override
 	public int compareTo(Neuron other)
@@ -260,12 +268,12 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	 * <p>Sums the list of inputs given.</p>
 	 * @param inputs The list of inputs to be summed.
 	 * @return The sum of the inputs.
-	 * @throws InvalidNeuronINputException When the
+	 * @throws InvalidNeuronInputException When the
 	 *				amount of inputs given is not
 	 * 				equal to the amount of weights
 	 *				minus one (for the bias weight),
 	 *				this {@code Exception} is thrown.
-	 * @see com.riskybusiness.neural.InvalidNeuronINputException
+	 * @see com.riskybusiness.neural.InvalidNeuronInputException
 	 */
 	protected float sum(float... inputs) throws InvalidNeuronInputException
 	{
@@ -395,7 +403,10 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	 * for more details.
 	 * @param desired The desired output for
 	 * 				the {@code Neuron}.
-	 * @throws InvalidNeuronInputException See adjustWeights(float[]).
+     * @param inputs The inputs to the
+     *              {@code Neuron}.
+	 * @throws com.riskybusiness.neural.InvalidNeuronInputException See
+     *              {@link com.riskybusiness.neural.Neuron#adjustWeights(float[])}
 	 */
 	public void train(float desired, float... inputs) throws InvalidNeuronInputException
 	{

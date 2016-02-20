@@ -19,11 +19,11 @@ package com.riskybusiness.neural;
 import java.lang.RuntimeException;
 
 /**
- * <p>&nbsp&nbsp&nbsp&nbspA basic {@code Exception} that tells us that
+ * <p>&nbsp;&nbsp;&nbsp;&nbsp;A basic {@code Exception} that tells us that
  * the amount of inputs sent to a {@code Neuron} was greater than the
  * amount it could hold.</p>
  * @author Coved W Oswald
- * @auhtor Kaleb Luse
+ * @author Kaleb Luse
  * @author Weston Miller
  * @version 1.0
  * @since 1.6

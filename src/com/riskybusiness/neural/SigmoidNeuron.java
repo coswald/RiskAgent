@@ -17,8 +17,19 @@
 
 package com.riskybusiness.neural;
 
+import com.riskybusiness.neural.Neuron;
 import java.lang.Math;
 
+/**
+ * <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A {@code Neuron} that uses the
+ * sigmoid function as its activation function.</p>
+ * @author Coved W Oswald
+ * @author Kaleb Luse
+ * @author Weston Miller
+ * @version 1.0
+ * @since 1.6
+ * @see com.riskybusiness.neural.Neuron
+ */
 public class SigmoidNeuron extends Neuron
 {
 	
@@ -26,22 +37,53 @@ public class SigmoidNeuron extends Neuron
 	
 	private float summationDivisor;
 	
+    /**
+     * <p>Constructs a {@code SigmoidNeuron} with the given
+     * summation divisor to use in the activation function, as
+     * well as the amount of inputs for the {@code Neuron}.</p>
+     * @param summationDivisor The number to divide the sum by
+     *              as it is sent into the activation function.
+     * @param inputNum The amount of inputs to this
+     *              {@code SigmoidNeuron}.
+     * @see com.riskybusiness.neural.Neuron#Neuron(int)
+     */
 	public SigmoidNeuron(float summationDivisor, int inputNum)
 	{
 		super(inputNum);
 		this.setSummationDivisor(summationDivisor);
 	}
 	
+    /**
+     * <p>Constructs a {@code SigmoidNeuron} with the given
+     * amount of inputs for the {@code SigmoidNeuron}. The
+     * summation divisor is set to 1.</p>
+     * @param inputNum The amount of inputs to this
+     *              {@code SigmoidNeuron}.
+     * @see com.riskybusiness.neural.SigmoidNeuron#SigmoidNeuron(float, int)
+     */
 	public SigmoidNeuron(int inputNum)
 	{
 		this(1.0F, inputNum);
 	}
 	
+    /**
+     * <p>Changes the number that is used to divide the sum by.</p>
+     * @param summationDivisor The number to divide the sum by
+     *              as it is sent into the activation function.
+     */
 	public void setSummationDivisor(float summationDivisor)
 	{
 		this.summationDivisor = summationDivisor;
 	}
 	
+    /**
+     * <p>Describes the sigmoid activation function. More can
+     * be seen at
+     *  <a href="https://en.wikipedia.org/wiki/Sigmoid_function">Wikipedia</a></p>
+     * @param summation {@inheritDoc}
+     * @return A float between 0 and 1 found on the sigmoid
+     *              curve.
+     */
 	@Override
 	public float activate(float summation)
 	{

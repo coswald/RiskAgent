@@ -20,12 +20,12 @@ package com.riskybusiness.neural;
 import java.lang.RuntimeException;
 
 /**
- * <p>&nbsp&nbsp&nbsp&nbspA basic {@code Exception} that tells us that
+ * <p>&nbsp;&nbsp;&nbsp;&nbsp;A basic {@code Exception} that tells us that
  * a {@code Neuron} could not fire. This could be due to programmer
  * restrictions, implementation issues, but most likely the fact that
  * the {@code Neuron} did not have enough inputs to fire.</p>
  * @author Coved W Oswald
- * @auhtor Kaleb Luse
+ * @author Kaleb Luse
  * @author Weston Miller
  * @version 1.0
  * @since 1.6
