@@ -107,11 +107,7 @@ public class Synapse extends Object implements Serializable
 	
     /**
      * <p>Feeds the output from the sending {@code Neuron} to
-     * the input of the receiving {@code Neuron}. Once this
-     * {@code Synapse} has fed forward the information, it
-     * will clear the sender's inputs by calling the
-     * {@link com.riskybusiness.neural.Neuron#clearInputs()}
-     * method.</p>
+     * the input of the receiving {@code Neuron}.</p>
      * @throws ExceededNeuronInputException See the "See also"
      *              section.
      * @throws InvalidNeuronInputException See the "See also"
@@ -126,7 +122,17 @@ public class Synapse extends Object implements Serializable
 		if(!sender.canFire())
 			throw new NeuronCannotFireException(sender.toString() + " cannot fire!");
 		receiver.addToInput(neuronIndex, sender.fire());
-        sender.clearInputs();
+        //sender.clearInputs();
+	}
+	
+	/**
+     * <p>Returns the neuron index of the receiving
+	 * {@code Neuron}.</p>
+     * @return The neuron index.
+     */
+	public int getNeuronIndex()
+	{
+		return this.neuronIndex;
 	}
 	
     /**

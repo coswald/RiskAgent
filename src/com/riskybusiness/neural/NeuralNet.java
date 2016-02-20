@@ -23,7 +23,6 @@ import com.riskybusiness.neural.SigmoidNeuron;
 import com.riskybusiness.neural.Synapse;
 
 import java.io.Serializable;
-import java.lang.Integer;
 import java.lang.Object;
 
 /**
@@ -146,20 +145,30 @@ public class NeuralNet extends Object implements Serializable
 		}
 		
 		int levelIndex = 0;
+		int synapseIndex = 0;
 		synapseSum = inputLayerRows - 1;
-		for(int i = 0, j = 0, k = inputLayerRows, l = -1; i < synapses.length; i++, j++)
+		boolean setLevel = false;
+		for(int i = 0, j = 0, k = inputLayerRows, l = -1; i < synapses.length; i++, j++, synapseIndex++)
 		{
-			synapses[i] = new Synapse(j - levelIndex, neurons[j], neurons[k]);
+			if(setLevel)
+			{
+				j = levelIndex;
+				synapseIndex = 0;
+				k++;
+				setLevel = false;
+			}
+			//System.out.println("I: " + i + " : " + synapseIndex + " : " + j + " : " + k);
+			synapses[i] = new Synapse(synapseIndex, neurons[j], neurons[k]);
+			
 			if(j >= synapseSum)
 			{
-				if(k + 1 >= (synapseSum + ((l + 1 < hiddenLayerRows.length) ? hiddenLayerRows[l + 1] : outputLayerRows)))
+				if(k + 1 > (synapseSum + ((l + 1 < hiddenLayerRows.length) ? hiddenLayerRows[l + 1] : outputLayerRows)))
 				{
 					levelIndex = synapseSum + 1;
 					synapseSum += (++l < hiddenLayerRows.length) ? hiddenLayerRows[l] : outputLayerRows;
 				}
-				j = levelIndex;
-				k++;
-			} 
+				setLevel = true;
+			}
 		}
 	}
 	
@@ -209,7 +218,8 @@ public class NeuralNet extends Object implements Serializable
 		//Go through the inputs and fire them. If suddenly a Neuron can fire, that means all
 		//of the Synapses for the input layer have been exhausted, meaning the amount of
 		//inputs exceeds that of the amount given in the input layer.
-		for(int i = 0; i < inputs.length; i++)
+		int synapseIndex = 0;
+		for(int i = 0; !(this.synapses[synapseIndex].getSender().canFire()); i++, synapseIndex++)
 		{
 			if(this.neurons[i].canFire())
 			{
@@ -218,11 +228,16 @@ public class NeuralNet extends Object implements Serializable
 				throw new InvalidNeuronInputException("The amount of inputs given are greater than that of the input layer!");
 			}
 			else
-				this.synapses[i].feedForward(inputs[i]);
+			{
+				this.synapses[synapseIndex].feedForward(inputs[i]);
+				
+				if(i == inputs.length - 1)
+					i = -1;
+			}
 		}
 		
 		//Fires the rest of the synapses.
-		for(int i = inputs.length; i < this.synapses.length; i++)
+		for(int i = synapseIndex; i < this.synapses.length; i++)
 			this.synapses[i].feedForward();
 		
 		//Finds the first output neuron and saves its position

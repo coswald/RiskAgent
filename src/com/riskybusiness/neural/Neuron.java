@@ -22,6 +22,7 @@ import com.riskybusiness.neural.InvalidNeuronInputException;
 
 import java.io.Serializable;
 import java.lang.Comparable;
+import java.lang.Float;
 import java.lang.Math;
 import java.lang.Object;
 
@@ -226,7 +227,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 			throw new ExceededNeuronInputException("The amount of given inputs is already at its maximum!");
 		
 		if(this.inputs[index] >= 0)
-			throw new InvalidNeuronInputException("The input " + index + " on neuron " + this.toString() + "cannot be overriden!");
+			throw new InvalidNeuronInputException("The input " + index + " on neuron " + this.toString() + " cannot be overriden!");
 		
 		this.inputs[index] = output;
 	}
@@ -256,12 +257,12 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	 @Override
 	public int compareTo(Neuron other)
 	{
-		float[] sample = new float[this.weights.length];
-		float[] sampleTwo = new float[other.weights.length];
+		float[] sample = new float[this.weights.length - 1];
+		float[] sampleTwo = new float[other.weights.length - 1];
 		Neuron.fillList(false, sample);
 		Neuron.fillList(false, sampleTwo);
 		
-		return (int)Math.round(this.fire(sample) - other.fire(sampleTwo));
+		return Float.floatToIntBits(this.fire(sample)) - Float.floatToIntBits(other.fire(sampleTwo));
 	}
 	
 	/**
@@ -348,6 +349,18 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	public float[] getWeights()
 	{
 		return this.weights;
+	}
+	
+	/**
+	 * <p>Sets the weights associated with
+	 * this {@code Neuron}.</p>
+	 * @param The list containing all of the
+	 * 				weights.
+	 * @see com.riskybusiness.neural.Neuron#weights
+	 */
+	public void setWeights(float... weights)
+	{
+		this.weights = weights;
 	}
 	
 	/**
