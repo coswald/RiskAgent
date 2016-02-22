@@ -20,22 +20,14 @@ package com.riskybusiness.genetic;
 import com.riskybusiness.neural.Neuron;
 import com.riskybusiness.neural.Synapse;
 import java.io.Serializable;
-import java.util.*; //NOTE: I HATE this. But that's okay. -C
-//Whats the proper way, I just saw it on a website and it worked. -K
+import java.util.Random;
 
 public class Genome implements Serializable
 {
     
     private static final long serialVersionUID = 1L;
 
-    private int m_GenomeID;
-    /*
-     * Okay, I'll start off by saying that a "Vector"
-     * in Java should almost always be an ArrayList.
-     * That being stated, you also need to state the
-     * type of the elements inside the ArrayList. So
-     * i'll change it for you.
-     */
+    private int                   genomeID;
     private ArrayList<NeuronGene> neuronGeneSet;
     private ArrayList<LinkGene>   linkGeneSet;
     private double                genomeFitness;
@@ -48,24 +40,18 @@ public class Genome implements Serializable
     //Returns true if the specified link is already part of the genome
     public boolean duplicateLink(int neuronIn, int neuronOut)
     {
-        //Idk what to do yet; -K
-        //null;
         return true;
     }
 
     //Given a neuron id this function just finds its position in m_vecNeurons
     public int getElementPos(int neuronId)
     {
-        //Nope -K
-        //null;
         return 0;
     }
 
     //Tests if the passed ID is the same as any existing neuron IDs. Used in AddNeuron
-     public boolean alreadyHaveThisNeuronID(int ID) //can't have const
+     public boolean alreadyHaveThisNeuronID(int ID)
      {
-         //Meh? -K
-         //null;
          return true;
      }
 
@@ -104,12 +90,12 @@ public class Genome implements Serializable
             //}
             //} else {
             //What if the link doesn't know its recursive??
-            //if (currentNeuron.getID() == link.getToNeuron() && currentNeuron.getID() == link.getFoNeuron()){
-            //    toNeuron = currentNeuron;
-            //    fromNeuron = currentNeuron;
-            //    link.setRecurrency(true); 
-            //} else
-            if (currentNeuron.getID() == link.getToNeuron())
+            if (currentNeuron.getID() == link.getToNeuron() && currentNeuron.getID() == link.getFoNeuron())
+            {
+                toNeuron = currentNeuron;
+                fromNeuron = currentNeuron;
+            } 
+            else if (currentNeuron.getID() == link.getToNeuron())
             {
                 toNeuron = createNeuron (currentNeuron);
                 toNeuronSet = true;
@@ -131,11 +117,10 @@ public class Genome implements Serializable
         }
         else
         {
-            null; //Raise some kind of missing neuron error.
+            null;
         }
         
     }
-     //We'll talk about these -C
      
      //This constructor creates a genome from a vector of SLinkGenes a vector of SNeuronGenes and an ID number
      //public Genome(int id, Vector neurons, Vector genes, int inputs, int outputs);
@@ -158,13 +143,81 @@ public class Genome implements Serializable
         return new com.riskybusiness.neural.NeuralNet(neuronSet, linkSet);
      }
 
-
-
      //Delete the neural network
      //public void deletePhenotype(){?}
 
      //Add a link to the genome dependent upon the mutation rate
-     //public void addLink(double mutationRate, double chanceOfRecurrent, CInnovation innovation?, int numeTrysToFindLoop, int numTrysToAddLink){?}
+     public void addLink(double mutationRate, double chanceOfLooped, CInnovation innovation, int numTrysToFindLoop, int numTrysToAddLink)
+     {
+        Random random = new Random();
+        double randomValue = randomGenerator.nextDouble();
+
+        int toNeuronID   = -1;
+        int fromNeuronID = -1;
+
+        boolean recurrent = false;
+
+
+
+        //If the random value doesn't exceed the probability threshold then exit
+        if (random.nextDouble() > mutationRate)
+        {
+            return;
+        }
+
+        if (random.nextDouble() > chanceOfLooped)
+        {
+            while(numTrysToFindLoop--)
+            {
+                //This needs to be a number between the number of inputs + 1 and the size of the neuron arraylist - 1
+                int neuronIndex = random.nextDouble(); //type issues
+
+                if (!neuronGeneSet.get(neuronIndex)) //neuron can't be a bias neuron or input neuron
+                {
+                    toNeuronID   = neuronGeneSet.get(neuronIndex).getID;
+                    fromNeuronID = neuronGeneSet.get(neuronIndex).getID;
+                    recurrent    = true;
+                    numTrysToFindLoop = 0;
+                }
+            }
+        }
+        else
+        {
+            while(numTrysToAddLink--)
+            {
+                //Needs to be inbetween 0 and the size of the neuron array - 1
+                neuronIndex  = random.nextDouble(); 
+                fromNeuronID = neuronGeneSet.get(neuronIndex).getId;
+                //Needs to be inbetween the number of input neurons + 1 and the size of the neuron array - 1
+                neuronIndex  = random.nextDouble();
+                toNeuronID   = neuronGeneSet.get(neuronIndex).getID;
+
+                //if(toNeuronID == 2)
+                //{
+                //continue?
+                //}
+                if(!(duplicateLink(fromNeuronID,toNeuronID)) || (fromNeuronID == toNeuronID))
+                {
+                    numTrysToAddLink = 0;
+                }
+                else
+                {
+                    toNeuronID   = -1;
+                    fromNeuronID = -1;
+                }
+            }
+        }
+        if (toNeuronID < 0 || fromNeuronID < 0)
+        {
+            return;
+        }
+
+        int id = innovation.checkInnovation(fromNeuronID, toNeuronID, new_link);
+
+        //stopped on page 371
+     }
+
+
 
      //Add a neuron to the genome dependent upon the mutation rate
      //public void addNeuron(double mutationRate, Innovation &innovation?, int numTrysToFindOldLink){?}
@@ -180,5 +233,4 @@ public class Genome implements Serializable
      
      //Not sure
      //public void sortGenes();
-
 }

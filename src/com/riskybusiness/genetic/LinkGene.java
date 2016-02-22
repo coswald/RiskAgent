@@ -26,12 +26,12 @@ public class LinkGene implements Serializable
     
     private static final long serialVersionUID = 1L;
     
-    private int fromNeuron;
-    private int toNeuron;
-    private double linkWeight;
+    private int     fromNeuron;
+    private int     toNeuron;
+    private double  linkWeight;
     private boolean linkEnabledh;
     private boolean linkRecurrent;
-    private int innovationID;
+    private int     innovationID;
     
     //Create a LinkGene
     public LinkGene(int fNeuron, int tNeuron, double weight, boolean recur)
@@ -39,31 +39,44 @@ public class LinkGene implements Serializable
         fromNeuron = fNeuron;
         toNeuron = tNeuron;
         linkWeight = weight;
-        linkEnabled = true; //lowercase
+        linkEnabled = true;
         linkRecurrent = recur;
         //I have no clue what to do with the innovationID. -K
         //Neither do I! -C
     }
     
+    //Get the ID of the link
+    public int getID()
+    {
+        return innovationID;
+    }
+
     //Return whether the link is enabled
     public boolean getEnabled()
     {
         return linkEnabled;
     }
+       
+    //Get the weight of the link
+    public double getWeight()
+    {
+        return linkWeight;
+    }
     
+    //Possibly combines these two?
+    //Get the neuron the link goes to
+    public int getToNeuron()
+    {
+        return toNeuron;
+    }
     
-    //Re-enables a link
-    //Is this possible??
-    /*
-     * Hmmm....I'd have to think about this.
-     * Also, I'd suggest combining the two
-     * methods into one. I think that a link
-     * should always be enabled, but the only
-     * way it could be "disabled" is if it
-     * were changed during mutation, but I
-     * like this method(s) for legacy reasons
-     * -C
-     */
+    //Get the neuron the link comes from
+    public int getFromNeuron()
+    {
+        return fromNeuron;
+    }
+
+    //Set the link to be enabled or disabled
     public void setLink(boolean enabled)
     {
         this.linkEnabled = enabled;
@@ -81,30 +94,14 @@ public class LinkGene implements Serializable
         this.linkWeight = weight;
     }
     
-    //Get the weight of the link
-    public double getWeight()
-    {
-        return linkWeight;
-    }
-    
-    public void setToNeuron(int neuron)
-    {
-        this.toNeuron = neuron;
-    }
-    
-    public int getToNeuron()
-    {
-        return toNeuron;
-    }
-    
     public void setFromNeuron(int neuron)
     {
         this.fromNeuron = neuron;
     }
-    
-    public int getFromNeuron()
+
+    public void setToNeuron(int neuron)
     {
-        return fromNeuron;
+        this.toNeuron = neuron;
     }
     
     //Have it return a Synapse -C
