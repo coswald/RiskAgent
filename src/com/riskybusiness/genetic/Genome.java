@@ -36,14 +36,14 @@ public class Genome implements Serializable
      * type of the elements inside the ArrayList. So
      * i'll change it for you.
      */
-    private ArrayList<NeuronGene> m_vecNeurons;
-    private ArrayList<LinkGene> m_vecLinks;
-    private double m_dFitness;
-    private double m_dAdjustedFitness;
-    private double m_dAmountToSpawn;
-    private int m_iNumInputs;
-    private int m_iNumOutputs;
-    private int m_iSpecies;
+    private ArrayList<NeuronGene> neuronGeneSet;
+    private ArrayList<LinkGene>   linkGeneSet;
+    private double                genomeFitness;
+    private double                genomeAdjFitness;
+    private double                amountToSpawn;
+    private int                   numInputs;
+    private int                   numOutputs;
+    private int                   species;
 
     //Returns true if the specified link is already part of the genome
     public boolean duplicateLink(int neuronIn, int neuronOut)
@@ -86,19 +86,53 @@ public class Genome implements Serializable
 
     public Synapse createSynapse(LinkGene link)
     {
-
+        //Variables
         private Neuron toNeuron;
         private Neuron fromNeuron;
+        private Neuron currentNeuron;
 
-        if (neuron.getNeuronType() == "Sigmoid")
+        for (i = 0;i < neuronGeneSet.size(); i++)
         {
-            toNeuron = new com.riskybusiness.neural.SigmoidNeuron (neuron.getActivationResponse(), 5);
+            currentNeuron = neuronGeneSet.get(i);
+            //What happens if the link is recursive??
+            //if (link.isRecurrent)
+            //{
+            //  if (currentNeuron.getID() == link.getToNeuron())
+            //{
+            //    toNeuron = currentNeuron;
+            //    fromNeuron = currentNeuron;
+            //}
+            //} else {
+            //What if the link doesn't know its recursive??
+            //if (currentNeuron.getID() == link.getToNeuron() && currentNeuron.getID() == link.getFoNeuron()){
+            //    toNeuron = currentNeuron;
+            //    fromNeuron = currentNeuron;
+            //    link.setRecurrency(true); 
+            //} else
+            if (currentNeuron.getID() == link.getToNeuron())
+            {
+                toNeuron = createNeuron (currentNeuron);
+                toNeuronSet = true;
+            }
+            else if (currentNeuron.getID() == link.getFromNeuron())
+            {
+                fromNeuron = createNeuron (currentNeuron);
+                fromNeuronSet = true;
+            }
+            if (toNeuronIsSet && fromNeuronIsSet)
+            {
+                break;
+            }
+            //}
         }
-        else if (neuron.getNeuronType() == "Step") 
+        if (toNeuronIsSet && fromNeuronIsSet)
         {
-            toNeuron = new com.riskybusiness.neural.StepNeuron (neuron.getActivationResponse(), 5);
+            return new com.riskybusiness.neural.Synapse (link.getID(), fromNeuron, toNeuron);
         }
-
+        else
+        {
+            null; //Raise some kind of missing neuron error.
+        }
         
     }
      //We'll talk about these -C
@@ -107,7 +141,24 @@ public class Genome implements Serializable
      //public Genome(int id, Vector neurons, Vector genes, int inputs, int outputs);
 
      //Create a neural network from the genome
-     //public NeuralNet createPhenotype(int depth){?}
+     public NeuralNet createPhenotype(int depth)
+     {
+        //Variables
+        private ArrayList<Neuron>  neuronSet; //Do these need to be array's and not array lists?
+        private ArrayList<Synapse> linkSet;   //------------------------------------------------
+
+        for (i = 0;i < neuronGeneSet.size(); i++)
+        {
+            neuronSet.add(i, createNeuron(neuronGeneSet.get(i)));
+        }
+        for (j = 0;j < linkGeneSet.size(); j++)
+        {
+            linkSet.add(j, createSynapse(linkGeneSet.get(j)));
+        }
+        return new com.riskybusiness.neural.NeuralNet(neuronSet, linkSet);
+     }
+
+
 
      //Delete the neural network
      //public void deletePhenotype(){?}
