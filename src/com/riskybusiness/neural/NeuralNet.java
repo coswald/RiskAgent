@@ -18,8 +18,10 @@
 package com.riskybusiness.neural;
 
 import com.riskybusiness.neural.InvalidNeuronInputException;
+import com.riskybusiness.neural.InvalidNeuronOutputException;
 import com.riskybusiness.neural.Neuron;
 import com.riskybusiness.neural.SigmoidNeuron;
+import com.riskybusiness.neural.StepNeuron;
 import com.riskybusiness.neural.Synapse;
 
 import java.io.Serializable;
@@ -104,7 +106,9 @@ public class NeuralNet extends Object implements Serializable
      * interconnected. This means that each input {@code Neuron}
      * sends its output to exactly every hidden {@code Neuron} in the
      * next layer, and so on for every layer. The default
-     * {@code Neuron} that is used is the {@code SigmoidNeuron}.</p>
+     * {@code Neuron} that is used is the {@code SigmoidNeuron}.
+     * The exception to this rule is the output layer, which is made
+     * up of {@code Stepneuron}s.</p>
      * @param inputLayerRows The amount of {@code Neuron}s in the
      *              input layer.
      * @param outputLayerRows The amount of {@code Neuron}s in the
@@ -139,7 +143,10 @@ public class NeuralNet extends Object implements Serializable
 		sum = inputLayerRows - 1;
 		for(int i = 0, j = -1; i < neurons.length; i++)
 		{
-			neurons[i] = new SigmoidNeuron((j == -1) ? 1 : connections[j]);
+			if(neurons.length - i <= outputLayerRows)
+				neurons[i] = new StepNeuron(connections[j]);
+			else
+				neurons[i] = new SigmoidNeuron((j == -1) ? 1 : connections[j]);
 			if(i >= sum)
 				sum += (++j < hiddenLayerRows.length) ? hiddenLayerRows[j] : outputLayerRows;
 		}
@@ -191,10 +198,24 @@ public class NeuralNet extends Object implements Serializable
 	{
 		return this.synapses;
 	}
+
+    /**
+     * <p>Clears the networks {@code Neuron}s of input
+     * values.</p>
+     * @see com.riskybusiness.neural.Neuron#clearInputs()
+     */
+	public void clearNetwork()
+	{
+		for(Neuron n : this.neurons)
+			n.clearInputs();
+	}
 	
     /**
      * <p>Populates the {@code NeuralNet} with the inputs and
-     * calculates their corresponding output.</p>
+     * calculates their corresponding output. This will leave
+     * the {@code NeuralNet} with the {@code Neuron}s filled
+     * with the input values that they would received while
+     * firing.</p>
      * @param inputs The inputs to the {@code NeuralNet}. These
      *              values are determined in that each list
      *              accessed in from the inputs list corresponds
@@ -246,7 +267,7 @@ public class NeuralNet extends Object implements Serializable
 		int size = 0;
 		for(int i = 0; i < this.neurons.length; i++)
 		{
-			if(this.neurons[i].canFire())
+			if(!this.neurons[i].hasFired())
 			{
 				size = i;
 				break;
@@ -256,24 +277,63 @@ public class NeuralNet extends Object implements Serializable
 		//Computes how many output neurons there are and
 		//then fires them all, saving those values to 
 		//the output variable.
-		output = new float[this.neurons.length - size + 1];
+		output = new float[this.neurons.length - size];
 		for(int i = size; i < this.neurons.length; i++)
 			output[i - size] = this.neurons[i].fire();
-		
+	
 		return output;
 	}
 	
     /**
      * <p>Trains the {@code NeuralNet} in the traditional
-     * sense, using backpropagation.</p>
+     * sense, using backpropagation. This method requires
+     * that the type of activation function used by each
+     * {@code Neuron} is continuous and differentiable.
+     * This means that a {@code StepNeuron} can only be
+     * used for the output layer if you are using this
+     * method.</p>
      * @param desired The desired outputs from the 
      *              {@code NeuralNet}.
      * @param inputs The inputs to send to the
      *              {@code NeuralNet}.
+     * @throws InvalidNeuronOutputException If the given size of outputs
+     * 	            is not equal to that of the neural network's output
+     *              layer.
      * @see com.riskybusiness.neural.NeuralNet#fire(float[][])
      */
-	public void train(float[] desired, float[][] inputs)
+	public void train(float[] desired, float[][] inputs) throws InvalidNeuronOutputException
 	{
-		float[] error = this.fire(inputs); //I have no idea what to do from here.
+		//http://www.nnwj.de/backpropagation.html
+		float[] prediction = this.fire(inputs); //I have no idea what to do from here.
+		if(prediction.length != desired.length)
+			throw new InvalidNeuronOutputException("The amount of outputs given is not equal to that of the outputs in the output layer!");
+		float[] error = new float[prediction.length];
+		for(int i = 0; i < error.length; i++)
+		{
+			error[i] = desired[i] - prediction[i];
+			//System.out.println("Desired: " + desired[i] + "; Predicted: " + prediction[i] + "; Error: " + error[i]);
+		}
+		
+		//NOTE: Not sure if correct. I need a way to compute the total error, but I don't think that this is correct. -C
+		//Website listed above gives record of ways to compute total error with one output neuron. I know this value,
+		//but I don't know for multiple outputs. Wes, I'd appreciate a way to compute all of the output layers values.
+		float totalError = 0;
+		for(int i = 0; i < error.length; i++)
+			totalError += error[i];
+		//End confusion.
+		
+		float adjustment;
+		for(int i = this.synapses.length - 1; i >= 0; i--)
+		{
+			adjustment = totalError * this.synapses[i].getSender().fire() * this.synapses[i].getReciever().fire() * (1 - this.synapses[i].getReciever().fire());
+			this.synapses[i].getReciever().adjustWeight(this.synapses[i].getNeuronIndex(), adjustment);
+		}
+		
+		//for Bias Weight adjustment
+		for(int i = this.neurons.length - 1; i >= 0; i--)
+		{
+			adjustment = totalError * 1 * this.neurons[i].fire() * (1 - this.neurons[i].fire());
+			this.neurons[i].adjustWeight(this.neurons[i].getWeights().length - 1, adjustment);
+		}
 	}
 }

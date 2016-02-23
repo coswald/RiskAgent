@@ -23,6 +23,7 @@ import com.riskybusiness.neural.Neuron;
 import com.riskybusiness.neural.NeuronCannotFireException;
 
 import java.io.Serializable;
+import java.lang.Exception;
 import java.lang.Object;
 
 /**
@@ -73,6 +74,11 @@ public class Synapse extends Object implements Serializable
     private Neuron receiver;
 	
     /**
+     * <p>The value that last traveled through this {@code Synapse}.</p>
+     */	
+	private float lastOutput = 0F;
+
+    /**
      * <p>Constructs a {@code Synapse} with the given input index
      * and the sender and receiver.</p>
      * @param neuronIndex The index of the input to send from the
@@ -102,7 +108,17 @@ public class Synapse extends Object implements Serializable
      */
 	public void feedForward(float... inputs) throws ExceededNeuronInputException, InvalidNeuronInputException
 	{
-		receiver.addToInput(neuronIndex, sender.fire(inputs));
+		float temp = this.lastOutput;
+		try
+		{
+			this.lastOutput = sender.fire(inputs);
+			receiver.addToInput(neuronIndex, this.lastOutput);
+		}
+		catch(Exception e)
+		{
+			this.lastOutput = temp;
+			throw e;
+		}
 	}
 	
     /**
@@ -121,7 +137,18 @@ public class Synapse extends Object implements Serializable
 	{
 		if(!sender.canFire())
 			throw new NeuronCannotFireException(sender.toString() + " cannot fire!");
-		receiver.addToInput(neuronIndex, sender.fire());
+		
+		float temp = this.lastOutput;
+                try
+                {
+                        this.lastOutput = sender.fire();
+                        receiver.addToInput(neuronIndex, this.lastOutput);
+                }
+                catch(Exception e)
+                {
+                        this.lastOutput = temp;
+                        throw e;
+                }
         //sender.clearInputs();
 	}
 	
@@ -153,6 +180,15 @@ public class Synapse extends Object implements Serializable
 		return this.receiver;
 	}
 	
+    /**
+     * <p>Returns the last value sent through
+     * this {@code Synapse}.</p>
+     */
+	public float getLastOutput()
+	{
+		return this.lastOutput;
+	}
+
     /**
      * <p>Returns a {@code String} representation of this
      * {@code Synapse}. This is done by returning the class

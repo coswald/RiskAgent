@@ -98,6 +98,12 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	protected float learningRate;
 	
 	/**
+	 * <p>Determines whether this {@code Neron} has fired
+	 * since it's inputs have been filled.</p>
+	 */
+	private boolean haveFired = false;
+	
+	/**
 	 * <p>Constructs a {@code Neuron} which uses the
 	 * learning rate and weights given as starting points.</p>
 	 * @param learningRate The learning rate to adjust the
@@ -187,6 +193,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	{
 		for(int i = 0; i < this.inputs.length; i++)
 			this.inputs[i] = -1;
+		haveFired = false;
 	}
 	
 	/**
@@ -311,7 +318,9 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	 * method on the inputs given, and determining
 	 * whether or not to fire based on this classes
 	 * {@link com.riskybusiness.neural.Neuron#activate(float)}
-	 * method.</p>
+	 * method. This method will also save the inputs
+	 * given to the {@code Neuron} in the parameter
+	 * to the stored input list.</p>
 	 * @param inputs The inputs that determine whether or
 	 * 				not to fire.
 	 * @return A float value found by the activation function
@@ -321,6 +330,11 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	 */
 	public float fire(float... inputs)
 	{
+		if(inputs.length == this.inputs.length)
+		{
+			this.inputs = inputs;
+			haveFired = true;
+		}
 		return this.activate(this.sum(inputs));
 	}
 	
@@ -349,6 +363,27 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	public float[] getWeights()
 	{
 		return this.weights;
+	}
+	
+	/**
+	 * <p>Returns whether or not the {@code Neuron}
+	 * has already fired with the inputs currently
+	 * stored within it. This value is set to true
+	 * when the
+	 * {@link com.riskybusiness.neural.Neuron#fire()}
+	 * methods are called, and is set to false when the
+	 * {@link com.riskybusiness.neural.Neuron#clearInputs()}
+	 * function is called. This also only accounts
+	 * for when both of these methods terminate
+	 * successfully.</p>
+	 * @return true if the {@code Neuron} has fired
+	 * 			with the stored weights
+	 *			currently stored, false
+	 * 			otherwise.
+	 */
+	public boolean hasFired()
+	{
+		return this.haveFired;
 	}
 	
 	/**
@@ -395,7 +430,27 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 			throw new InvalidNeuronInputException("The amount of inputs is not the same as weights.");
 		
 		for(int i = 0; i < adjustments.length; i++)
-			this.weights[i] += (adjustments[i] * this.learningRate);
+			this.adjustWeight(i, adjustments[i]);
+	}
+	
+	
+	/**
+	 * <p>Adjust the wieght given the learning
+	 * rate and the weight index of this
+	 * {@code Neuron}.
+	 * @param index The weight index to adjust
+	 * @param adjustment The adjustment to add
+	 *				onto the weight.
+	 * @see com.riskybusiness.neural.Neuron#adjustWeights(float[])
+	 * @throws InvlalidNeuronInputException If the index is greater
+	 * 				than the length of weights given.
+	 */
+	public void adjustWeight(int index, float adjustment) throws InvalidNeuronInputException
+	{
+		if(index < 0 || index >= this.weights.length)
+			throw new InvalidNeuronInputException("The index given is greater than the amount of weights!");
+		
+		this.weights[index] += (adjustment * this.learningRate);
 	}
 	
 	/**
@@ -458,6 +513,10 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	@Override
 	public String toString()
 	{
-		return this.getClass().getSimpleName() + " with a learning rate of " + this.learningRate + " and " + this.weights.length + " weights";
+		String weightString = "";
+		for(float w : weights)
+			weightString += w + ", ";
+		weightString = weightString.substring(0, weightString.length() - 2); 
+		return this.getClass().getSimpleName() + " with a learning rate of " + this.learningRate + " and " + this.weights.length + " weights containing " + weightString + " as values.";
 	}
 }
