@@ -313,7 +313,7 @@ public class NeuralNet extends Object implements Serializable
 			for(int i = 0; i < error.length; i++)
 			{
 				error[i] = desired[i] - prediction[i];
-				System.out.println("Desired: " + desired[i] + "; Predicted: " + prediction[i] + "; Error: " + error[i]);
+				//System.out.println("Desired: " + desired[i] + "; Predicted: " + prediction[i] + "; Error: " + error[i]);
 			}
 			
 			//NOTE: Not sure if correct. I need a way to compute the total error, but I don't think that this is correct. -C
