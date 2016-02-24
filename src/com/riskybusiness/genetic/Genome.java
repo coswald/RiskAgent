@@ -282,7 +282,43 @@ public class Genome implements Serializable
 
 
      //Add a neuron to the genome dependent upon the mutation rate
-     //public void addNeuron(double mutationRate, Innovation &innovation?, int numTrysToFindOldLink){?}
+     //I need to find a way to create a pointer to the innovation db
+     public void addNeuron(double mutationRate, Innovation innovation, int numTrysToFindOldLink) 
+     {
+        //This variable describes a function to create random numbers
+        Random random = new Random();
+        //This variable contains a random value used to determine if a link or loop should happen
+        double randomValue = randomGenerator.nextDouble();
+        //If a valid link is found to add a neuron to then this will be set to true
+        boolean linkFound = false;
+        //This is the index of the chosen link to test
+        int chosenLink = 0;
+
+        //If the random value doesn't exceed the probability threshold then exit by returning
+        if (random.nextDouble() > mutationRate)
+        {
+            return;
+        }
+
+        //Not quite sure what the size threshold is yet but it prevents the chaining effect so I will implement it
+        if (linkGeneSet.size() < sizeThreshold)
+        {
+            //Loop through and try to find an old link to add a neuron to
+            while(numTrysToFindOldLink--)
+            {
+                //This needs to be a value between 0 and some weird number that I will determine later
+                chosenLink = random.nextDouble();
+
+                
+            }
+        }
+
+
+
+
+
+
+     }
 
      //Function to mutate the connection weights
      //public void mutateWeights(double mutationRate, double probNewMutation, double dMaxPertubation){?}
