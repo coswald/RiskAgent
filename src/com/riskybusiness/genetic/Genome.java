@@ -306,10 +306,58 @@ public class Genome implements Serializable
             //Loop through and try to find an old link to add a neuron to
             while(numTrysToFindOldLink--)
             {
-                //This needs to be a value between 0 and some weird number that I will determine later
+                /**
+                This needs to be a value between 0 and some weird number that I will determine later
+                **/
                 chosenLink = random.nextDouble();
 
+                int fromNeuron =  linkGeneSet.get(chosenLink).fromNeuron;
+
+                if ((linkGeneSet.get(chosenLink).getEnabled) &&
+                    (!linkGeneSet.get(chosenLink).getRecurrent) &&
+                    //(neuronGeneSet.get(fromNeuron).getNeuronType != bias)) can't be a bias gene
+                {
+                    linkFound = true;
+
+                    numTrysToFindOldLink = 0;
+                }
+
+                //If we didn't find a link then exit by returning
+                if (!linkFound)
+                {
+                    return;
+                }
+                else
+                {
+                    while(!linkFound)
+                    {
+                        chosenLink = radnom.nextDouble(); //needs to be a number between 0 and the number of genes - 1
+
+                        //Grab the neuron attached to the link
+                        int fromNeuron = linkGeneSet.get(chosenLink); 
+
+                        //That the link is enabled and not recurrent
+                        if ((linkGeneSet.get(chosenLink).getEnabled) &&
+                            (linkGeneSet.get(chosenLink).getRecurrent))
+                        {
+                            
+                        }
+
+
+
+
+
+
+
+
+
+                    })
+                }
                 
+
+
+
+
             }
         }
 
