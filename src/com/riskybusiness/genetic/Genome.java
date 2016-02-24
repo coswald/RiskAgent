@@ -212,7 +212,22 @@ public class Genome implements Serializable
             return;
         }
 
-        int id = innovation.checkInnovation(fromNeuronID, toNeuronID, new_link);
+
+        /**
+        Why can't I just add the innovation and have my add innovation check to see if it already exists? Seems silly to seperate the two
+        **/
+        int id = innovation.innovationExists(NEW_LINK, fromNeuronID, toNeuronID, -1);
+
+        //The algortihm in the book uses the y values to determine if the link is recurrent so im gonna skip this part
+        /**
+        Complete the code to determine if a link is recurrent
+        **/
+
+        if (id < 0)
+        {
+            innovation.addInnovation(NEW_LINK, fromNeuronID, toNeuronID, -1);
+        }
+
 
         //stopped on page 371
      }
