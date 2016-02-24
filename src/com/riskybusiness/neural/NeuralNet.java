@@ -303,37 +303,43 @@ public class NeuralNet extends Object implements Serializable
      */
 	public void train(float[] desired, float[][] inputs) throws InvalidNeuronOutputException
 	{
-		//http://www.nnwj.de/backpropagation.html
-		float[] prediction = this.fire(inputs); //I have no idea what to do from here.
-		if(prediction.length != desired.length)
-			throw new InvalidNeuronOutputException("The amount of outputs given is not equal to that of the outputs in the output layer!");
-		float[] error = new float[prediction.length];
-		for(int i = 0; i < error.length; i++)
+		while(true)
 		{
-			error[i] = desired[i] - prediction[i];
-			//System.out.println("Desired: " + desired[i] + "; Predicted: " + prediction[i] + "; Error: " + error[i]);
-		}
-		
-		//NOTE: Not sure if correct. I need a way to compute the total error, but I don't think that this is correct. -C
-		//Website listed above gives record of ways to compute total error with one output neuron. I know this value,
-		//but I don't know for multiple outputs. Wes, I'd appreciate a way to compute all of the output layers values.
-		float totalError = 0;
-		for(int i = 0; i < error.length; i++)
-			totalError += error[i];
-		//End confusion.
-		
-		float adjustment;
-		for(int i = this.synapses.length - 1; i >= 0; i--)
-		{
-			adjustment = totalError * this.synapses[i].getSender().fire() * this.synapses[i].getReciever().fire() * (1 - this.synapses[i].getReciever().fire());
-			this.synapses[i].getReciever().adjustWeight(this.synapses[i].getNeuronIndex(), adjustment);
-		}
-		
-		//for Bias Weight adjustment
-		for(int i = this.neurons.length - 1; i >= 0; i--)
-		{
-			adjustment = totalError * 1 * this.neurons[i].fire() * (1 - this.neurons[i].fire());
-			this.neurons[i].adjustWeight(this.neurons[i].getWeights().length - 1, adjustment);
+			//http://www.nnwj.de/backpropagation.html
+			float[] prediction = this.fire(inputs); //I have no idea what to do from here.
+			if(prediction.length != desired.length)
+				throw new InvalidNeuronOutputException("The amount of outputs given is not equal to that of the outputs in the output layer!");
+			float[] error = new float[prediction.length];
+			for(int i = 0; i < error.length; i++)
+			{
+				error[i] = desired[i] - prediction[i];
+				System.out.println("Desired: " + desired[i] + "; Predicted: " + prediction[i] + "; Error: " + error[i]);
+			}
+			
+			//NOTE: Not sure if correct. I need a way to compute the total error, but I don't think that this is correct. -C
+			//Website listed above gives record of ways to compute total error with one output neuron. I know this value,
+			//but I don't know for multiple outputs. Wes, I'd appreciate a way to compute all of the output layers values.
+			float totalError = 0;
+			for(int i = 0; i < error.length; i++)
+				totalError += error[i];
+			if(totalError == 0)
+				break;
+			//End confusion.
+			
+			float adjustment;
+			for(int i = this.synapses.length - 1; i >= 0; i--)
+			{
+				adjustment = totalError * this.synapses[i].getSender().fire() * this.synapses[i].getReciever().fire() * (1 - this.synapses[i].getReciever().fire());
+				this.synapses[i].getReciever().adjustWeight(this.synapses[i].getNeuronIndex(), adjustment);
+			}
+			
+			//for Bias Weight adjustment
+			for(int i = this.neurons.length - 1; i >= 0; i--)
+			{
+				adjustment = totalError * 1 * this.neurons[i].fire() * (1 - this.neurons[i].fire());
+				this.neurons[i].adjustWeight(this.neurons[i].getWeights().length - 1, adjustment);
+			}
+			this.clearNetwork();
 		}
 	}
 }
