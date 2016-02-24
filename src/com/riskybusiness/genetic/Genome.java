@@ -125,66 +125,113 @@ public class Genome implements Serializable
      //This constructor creates a genome from a vector of SLinkGenes a vector of SNeuronGenes and an ID number
      //public Genome(int id, Vector neurons, Vector genes, int inputs, int outputs);
 
-     //Create a neural network from the genome
-     public NeuralNet createPhenotype(int depth)
+
+     /**
+      * <p>This function converts the respective genome into a 
+      * neural network.</p>
+      **/
+     public NeuralNet createPhenotype()
      {
         //Variables
+        //These arrays hold the actual neurons and synapses of the neural network
         private ArrayList<Neuron>  neuronSet; //Do these need to be array's and not array lists?
         private ArrayList<Synapse> linkSet;   //------------------------------------------------
 
+        //This loop loops through the global neuronGeneSet and creates neurons from these genes
+        //and then adds them to the neuronSet
         for (i = 0;i < neuronGeneSet.size(); i++)
         {
             neuronSet.add(i, createNeuron(neuronGeneSet.get(i)));
         }
+        
+        //This loop does the same as above but converts the link genes into synapses
         for (j = 0;j < linkGeneSet.size(); j++)
         {
             linkSet.add(j, createSynapse(linkGeneSet.get(j)));
         }
+
+        //Combines the neurons and synapses into a neural network and returns the network
         return new com.riskybusiness.neural.NeuralNet(neuronSet, linkSet);
      }
+
 
      //Delete the neural network
      //public void deletePhenotype(){?}
 
-     //Add a link to the genome dependent upon the mutation rate
+
+     /**
+      * This functions adds a link to the genome dependent upon the mutation rate and other parameters.
+      * @param mutationRate The rate at which links can be added
+      * @param chanceOfLooped The chance a link has of being a looped link
+      * @param innovation This is simply the database that contains all the innovations
+      * @param numTrysToFindLoop This determines how many times the function will look to 
+      *                          create a looped link
+      * @param numTrysToAddLink This prevents the possibility of an infinite loop in the case
+      *                         where the all neurons are connected to each other and thus limits
+      *                         the amount of times the function will look for the opportunity to add a link
+      *
+     **/ 
+
+    
      public void addLink(double mutationRate, double chanceOfLooped, CInnovation innovation, int numTrysToFindLoop, int numTrysToAddLink)
      {
+        //This variable describes a function to create random numbers
         Random random = new Random();
+        //This variable contains a random value used to determine if a link or loop should happen
         double randomValue = randomGenerator.nextDouble();
-
+        //These two variables respresent the id's of the neurons the link will connect. If the id's are -1
+        //then these is no link connecting two neurons
         int toNeuronID   = -1;
         int fromNeuronID = -1;
 
+        //This variable determines if the link is recurrent.
+        /**
+        Not Currently implemented
+        **/
         boolean recurrent = false;
 
 
 
-        //If the random value doesn't exceed the probability threshold then exit
+        //If the random value doesn't exceed the probability threshold then exit by returning
         if (random.nextDouble() > mutationRate)
         {
             return;
         }
 
+        //If we made it here then we are going to attempt to mutate the genome
+        //If the random value exceeds the chance of a looped link then attempt to create a looped link
         if (random.nextDouble() > chanceOfLooped)
         {
+            //This loop will loop thorugh as many times as specified looking for a proper neuron to create a looped link with
             while(numTrysToFindLoop--)
             {
+                /**
                 //This needs to be a number between the number of inputs + 1 and the size of the neuron arraylist - 1
-                int neuronIndex = random.nextDouble(); //type issues
+                //Also will there be type issues with double and int will fix
+                **/
+                int neuronIndex = random.nextDouble();
 
-                if (!neuronGeneSet.get(neuronIndex)) //neuron can't be a bias neuron or input neuron
+                /**
+                We need to find a way to determine if a neuron is input, output, etc. I may add this to the neuron gene
+                This if statement is supposed to ensure that the gene we are adding a looped link to isn't an input gene or bias gene
+                **/
+                if (!neuronGeneSet.get(neuronIndex))
                 {
                     toNeuronID   = neuronGeneSet.get(neuronIndex).getID;
                     fromNeuronID = neuronGeneSet.get(neuronIndex).getID;
                     recurrent    = true;
+                    //If we find a good neuron that satisfies our conditions then we don't need to loop anymore
                     numTrysToFindLoop = 0;
                 }
             }
         }
+        //If the random value didn't exceed the chance to create a looped link then we still need to mutate the genome
         else
         {
+            //This loop will loop through and try to create a link until it has created a link or has exceed its number of tries
             while(numTrysToAddLink--)
             {
+                //Find two random neurons and determine if a link can be made between them
                 //Needs to be inbetween 0 and the size of the neuron array - 1
                 neuronIndex  = random.nextDouble(); 
                 fromNeuronID = neuronGeneSet.get(neuronIndex).getId;
@@ -192,10 +239,12 @@ public class Genome implements Serializable
                 neuronIndex  = random.nextDouble();
                 toNeuronID   = neuronGeneSet.get(neuronIndex).getID;
 
+                //The book had this and I don't know why?
                 //if(toNeuronID == 2)
                 //{
                 //continue?
                 //}
+                //Check to see if a link exists and if it doesn't then break from the loop else continue looping
                 if(!(duplicateLink(fromNeuronID,toNeuronID)) || (fromNeuronID == toNeuronID))
                 {
                     numTrysToAddLink = 0;
@@ -207,6 +256,7 @@ public class Genome implements Serializable
                 }
             }
         }
+        //If either neuronid is less than 0 then we can't create a link so exit by returning
         if (toNeuronID < 0 || fromNeuronID < 0)
         {
             return;
@@ -227,9 +277,6 @@ public class Genome implements Serializable
         {
             innovation.addInnovation(NEW_LINK, fromNeuronID, toNeuronID, -1);
         }
-
-
-        //stopped on page 371
      }
 
 
