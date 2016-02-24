@@ -6,6 +6,8 @@ import com.riskybusiness.neural.Trainer;
 import java.lang.Exception;
 import static java.lang.Math.random;
 import java.lang.Object;
+import java.util.Scanner;
+
 
 public class XORTest extends Object
 {
@@ -44,13 +46,29 @@ public class XORTest extends Object
 					if(xor.fire(new float[][] {new float[] {i}, new float[] {j}})[0] != ((float)(((int)i) ^ ((int)j))))
 						amountWrong++;
 					xor.clearNetwork();
-					System.out.println("I: " + i + "; J: " + j + "; Got: " + got);
+					//System.out.println("I: " + i + "; J: " + j + "; Got: " + got);
 				}
 			}
 			if(amountWrong == 0)
 				trained = true;
 		}
 		
-		System.out.println("The network is trained!");
+		System.out.println("The network is trained to the XOR function!");
+		System.out.println("Ready to test it?");
+		Scanner z = new Scanner(System.in);
+		
+		int a = 0, b = 0;
+		while(a >= 0 && b >= 0)
+		{
+			System.out.print("Give me a valid integer, either 0 and 1: ");
+			a = z.nextInt();
+			b = z.nextInt();
+			
+			if(a >= 0 && b >= 0)
+				System.out.println("The network says: " + xor.fire(new float[][] {new float[] {a}, new float[] {b}})[0]);
+			else
+				System.out.println("Have a great day!");
+			xor.clearNetwork();
+		}
 	}
 }
