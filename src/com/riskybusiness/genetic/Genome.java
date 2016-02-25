@@ -275,8 +275,15 @@ public class Genome implements Serializable
 
         if (id < 0)
         {
-            innovation.addInnovation(NEW_LINK, fromNeuronID, toNeuronID, -1);
+            innovation.addInnovation(NEW_LINK, fromNeuronID, toNeuronID);
+            int id = innovation.nextNumber() - 1;
+            LinkGene newLinkGene = LinkGene(fromNeuronID, toNeuronID, id, random.nextDouble(), recurrent);
+            //Push the new gene into the array?
+            /**
+             I'm gonna wait until I know what order the genes are in or if it matters
+            **/
         }
+
      }
 
 
@@ -293,6 +300,12 @@ public class Genome implements Serializable
         boolean linkFound = false;
         //This is the index of the chosen link to test
         int chosenLink = 0;
+        //Represents the weight of the original link
+        double originalWeight;
+        //These two variables respresent the id's of the neurons the original link connects
+        int toNeuronID;
+        int fromNeuronID;
+
 
         //If the random value doesn't exceed the probability threshold then exit by returning
         if (random.nextDouble() > mutationRate)
@@ -327,6 +340,7 @@ public class Genome implements Serializable
                 {
                     return;
                 }
+                //I'm not entirely sure why this else statement is here
                 else
                 {
                     while(!linkFound)
@@ -336,22 +350,40 @@ public class Genome implements Serializable
                         //Grab the neuron attached to the link
                         int fromNeuron = linkGeneSet.get(chosenLink); 
 
-                        //That the link is enabled and not recurrent
-                        if ((linkGeneSet.get(chosenLink).getEnabled) &&
-                            (linkGeneSet.get(chosenLink).getRecurrent))
+                        //Check that the link is enabled and not recurrent
+                        //If the link is enabled and not recurrent then we have found a candidate
+                        if ((linkGeneSet.get(chosenLink).getEnabled()) &&
+                            (linkGeneSet.get(chosenLink).getRecurrent()))
                         {
-                            
+                            linkFound = true;
                         }
+                    }
+                }
+
+                //Disable the original link gene
+                linkGeneSet.get(chosenLink).setLink(false);
+
+                //Grab the weight of the original link
+                originalWeight = linkGeneSet.get(chosenLink).getWeight();
+
+                //Get the id's of the neurons the original link connected
+                fromNeuronID = linkGeneSet.get(chosenLink).getFromNeuron();
+                toNeuronID   = linkGeneSet.get(chosenLink).getToNeuron();
+
+                //If we want to add the x and y coords we could do so here// pg. 376
+
+                //Check to see if this innovation exists in another genome
+                //int id = innovation.innovationExists(NEW_LINK, toNeuronID, fromNeuronID)
+
+                /**
+                Add link
+                **/
 
 
 
 
 
-
-
-
-
-                    })
+                    }
                 }
                 
 

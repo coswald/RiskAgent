@@ -26,26 +26,39 @@ public class InnovationDB implements Serializable
 	private Innovation toFind;
 	private int innovationID = 0;
 
+
+	/**
+	Fix these two function
+	**///Also the id may not be necassary
+	private int innovationExists(InnovationType type, int to, int from, int id)
+	{
+		//Instantiate the inputs into an innovation to be compared throughout the database
+		toFind = new Innovation(type, to, from, id);
+		//See if the innovation datebase contains the toFind object
+		return innovationDB.contains(toFind);
+
+	}
+
 	private boolean innovationExists(InnovationType type, int in, int out, int id)
 	{
 		//Instantiate the inputs into an innovation to be compared throughout the database
-		toFind = new Innovation(type, in, out, id);
+		toFind = new Innovation(type, to, from, id);
 		//See if the innovation datebase contains the toFind object
 		return (innovationDB.contains(toFind) == -1);
 
 	}
 
-	public int addInnovation(InnovationType type, int in, int out, int id)
+	public int addInnovation(InnovationType type, int to, int from, int id)
 	{
 		//Check to see if innovation exists
-		if innovationExists(type, in, out, id)
+		if innovationExists(type, to, from, id)
 		{
 			return -1;
 		} 
 		else 
 		{
 			//Add innovation
-			innovationDB.add(innovationID, new Innovation(type, in, out, id));
+			innovationDB.add(innovationID, new Innovation(type, to, from, id));
 			//Increment innovationID
 			innovationID++; 
 		}
