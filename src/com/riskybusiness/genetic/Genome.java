@@ -66,21 +66,22 @@ public class Genome implements Serializable
         {
             return new com.riskybusiness.neural.SigmoidNeuron (neuron.getActivationResponse(), 5);
         }
-        else if (neuron.getNeuronType() == "Step") 
+        else //if (neuron.getNeuronType() == "Step") 
         {
             return new com.riskybusiness.neural.StepNeuron (neuron.getActivationResponse(), 5);
         }
+
     }
 
     public Synapse createSynapse(LinkGene link)
     {
         //Variables
-        Neuron toNeuron;
-        Neuron fromNeuron;
+        Neuron toNeuron = null;
+        Neuron fromNeuron = null;
         NeuronGene currentNeuron;
 
-        boolean toNeuronIsSet;
-        boolean fromNeuronIsSet;
+        boolean toNeuronIsSet = false;
+        boolean fromNeuronIsSet = false;
 
         int i;
 
@@ -127,7 +128,7 @@ public class Genome implements Serializable
         else
         {
             //Change this
-            return new com.riskybusiness.neural.Synapse (link.getID(), fromNeuron, toNeuron);;
+            return new com.riskybusiness.neural.Synapse (link.getID(), fromNeuron, toNeuron);
         }
         
     }
@@ -144,8 +145,9 @@ public class Genome implements Serializable
      {
         //Variables
         //These arrays hold the actual neurons and synapses of the neural network
-        ArrayList<Neuron>  neuronSet = new ArrayList<Neuron>(); //Do these need to be array's and not array lists?
-        ArrayList<Synapse> linkSet   = new ArrayList<Synapse>();   //------------------------------------------------
+        Synapse[] linkSet = null;
+    
+        Neuron[] neuronSet = null;
 
         int i;
         int j;
@@ -154,13 +156,13 @@ public class Genome implements Serializable
         //and then adds them to the neuronSet
         for (i = 0;i < neuronGeneSet.size(); i++)
         {
-            neuronSet.add(i, createNeuron(neuronGeneSet.get(i)));
+            neuronSet[i] = createNeuron(neuronGeneSet.get(i));
         }
         
         //This loop does the same as above but converts the link genes into synapses
         for (j = 0;j < linkGeneSet.size(); j++)
         {
-            linkSet.add(j, createSynapse(linkGeneSet.get(j)));
+            linkSet[j] = createSynapse(linkGeneSet.get(j));
         }
 
         //Combines the neurons and synapses into a neural network and returns the network

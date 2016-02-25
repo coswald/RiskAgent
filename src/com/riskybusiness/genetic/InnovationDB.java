@@ -70,6 +70,7 @@ public class InnovationDB implements Serializable
 			innovationDB.add(innovationID, new Innovation(type, to, from, id));
 			//Increment innovationID
 			innovationID++; 
+			return 0;
 		}
 	}
 

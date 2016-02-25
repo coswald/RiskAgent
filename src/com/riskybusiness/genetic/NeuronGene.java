@@ -125,7 +125,7 @@ public class NeuronGene implements Serializable
         {
             return new SigmoidNeuron(this.neuronActivationResponse, 5);
         }
-        else if (neuronType == "Step") 
+        else //if (neuronType == "Step") 
         {
             return new StepNeuron(this.neuronActivationResponse, 5);
         }
