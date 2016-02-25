@@ -18,6 +18,8 @@
 package com.riskybusiness.genetic;
 
 import com.riskybusiness.neural.Neuron;
+import com.riskybusiness.neural.StepNeuron;
+import com.riskybusiness.neural.SigmoidNeuron;
 import java.io.Serializable; //Don't forget to import.
 
 public class NeuronGene implements Serializable
@@ -29,9 +31,9 @@ public class NeuronGene implements Serializable
     private int neuronID;
     private String neuronType; 
     private boolean neuronRecurrent;
-    private double neuronActivationResponse;
+    private float neuronActivationResponse;
 
-    public NeuronGene(int id, String type, boolean recur, double activate)
+    public NeuronGene(int id, String type, boolean recur, float activate)
     {
         //Is their a way to make this unique and not have to provide it? Like an autoincrement -K
         /*
@@ -102,13 +104,13 @@ public class NeuronGene implements Serializable
     }
     
     //Get the activation response of the neuron
-    public double getActivationResponse()
+    public float getActivationResponse()
     {
         return neuronActivationResponse;
     }
     
     //Set the activation response of the neuron
-    public void setActivationResponse(double activate)
+    public void setActivationResponse(float activate)
     {
         this.neuronActivationResponse = activate;
     }

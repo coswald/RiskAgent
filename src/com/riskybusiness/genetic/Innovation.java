@@ -16,13 +16,11 @@ public class Innovation extends Object
 		this.neuronID = id;
 	}
 
-	@Override
-	public boolean equals(Object o)
+	//fix this?
+	//@Override
+	public boolean equals(Innovation innovation)
 	{
-		if(!(o instanceof Innovation))
-			return false;
-		Innovation i = (Innovation)o;
-		return (this.type == o.type && this.in == o.in && this.out == o.out && this.neuronID == o.id);
+		return (this.type == innovation.type && this.in == innovation.in && this.out == innovation.out && this.neuronID == innovation.neuronID);
 	}
 
 	//Get whether the innovation is a neuron or a link

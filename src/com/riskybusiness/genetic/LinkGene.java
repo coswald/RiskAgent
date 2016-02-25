@@ -29,18 +29,19 @@ public class LinkGene implements Serializable
     private int     fromNeuron;
     private int     toNeuron;
     private double  linkWeight;
-    private boolean linkEnabledh;
+    private boolean linkEnabled;
     private boolean linkRecurrent;
     private int     innovationID;
     
     //Create a LinkGene
-    public LinkGene(int fNeuron, int tNeuron, double weight, boolean recur)
+    public LinkGene(int fNeuron, int tNeuron, int id, double weight, boolean recur)
     {
         fromNeuron = fNeuron;
         toNeuron = tNeuron;
         linkWeight = weight;
         linkEnabled = true;
         linkRecurrent = recur;
+        innovationID = id;
         //I have no clue what to do with the innovationID. -K
         //Neither do I! -C
     }

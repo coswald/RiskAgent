@@ -19,8 +19,10 @@ package com.riskybusiness.genetic;
 
 import com.riskybusiness.neural.Neuron;
 import com.riskybusiness.neural.Synapse;
+import com.riskybusiness.neural.NeuralNet;
 import java.io.Serializable;
 import java.util.Random;
+import java.util.ArrayList;
 
 public class Genome implements Serializable
 {
@@ -28,8 +30,8 @@ public class Genome implements Serializable
     private static final long serialVersionUID = 1L;
 
     private int                   genomeID;
-    private ArrayList<NeuronGene> neuronGeneSet;
-    private ArrayList<LinkGene>   linkGeneSet;
+    ArrayList<NeuronGene> neuronGeneSet = new ArrayList<NeuronGene>();
+    ArrayList<LinkGene>   linkGeneSet   = new ArrayList<LinkGene>();
     private double                genomeFitness;
     private double                genomeAdjFitness;
     private double                amountToSpawn;
@@ -73,9 +75,14 @@ public class Genome implements Serializable
     public Synapse createSynapse(LinkGene link)
     {
         //Variables
-        private Neuron toNeuron;
-        private Neuron fromNeuron;
-        private Neuron currentNeuron;
+        Neuron toNeuron;
+        Neuron fromNeuron;
+        NeuronGene currentNeuron;
+
+        boolean toNeuronIsSet;
+        boolean fromNeuronIsSet;
+
+        int i;
 
         for (i = 0;i < neuronGeneSet.size(); i++)
         {
@@ -90,20 +97,22 @@ public class Genome implements Serializable
             //}
             //} else {
             //What if the link doesn't know its recursive??
-            if (currentNeuron.getID() == link.getToNeuron() && currentNeuron.getID() == link.getFoNeuron())
+            if (currentNeuron.getID() == link.getToNeuron() && currentNeuron.getID() == link.getFromNeuron())
             {
-                toNeuron = currentNeuron;
-                fromNeuron = currentNeuron;
+                toNeuron = createNeuron(currentNeuron);
+                fromNeuron = createNeuron(currentNeuron);
+                toNeuronIsSet = true;
+                fromNeuronIsSet = true;
             } 
             else if (currentNeuron.getID() == link.getToNeuron())
             {
-                toNeuron = createNeuron (currentNeuron);
-                toNeuronSet = true;
+                toNeuron = createNeuron(currentNeuron);
+                toNeuronIsSet = true;
             }
             else if (currentNeuron.getID() == link.getFromNeuron())
             {
-                fromNeuron = createNeuron (currentNeuron);
-                fromNeuronSet = true;
+                fromNeuron = createNeuron(currentNeuron);
+                fromNeuronIsSet = true;
             }
             if (toNeuronIsSet && fromNeuronIsSet)
             {
@@ -117,7 +126,8 @@ public class Genome implements Serializable
         }
         else
         {
-            null;
+            //Change this
+            return new com.riskybusiness.neural.Synapse (link.getID(), fromNeuron, toNeuron);;
         }
         
     }
@@ -134,8 +144,11 @@ public class Genome implements Serializable
      {
         //Variables
         //These arrays hold the actual neurons and synapses of the neural network
-        private ArrayList<Neuron>  neuronSet; //Do these need to be array's and not array lists?
-        private ArrayList<Synapse> linkSet;   //------------------------------------------------
+        ArrayList<Neuron>  neuronSet = new ArrayList<Neuron>(); //Do these need to be array's and not array lists?
+        ArrayList<Synapse> linkSet   = new ArrayList<Synapse>();   //------------------------------------------------
+
+        int i;
+        int j;
 
         //This loop loops through the global neuronGeneSet and creates neurons from these genes
         //and then adds them to the neuronSet
@@ -173,12 +186,12 @@ public class Genome implements Serializable
      **/ 
 
     
-     public void addLink(double mutationRate, double chanceOfLooped, CInnovation innovation, int numTrysToFindLoop, int numTrysToAddLink)
+     public void addLink(double mutationRate, double chanceOfLooped, InnovationDB innovation, int numTrysToFindLoop, int numTrysToAddLink)
      {
         //This variable describes a function to create random numbers
         Random random = new Random();
         //This variable contains a random value used to determine if a link or loop should happen
-        double randomValue = randomGenerator.nextDouble();
+        double randomValue = random.nextDouble();
         //These two variables respresent the id's of the neurons the link will connect. If the id's are -1
         //then these is no link connecting two neurons
         int toNeuronID   = -1;
@@ -203,18 +216,18 @@ public class Genome implements Serializable
         if (random.nextDouble() > chanceOfLooped)
         {
             //This loop will loop thorugh as many times as specified looking for a proper neuron to create a looped link with
-            while(numTrysToFindLoop--)
+            while(numTrysToFindLoop > 0)
             {
                 /**
                 //This needs to be a number between the number of inputs + 1 and the size of the neuron arraylist - 1
                 //Also will there be type issues with double and int will fix
                 **/
-                int neuronIndex = random.nextDouble();
+                int neuronIndex = random.nextInt();
 
                 /**
                 We need to find a way to determine if a neuron is input, output, etc. I may add this to the neuron gene
                 This if statement is supposed to ensure that the gene we are adding a looped link to isn't an input gene or bias gene
-                **/
+                **//**
                 if (!neuronGeneSet.get(neuronIndex))
                 {
                     toNeuronID   = neuronGeneSet.get(neuronIndex).getID;
@@ -223,21 +236,23 @@ public class Genome implements Serializable
                     //If we find a good neuron that satisfies our conditions then we don't need to loop anymore
                     numTrysToFindLoop = 0;
                 }
+                **/
+                numTrysToFindLoop--;
             }
         }
         //If the random value didn't exceed the chance to create a looped link then we still need to mutate the genome
         else
         {
             //This loop will loop through and try to create a link until it has created a link or has exceed its number of tries
-            while(numTrysToAddLink--)
+            while(numTrysToAddLink > 0)
             {
                 //Find two random neurons and determine if a link can be made between them
                 //Needs to be inbetween 0 and the size of the neuron array - 1
-                neuronIndex  = random.nextDouble(); 
-                fromNeuronID = neuronGeneSet.get(neuronIndex).getId;
+                int neuronIndex  = random.nextInt(); 
+                fromNeuronID = neuronGeneSet.get(neuronIndex).getID();
                 //Needs to be inbetween the number of input neurons + 1 and the size of the neuron array - 1
-                neuronIndex  = random.nextDouble();
-                toNeuronID   = neuronGeneSet.get(neuronIndex).getID;
+                neuronIndex  = random.nextInt();
+                toNeuronID   = neuronGeneSet.get(neuronIndex).getID();
 
                 //The book had this and I don't know why?
                 //if(toNeuronID == 2)
@@ -254,6 +269,7 @@ public class Genome implements Serializable
                     toNeuronID   = -1;
                     fromNeuronID = -1;
                 }
+                numTrysToAddLink--;
             }
         }
         //If either neuronid is less than 0 then we can't create a link so exit by returning
@@ -266,7 +282,7 @@ public class Genome implements Serializable
         /**
         Why can't I just add the innovation and have my add innovation check to see if it already exists? Seems silly to seperate the two
         **/
-        int id = innovation.innovationExists(NEW_LINK, fromNeuronID, toNeuronID, -1);
+        int id = innovation.innovationExists(InnovationType.NEW_LINK, fromNeuronID, toNeuronID, -1);
 
         //The algortihm in the book uses the y values to determine if the link is recurrent so im gonna skip this part
         /**
@@ -275,9 +291,9 @@ public class Genome implements Serializable
 
         if (id < 0)
         {
-            innovation.addInnovation(NEW_LINK, fromNeuronID, toNeuronID);
-            int id = innovation.nextNumber() - 1;
-            LinkGene newLinkGene = LinkGene(fromNeuronID, toNeuronID, id, random.nextDouble(), recurrent);
+            innovation.addInnovation(InnovationType.NEW_LINK, fromNeuronID, toNeuronID, -1); //Need to figure out what to do with the innovation id -1
+            id = innovation.nextNumber() - 1;
+            LinkGene newLinkGene = new LinkGene(fromNeuronID, toNeuronID, id, random.nextDouble(), recurrent);
             //Push the new gene into the array?
             /**
              I'm gonna wait until I know what order the genes are in or if it matters
@@ -290,6 +306,7 @@ public class Genome implements Serializable
 
      //Add a neuron to the genome dependent upon the mutation rate
      //I need to find a way to create a pointer to the innovation db
+     /**
      public void addNeuron(double mutationRate, Innovation innovation, int numTrysToFindOldLink) 
      {
         //This variable describes a function to create random numbers
@@ -321,13 +338,13 @@ public class Genome implements Serializable
             {
                 /**
                 This needs to be a value between 0 and some weird number that I will determine later
-                **/
+                **//**
                 chosenLink = random.nextDouble();
 
                 int fromNeuron =  linkGeneSet.get(chosenLink).fromNeuron;
 
                 if ((linkGeneSet.get(chosenLink).getEnabled) &&
-                    (!linkGeneSet.get(chosenLink).getRecurrent) &&
+                    (!linkGeneSet.get(chosenLink).getRecurrent))
                     //(neuronGeneSet.get(fromNeuron).getNeuronType != bias)) can't be a bias gene
                 {
                     linkFound = true;
@@ -377,7 +394,7 @@ public class Genome implements Serializable
 
                 /**
                 Add link
-                **/
+                **//**
 
 
 
@@ -399,7 +416,7 @@ public class Genome implements Serializable
 
 
      }
-
+     **/
      //Function to mutate the connection weights
      //public void mutateWeights(double mutationRate, double probNewMutation, double dMaxPertubation){?}
 

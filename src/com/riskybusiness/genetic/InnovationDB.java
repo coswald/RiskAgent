@@ -18,11 +18,12 @@
 package com.riskybusiness.genetic;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class InnovationDB implements Serializable
 {
 
-	private ArrayList<Innovation> innovationDB;
+	private ArrayList<Innovation> innovationDB = new ArrayList<Innovation>();
 	private Innovation toFind;
 	private int innovationID = 0;
 
@@ -30,15 +31,23 @@ public class InnovationDB implements Serializable
 	/**
 	Fix these two function
 	**///Also the id may not be necassary
-	private int innovationExists(InnovationType type, int to, int from, int id)
+	public int innovationExists(InnovationType type, int to, int from, int id)
 	{
 		//Instantiate the inputs into an innovation to be compared throughout the database
 		toFind = new Innovation(type, to, from, id);
 		//See if the innovation datebase contains the toFind object
-		return innovationDB.contains(toFind);
+		if (innovationDB.contains(toFind))
+		{
+			return 1;
+		}
+		else
+		{
+			return -1;
+		}
 
 	}
 
+	/**
 	private boolean innovationExists(InnovationType type, int in, int out, int id)
 	{
 		//Instantiate the inputs into an innovation to be compared throughout the database
@@ -47,11 +56,11 @@ public class InnovationDB implements Serializable
 		return (innovationDB.contains(toFind) == -1);
 
 	}
-
+	**/
 	public int addInnovation(InnovationType type, int to, int from, int id)
 	{
 		//Check to see if innovation exists
-		if innovationExists(type, to, from, id)
+		if (innovationExists(type, to, from, id) != -1)
 		{
 			return -1;
 		} 
@@ -62,5 +71,10 @@ public class InnovationDB implements Serializable
 			//Increment innovationID
 			innovationID++; 
 		}
+	}
+
+	public int nextNumber()
+	{
+		return innovationID;
 	}
 }
