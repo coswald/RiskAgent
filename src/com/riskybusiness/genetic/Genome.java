@@ -134,8 +134,14 @@ public class Genome implements Serializable
     }
      
      //This constructor creates a genome from a vector of SLinkGenes a vector of SNeuronGenes and an ID number
-     //public Genome(int id, Vector neurons, Vector genes, int inputs, int outputs);
-
+     public Genome(int id, ArrayList<LinkGene> neurons, ArrayList<NeuronGene> links, int inputs, int outputs);
+     {
+        genomeID = id;
+        neuronGeneSet = neurons;
+        linkGeneSet = links;
+        numInputs = inputs;
+        numOutputs = outputs;
+     }
 
      /**
       * <p>This function converts the respective genome into a 

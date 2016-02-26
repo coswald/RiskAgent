@@ -1,0 +1,14 @@
+import com.riskybusiness.neural.Neuron;
+import com.riskybusiness.neural.Synapse;
+import com.riskybusiness.neural.NeuralNet;
+import com.riskybusiness.genetic.Genome;
+import com.riskybusiness.genetic.Innovation;
+import com.riskybusiness.genetic.InnovationDB;
+import com.riskybusiness.genetic.InnovationType;
+import com.riskybusiness.genetic.LinkGene;
+import com.riskybusiness.genetic.NeuronGene;
+
+public class geneticTest
+{
+	public static void main(String... arg) throws Exception
+}
