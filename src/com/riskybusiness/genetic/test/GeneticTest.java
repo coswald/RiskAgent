@@ -16,6 +16,8 @@ public class GeneticTest
 {
 	public static void main(String... arg) throws Exception
 	{
+		//Represents the scanner to get input
+		Scanner input = new Scanner(System.in);
 		//Represents the array of created neurons
 		ArrayList<NeuronGene> neuronGenes = new ArrayList<NeuronGene>();
 		//Represents the array of created links
@@ -31,6 +33,7 @@ public class GeneticTest
 		//Loop control variables
 		int i;
 		int j;
+		int k;
 		//Represents the current id of the neuron to be added
 		int neuronID = 1; //Also, this is a really piss poor way to address the issue that exists
 		//Represents the current id of the link to be added
@@ -50,6 +53,8 @@ public class GeneticTest
 		//ArrayList<int> hiddenLayers = new ArrayList<int>(numHiddenLayers);
 
 
+		System.out.println("Ready to test?");
+		k = input.nextLine();
 
 		//The next three loops will create the neurons
 		//Currently, there is no need to seperate into three loops, but I am working on implementing different neuron types
@@ -71,6 +76,10 @@ public class GeneticTest
 			neuronGenes.add(new NeuronGene(neuronID, "Sigmoid", false, activate/**, OUTPUT**/));
 			neuronID++; 
 		}
+
+		System.out.println("Yay neurons were created");
+		System.out.println("Ready to test links?");
+		k = input.nextLine();
 
 		//Create links
 		//This presents a wierd scenario. Will all neurons be connected in the beginning? If no how will we determine to connect them?
@@ -104,6 +113,10 @@ public class GeneticTest
 			}
 		}
 
+		System.out.println("Yay links were created");
+		System.out.println("Ready to test genome?");
+		k = input.nextLine();
+
 		//Create a genome!!
 		myGenome = new Genome(1, neuronGenes, linkGenes, numInputs, numOutputs);
 
@@ -115,6 +128,10 @@ public class GeneticTest
 		 *
 		 *
 		**/
+
+		System.out.println("Yay the genome was created");
+		System.out.println("Ready to test neural nets?");
+		k = input.nextLine();
 
 		//Create a neural network!!
 		myNetwork = myGenome.createPhenotype();
