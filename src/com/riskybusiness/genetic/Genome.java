@@ -24,6 +24,7 @@ import java.io.Serializable;
 import java.util.Random;
 import java.util.ArrayList;
 
+
 public class Genome implements Serializable
 {
     
@@ -38,6 +39,16 @@ public class Genome implements Serializable
     private int                   numInputs;
     private int                   numOutputs;
     private int                   species;
+
+    public int getSizeNeuron()
+    {
+        return neuronGeneSet.size();
+    }
+
+    public int getSizeLink()
+    {
+        return linkGeneSet.size();
+    }
 
     //Returns true if the specified link is already part of the genome
     public boolean duplicateLink(int neuronIn, int neuronOut)
@@ -134,7 +145,7 @@ public class Genome implements Serializable
     }
      
      //This constructor creates a genome from a vector of SLinkGenes a vector of SNeuronGenes and an ID number
-     public Genome(int id, ArrayList<LinkGene> neurons, ArrayList<NeuronGene> links, int inputs, int outputs);
+     public Genome(int id, ArrayList<NeuronGene> neurons, ArrayList<LinkGene> links, int inputs, int outputs)
      {
         genomeID = id;
         neuronGeneSet = neurons;
@@ -151,9 +162,9 @@ public class Genome implements Serializable
      {
         //Variables
         //These arrays hold the actual neurons and synapses of the neural network
-        Synapse[] linkSet = null;
+        Synapse[] linkSet = new Synapse[linkGeneSet.size()];
     
-        Neuron[] neuronSet = null;
+        Neuron[] neuronSet = new Neuron[neuronGeneSet.size()];
 
         int i;
         int j;

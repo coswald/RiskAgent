@@ -11,6 +11,8 @@ import com.riskybusiness.genetic.LinkGene;
 import com.riskybusiness.genetic.NeuronGene;
 
 import java.util.Random;
+import java.util.Scanner;
+import java.util.ArrayList;
 
 public class GeneticTest
 {
@@ -40,8 +42,10 @@ public class GeneticTest
 		int linkID   = 1; //Also, this is a really piss poor way to address the issue that exists
 		//Represents the variable used to create psuedorandom numbers
 		Random random = new Random();
-		//Represents the weight to be assigned to the neuron or link
-		float weight;
+		//Represents the weight to be assigned to the neuron
+		float fweight;
+		//Represents the weight to be assigned to the link
+		double dweight;
 		//Represents the genome we created
 		Genome myGenome;
 		//Represents the neural network
@@ -54,32 +58,32 @@ public class GeneticTest
 
 
 		System.out.println("Ready to test?");
-		k = input.nextLine();
+		k = input.nextInt();
 
 		//The next three loops will create the neurons
 		//Currently, there is no need to seperate into three loops, but I am working on implementing different neuron types
 		for (i = 0; i < numInputs; i++)
 		{
-			weight = random.nextFloat();
-			neuronGenes.add(new NeuronGene(neuronID, "Sigmoid", false, activate/**, INPUT**/));
+			fweight = random.nextFloat();
+			neuronGenes.add(new NeuronGene(neuronID, "Sigmoid", false, fweight/**, INPUT**/));
 			neuronID++; 
 		}
 		for (i = 0; i < numHidden; i++)
 		{
-			weight = random.nextFloat();
-			neuronGenes.add(new NeuronGene(neuronID, "Sigmoid", false, activate/**, HIDDEN**/));
+			fweight = random.nextFloat();
+			neuronGenes.add(new NeuronGene(neuronID, "Sigmoid", false, fweight/**, HIDDEN**/));
 			neuronID++; 
 		}
 		for (i = 0; i < numOutputs; i++)
 		{
-			weight = random.nextFloat();
-			neuronGenes.add(new NeuronGene(neuronID, "Sigmoid", false, activate/**, OUTPUT**/));
+			fweight = random.nextFloat();
+			neuronGenes.add(new NeuronGene(neuronID, "Sigmoid", false, fweight/**, OUTPUT**/));
 			neuronID++; 
 		}
 
 		System.out.println("Yay neurons were created");
 		System.out.println("Ready to test links?");
-		k = input.nextLine();
+		k = input.nextInt();
 
 		//Create links
 		//This presents a wierd scenario. Will all neurons be connected in the beginning? If no how will we determine to connect them?
@@ -96,8 +100,8 @@ public class GeneticTest
 		{
 			for (j = numInputs + 1; j < numInputs + numHidden + 1; j++) //numInputs + 1 was added so j is equal
 			{															//to the starting hidden node id
-				weight = random.nextDouble();
-				linkGenes.add(new LinkGene(i, j, weight, false));
+				dweight = random.nextDouble();
+				linkGenes.add(new LinkGene(i, j, linkID, dweight, false));
 				linkID++;
 			}
 		}
@@ -107,15 +111,15 @@ public class GeneticTest
 		{
 			for (j = numNeurons - numOutputs + 1; j < numNeurons + 1; j++) //Similarily to above the math is to ensure
 			{															   //that j starts at the first output node id
-				weight = random.nextDouble();
-				linkGenes.add(new LinkGene(i, j, weight, false));
+				dweight = random.nextDouble();
+				linkGenes.add(new LinkGene(i, j, linkID, dweight, false));
 				linkID++;
 			}
 		}
 
 		System.out.println("Yay links were created");
 		System.out.println("Ready to test genome?");
-		k = input.nextLine();
+		k = input.nextInt();
 
 		//Create a genome!!
 		myGenome = new Genome(1, neuronGenes, linkGenes, numInputs, numOutputs);
@@ -131,9 +135,11 @@ public class GeneticTest
 
 		System.out.println("Yay the genome was created");
 		System.out.println("Ready to test neural nets?");
-		k = input.nextLine();
+		k = input.nextInt();
 
 		//Create a neural network!!
+		System.out.println(myGenome.getSizeNeuron());
+		System.out.println(myGenome.getSizeLink());
 		myNetwork = myGenome.createPhenotype();
 
 	}
