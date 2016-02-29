@@ -408,7 +408,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	 * <br>
 	 * and is multiplied by the inputs that gave
 	 * the <b>NEURONOUTPUT</b>. This is done in
-	 * the {com.riskybusiness.neural.Neuron#train(float, float[]}
+	 * the {com.riskybusiness.neural.Neuron#train(float, float[])}
 	 * method, consiquentally calling this method
 	 * after doing this calculation.</p>
 	 * @param adjustments The list of adjustments

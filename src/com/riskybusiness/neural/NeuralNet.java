@@ -303,8 +303,10 @@ public class NeuralNet extends Object implements Serializable
      */
 	public void train(float[] desired, float[][] inputs) throws InvalidNeuronOutputException
 	{
-		while(true)
+		int count = 0;
+		while(++count < 500000)
 		{
+			//Code found at:
 			//http://www.nnwj.de/backpropagation.html
 			float[] prediction = this.fire(inputs); //I have no idea what to do from here.
 			if(prediction.length != desired.length)
