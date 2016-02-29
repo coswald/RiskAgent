@@ -163,6 +163,21 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	}
 	
 	/**
+	 * <p>Makes a copy of the given {@code Neuron}. This
+	 * does not use the clone method, nor does this class
+	 * implement {@link java.lang.Cloneable}, but this is
+	 * just a copy constructor.</p>
+	 * @param neuron The {@code Neuron} to copy.
+	 */
+	public Neuron(Neuron neuron)
+	{
+		this.inputs = neuron.inputs;
+		this.weights = neuron.weights;
+		this.learningRate = neuron.learningRate;
+		this.haveFired = neuron.haveFired;
+	}
+	
+	/**
 	 * <p>Fills a list with values, either 1, or a
 	 * random float between 0 and 1.</p>
 	 * @param random Determines which values to fill

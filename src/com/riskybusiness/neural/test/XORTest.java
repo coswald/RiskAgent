@@ -31,7 +31,7 @@ public class XORTest extends Object
 	public static void main(String... args) throws Exception
 	{
 		NeuralNet xor = new NeuralNet(2, 1, 2);
-		Trainer[] trainers = new Trainer[2000];
+		Trainer[] trainers = new Trainer[50000];
 		float in1, in2;
 		for(int i = 0 ; i < trainers.length; i++)
 		{
@@ -40,9 +40,12 @@ public class XORTest extends Object
 			trainers[i] = new Trainer(((int)in1) ^ ((int)in2), in1, in2);
 		}
 		
+		int round = 0;
 		boolean trained = false;
 		while(!trained)
 		{
+			System.out.println("Round: " + ++round);
+			System.out.println(xor);
 			for(int i = 0; i < trainers.length; i++)
 			{
 				xor.train(new float[] {trainers[i].getAnswer()}, new float[][] {new float[] {trainers[i].getInputs()[0]}, new float[] {trainers[i].getInputs()[1]}});
@@ -53,19 +56,18 @@ public class XORTest extends Object
 			
 			float got = 0F;
 			int amountWrong = 0;
-			outer:
 			for(float i = 0; i < 2; i++)
 			{
 				for(float j = 0; j < 2; j++)
 				{
 					got = xor.fire(new float[][] {new float[] {i}, new float[] {j}})[0];
-					xor.clearNetwork();
-					if(xor.fire(new float[][] {new float[] {i}, new float[] {j}})[0] != ((float)(((int)i) ^ ((int)j))))
+					if(got != ((float)(((int)i) ^ ((int)j))))
 						amountWrong++;
 					xor.clearNetwork();
-					//System.out.println("I: " + i + "; J: " + j + "; Got: " + got);
+					System.out.println("I: " + i + "; J: " + j + "; Got: " + got);
 				}
 			}
+			System.out.println();
 			if(amountWrong == 0)
 				trained = true;
 		}
@@ -80,7 +82,7 @@ public class XORTest extends Object
 		{
 			System.out.print("Give me a valid integer, either 0 and 1: ");
 			a = z.nextInt();
-			if(a >=0)
+			if(a >= 0)
 				b = z.nextInt();
 			
 			if(a >= 0 && b >= 0)
