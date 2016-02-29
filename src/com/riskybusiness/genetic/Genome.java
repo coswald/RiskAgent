@@ -31,8 +31,8 @@ public class Genome implements Serializable
     private static final long serialVersionUID = 1L;
 
     private int                   genomeID;
-    ArrayList<NeuronGene> neuronGeneSet = new ArrayList<NeuronGene>();
-    ArrayList<LinkGene>   linkGeneSet   = new ArrayList<LinkGene>();
+    private ArrayList<NeuronGene> neuronGeneSet = new ArrayList<NeuronGene>();
+    private ArrayList<LinkGene>   linkGeneSet   = new ArrayList<LinkGene>();
     private double                genomeFitness;
     private double                genomeAdjFitness;
     private double                amountToSpawn;
@@ -63,21 +63,21 @@ public class Genome implements Serializable
     }
 
     //Tests if the passed ID is the same as any existing neuron IDs. Used in AddNeuron
-     public boolean alreadyHaveThisNeuronID(int ID)
-     {
-         return true;
-     }
+    public boolean alreadyHaveThisNeuronID(int ID)
+    {
+       return true;
+    }
 
     public Neuron createNeuron(NeuronGene neuron)
     {
         //Need to figure out a way to determine amount of inputs. If I know my ID I
         //may be able to look and see how many active links point to me but we would 
         //have to account for links not yet created so maybe create neurons last.
-        if (neuron.getNeuronType() == "Sigmoid")
+        if (neuron.getNeuronType().equals("Sigmoid"))
         {
             return new com.riskybusiness.neural.SigmoidNeuron (neuron.getActivationResponse(), 5);
         }
-        else //if (neuron.getNeuronType() == "Step") 
+        else if (neuron.getNeuronType().equals("Step")) 
         {
             return new com.riskybusiness.neural.StepNeuron (neuron.getActivationResponse(), 5);
         }
@@ -87,12 +87,12 @@ public class Genome implements Serializable
     public Synapse createSynapse(LinkGene link)
     {
         //Variables
-        Neuron toNeuron = null;
-        Neuron fromNeuron = null;
+        Neuron     toNeuron   = null;
+        Neuron     fromNeuron = null;
         NeuronGene currentNeuron;
 
-        boolean toNeuronIsSet = false;
-        boolean fromNeuronIsSet = false;
+        boolean    toNeuronIsSet   = false;
+        boolean    fromNeuronIsSet = false;
 
         int i;
 
@@ -147,11 +147,11 @@ public class Genome implements Serializable
      //This constructor creates a genome from a vector of SLinkGenes a vector of SNeuronGenes and an ID number
      public Genome(int id, ArrayList<NeuronGene> neurons, ArrayList<LinkGene> links, int inputs, int outputs)
      {
-        genomeID = id;
+        genomeID      = id;
         neuronGeneSet = neurons;
-        linkGeneSet = links;
-        numInputs = inputs;
-        numOutputs = outputs;
+        linkGeneSet   = links;
+        numInputs     = inputs;
+        numOutputs    = outputs;
      }
 
      /**

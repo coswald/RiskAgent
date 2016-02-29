@@ -28,10 +28,11 @@ public class NeuronGene implements Serializable
     private static final long serialVersionUID = 1L;
     
     //I apologize for anything I have changed that will offend you.
-    private int neuronID;
-    private String neuronType; 
+    private int     neuronID;
+    private String  neuronType; 
     private boolean neuronRecurrent;
-    private float neuronActivationResponse;
+    private float   neuronActivationResponse;
+    //private int     innovationNum;
 
     public NeuronGene(int id, String type, boolean recur, float activate)
     {
