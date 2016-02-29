@@ -2,6 +2,7 @@
 /src/com/sillysoft/
 /src/org/
 sources
+makeDoc
 *.class
 
 # Mobile Tools for Java (J2ME)
