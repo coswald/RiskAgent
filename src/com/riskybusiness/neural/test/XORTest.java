@@ -72,6 +72,7 @@ public class XORTest extends Object
 		
 		System.out.println("The network is trained to the XOR function!");
 		System.out.println("Ready to test it?");
+		System.out.println("Enter a negative number to exit; otherwise, follow the instructions!\n");
 		Scanner z = new Scanner(System.in);
 		
 		int a = 0, b = 0;
@@ -79,7 +80,8 @@ public class XORTest extends Object
 		{
 			System.out.print("Give me a valid integer, either 0 and 1: ");
 			a = z.nextInt();
-			b = z.nextInt();
+			if(a >=0)
+				b = z.nextInt();
 			
 			if(a >= 0 && b >= 0)
 				System.out.println("The network says: " + xor.fire(new float[][] {new float[] {a}, new float[] {b}})[0]);
