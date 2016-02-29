@@ -435,7 +435,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	
 	
 	/**
-	 * <p>Adjust the wieght given the learning
+	 * <p>Adjust the weight given the learning
 	 * rate and the weight index of this
 	 * {@code Neuron}.
 	 * @param index The weight index to adjust
@@ -451,6 +451,15 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 			throw new InvalidNeuronInputException("The index given is greater than the amount of weights!");
 		
 		this.weights[index] += (adjustment * this.learningRate);
+	}
+	
+	/**
+	 * <p>Adjusts all of the weights to random
+	 * values.</p>
+	 */
+	public void randomizeWeights()
+	{
+		Neuron.fillList(true, this.weights);
 	}
 	
 	/**

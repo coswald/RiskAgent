@@ -343,5 +343,13 @@ public class NeuralNet extends Object implements Serializable
 			}
 			this.clearNetwork();
 		}
+		
+		//Bad training time, need to change weights.
+		if(count >= 500000)
+		{
+			System.out.println("Bad Training data");
+			for(Neuron n : this.neurons)
+				n.randomizeWeights();
+		}
 	}
 }
