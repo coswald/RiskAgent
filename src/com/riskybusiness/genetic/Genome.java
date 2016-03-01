@@ -80,16 +80,36 @@ public class Genome implements Serializable
 
     public Neuron createNeuron(NeuronGene neuron)
     {
+        int numInputs = 0;
+        int i;
         //Need to figure out a way to determine amount of inputs. If I know my ID I
         //may be able to look and see how many active links point to me but we would 
         //have to account for links not yet created so maybe create neurons last.
+        for (i = 0; i < linkGeneSet.size(); i++)
+        {
+            if (linkGeneSet.get(i).getToNeuron() == neuron.getID())
+            {
+                numInputs++;
+            }
+        }
+        if (neuron.getID() == 1)
+        {
+            numInputs = 1;
+        }
+        if (neuron.getID() == 2)
+        {
+            numInputs = 1;
+        }
+
+        System.out.println("NeuronID: " + neuron.getID() + " NumInputs: " + numInputs); 
+
         if (neuron.getNeuronType().equals("Sigmoid"))
         {
-            return new com.riskybusiness.neural.SigmoidNeuron (neuron.getActivationResponse(), 5);
+            return new com.riskybusiness.neural.SigmoidNeuron (neuron.getActivationResponse(), numInputs);
         }
         else //if (neuron.getNeuronType().equals("Step")) 
         {
-            return new com.riskybusiness.neural.StepNeuron (neuron.getActivationResponse(), 5);
+            return new com.riskybusiness.neural.StepNeuron (neuron.getActivationResponse(), numInputs);
         }
     }
 

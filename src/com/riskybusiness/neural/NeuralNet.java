@@ -164,7 +164,7 @@ public class NeuralNet extends Object implements Serializable
 				k++;
 				setLevel = false;
 			}
-			//System.out.println("I: " + i + " : " + synapseIndex + " : " + j + " : " + k);
+			System.out.println("I: " + i + " : " + synapseIndex + " : " + j + " : " + k);
 			synapses[i] = new Synapse(synapseIndex, neurons[j], neurons[k]);
 			
 			if(j >= synapseSum)
@@ -233,6 +233,7 @@ public class NeuralNet extends Object implements Serializable
      */
 	public float[] fire(float[][] inputs) throws InvalidNeuronInputException
 	{
+		//System.out.println("Inputs: " + inputs[0][0] + " " + inputs [1][0]);
 		if(inputs.length > neurons.length)
 			throw new InvalidNeuronInputException("The amount of inputs given are greater than the amount of neurons!");
 		
