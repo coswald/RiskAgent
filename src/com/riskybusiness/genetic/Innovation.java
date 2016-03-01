@@ -23,22 +23,22 @@ public class Innovation extends Object
 	private int            neuronIn;
 	private int            neuronOut;
 	private int            neuronID;
-	private int            innovationNum;
+	//private int            innovationNum;
 
-	public Innovation(InnovationType type, int in, int out, int id, int num)
+	public Innovation(InnovationType type, int in, int out, int id)
 	{
 		this.type = type;
 		this.neuronIn = in;
 		this.neuronOut = out;
 		this.neuronID = id;
-		this.innovationNum = num;
+		//this.innovationNum = num;
 	}
 
 	//fix this?
 	//@Override
 	public boolean equals(Innovation innovation)
 	{
-		return (this.type == innovation.type && this.in == innovation.in && this.out == innovation.out && this.neuronID == innovation.neuronID);
+		return (this.type == innovation.type && this.neuronIn == innovation.neuronIn && this.neuronOut == innovation.neuronOut && this.neuronID == innovation.neuronID);
 	}
 
 	//Get whether the innovation is a neuron or a link
@@ -50,13 +50,13 @@ public class Innovation extends Object
 	//Get synapse input neuronID, return -1 for neurons
 	public int getIn() 
 	{
-		return this.in;
+		return this.neuronIn;
 	}
 
 	//Get synapse output neuronID, return -1 for neurons
 	public int getOut()
 	{
-		return this.out;
+		return this.neuronOut;
 	}
 
 	//Get id of the neuron, will return -1 for links

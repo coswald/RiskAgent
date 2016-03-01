@@ -3,6 +3,7 @@ package com.riskybusiness.genetic.test;
 import com.riskybusiness.neural.Neuron;
 import com.riskybusiness.neural.Synapse;
 import com.riskybusiness.neural.NeuralNet;
+import com.riskybusiness.neural.Trainer;
 import com.riskybusiness.genetic.Genome;
 import com.riskybusiness.genetic.Innovation;
 import com.riskybusiness.genetic.InnovationDB;
@@ -25,8 +26,6 @@ public class GeneticTest
 		ArrayList<NeuronGene> neuronGenes = new ArrayList<NeuronGene>();
 		//Represents the array of created links
    		ArrayList<LinkGene>   linkGenes   = new ArrayList<LinkGene>();
-		//Represents the population of genomes created
-		ArrayList<Genome>     myGenomes   = new ArrayList<Genome>();
    		//Represents the number of hidden layers
 		int numHiddenLayers;
 		//Represents the size of the population
@@ -45,18 +44,17 @@ public class GeneticTest
 		//Represent the class used to create the unique ID's for the neurons, links, and genomes
 		UniqueID unique = new UniqueID();
 		//Represents the variable used to create psuedorandom numbers
-		Random random = new Random();
+		Random random   = new Random();
 		//Represents the weight to be assigned to the neuron
 		float fweight;
 		//Represents the weight to be assigned to the link
 		double dweight;
-		//Represents the neural network
-		NeuralNet myNetwork;
+		Genome genome;
 
 		System.out.println("How many hidden layers are there?");
 		numHiddenLayers = input.nextInt();
 
-		int[] hiddenLayers = new int[(numHiddenLayers)];
+		int[] hiddenLayers = new int[numHiddenLayers];
 		int[] summationNeuronsInLayer = new int[(numHiddenLayers + 3)];
 
 		//Note: numInputNeurons = summationNeuronsInLayer[1]
@@ -80,9 +78,16 @@ public class GeneticTest
 		System.out.println("How large is your population?");
 		populationSize = input.nextInt();
 
+		//Represents the population of genomes created
+		Genome[]    population  = new Genome[populationSize];
+		//Represents the neural network
+		NeuralNet[] myNetworks  = new NeuralNet[populationSize];
+
 		//Have fun trying to figure out what the hell is going on here
-		for (h = 1; h <= populationSize; h++)
+		for (h = 0; h < populationSize; h++)
 		{
+			neuronGenes.clear();
+			linkGenes.clear();
 
 			//The next three loops will create the neurons
 			//Currently, there is no need to seperate into three loops, but I am working on implementing different neuron types
@@ -125,11 +130,12 @@ public class GeneticTest
 			}
 
 			//Create a genome!!
-			myGenomes.add(new Genome(unique.getNextGenomeID(), neuronGenes, linkGenes, summationNeuronsInLayer[1], summationNeuronsInLayer[(numHiddenLayers + 2)] - summationNeuronsInLayer[(numHiddenLayers + 1)]));
-		
-			System.out.println("Creaeted genome: " + unique.getCurGenomeID() + "!");//  Neurons: " + myGenomes.get(unique.getCurGenomeID()).getSizeNeuron() + " Links: " + myGenomes.get(unique.getCurGenomeID()).getSizeLink());
-		}
+			population[h] = new Genome(unique.getNextGenomeID(), neuronGenes, linkGenes, summationNeuronsInLayer[1], summationNeuronsInLayer[(numHiddenLayers + 2)] - summationNeuronsInLayer[(numHiddenLayers + 1)]);
 
+			System.out.println("Created genome: " + unique.getCurGenomeID() + "!");
+			genome = population[h];
+			System.out.println("Neurons: " + genome.getSizeNeuron() + " Links: " + genome.getSizeLink());
+		}
 
 		/**
 		 * Space to create testers for manipulating genome
@@ -141,10 +147,57 @@ public class GeneticTest
 		**/
 
 		//Create a neural network!!
-		//System.out.println(myGenome.getSizeNeuron());
-		//System.out.println(myGenome.getSizeLink());
-		//myNetwork = myGenome.createPhenotype();
+		for (i = 0; i < populationSize; i++)
+		{
+			myNetworks[i] = population[i].createPhenotype();
+		}
 
+		Trainer[] trainers = new Trainer[2000];
+		float in1, in2;
+
+		for(i = 0 ; i < trainers.length; i++)
+		{
+			in1 = (Math.random() < .5) ? 0F : 1F;
+			in2 = (Math.random() < .5) ? 0F : 1F;
+			trainers[i] = new Trainer(((int)in1) ^ ((int)in2), in1, in2);
+		}
+
+		for (i = 0; i < populationSize; i++)
+		{
+
+			boolean trained = false;
+			while(!trained)
+			{
+				for(int z = 0; z < trainers.length; z++)
+				{
+					System.out.println (trainers[z].getAnswer());
+					myNetworks[i].train(new float[] {trainers[z].getAnswer()}, new float[][] {new float[] {trainers[z].getInputs()[0]}, new float[] {trainers[z].getInputs()[1]}});
+					//Thread.sleep(1000);
+					//System.out.println("Training: " + i);
+					myNetworks[i].clearNetwork();
+				}
+				
+				float got = 0F;
+				int amountWrong = 0;
+				outer:
+				for(float x = 0; x < 2; x++)
+				{
+					for(float y = 0; y < 2; y++)
+					{
+						got = myNetworks[i].fire(new float[][] {new float[] {x}, new float[] {y}})[0];
+						myNetworks[i].clearNetwork();
+						if(myNetworks[i].fire(new float[][] {new float[] {x}, new float[] {y}})[0] != ((float)(((int)x) ^ ((int)y))))
+							amountWrong++;
+						myNetworks[i].clearNetwork();
+						//System.out.println("I: " + i + "; J: " + j + "; Got: " + got);
+					}
+				}
+				if(amountWrong == 0)
+					trained = true;
+			}
+
+			System.out.println("Network " + i + " trained!");
+		}
 	}
 }
 

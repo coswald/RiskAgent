@@ -40,6 +40,16 @@ public class Genome implements Serializable
     private int                   numOutputs;
     private int                   species;
 
+     //This constructor creates a genome from a vector of SLinkGenes a vector of SNeuronGenes and an ID number
+     public Genome(int id, ArrayList<NeuronGene> neurons, ArrayList<LinkGene> links, int inputs, int outputs)
+     {
+        genomeID      = id;
+        neuronGeneSet = neurons;
+        linkGeneSet   = links;
+        numInputs     = inputs;
+        numOutputs    = outputs;
+     }
+
     public int getSizeNeuron()
     {
         return neuronGeneSet.size();
@@ -77,11 +87,10 @@ public class Genome implements Serializable
         {
             return new com.riskybusiness.neural.SigmoidNeuron (neuron.getActivationResponse(), 5);
         }
-        else if (neuron.getNeuronType().equals("Step")) 
+        else //if (neuron.getNeuronType().equals("Step")) 
         {
             return new com.riskybusiness.neural.StepNeuron (neuron.getActivationResponse(), 5);
         }
-
     }
 
     public Synapse createSynapse(LinkGene link)
@@ -144,16 +153,6 @@ public class Genome implements Serializable
         
     }
      
-     //This constructor creates a genome from a vector of SLinkGenes a vector of SNeuronGenes and an ID number
-     public Genome(int id, ArrayList<NeuronGene> neurons, ArrayList<LinkGene> links, int inputs, int outputs)
-     {
-        genomeID      = id;
-        neuronGeneSet = neurons;
-        linkGeneSet   = links;
-        numInputs     = inputs;
-        numOutputs    = outputs;
-     }
-
      /**
       * <p>This function converts the respective genome into a 
       * neural network.</p>
