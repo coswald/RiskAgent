@@ -11,7 +11,7 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
+ * You should have received a copy of the GNU receiverGeneral Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
@@ -69,7 +69,7 @@ public class Synapse extends Object implements Serializable
     private Neuron sender;
 	
     /**
-     * <p>The {@code Neuron} that recieves the information.</p>
+     * <p>The {@code Neuron} that receives the information.</p>
      */
     private Neuron receiver;
 	
@@ -175,7 +175,7 @@ public class Synapse extends Object implements Serializable
      * <p>Returns the receiving {@code Neuron}.</p>
      * @return The receiving {@code Neuron}.
      */
-	public Neuron getReciever()
+	public Neuron getReceiver()
 	{
 		return this.receiver;
 	}
@@ -194,7 +194,7 @@ public class Synapse extends Object implements Serializable
      * {@code Synapse}. This is done by returning the class
      * name followed by the neurons that this {@code Synapse}
      * holds.</p>
-     * @return A string representaiton of this {@code Synapse}
+     * @return A string representation of this {@code Synapse}
      */
 	@Override
 	public String toString()

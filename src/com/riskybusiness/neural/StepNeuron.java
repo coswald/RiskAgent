@@ -55,7 +55,18 @@ public class StepNeuron extends Neuron
 		super(inputNum);
 		this.setThreshold(threshold);
 	}
-	
+
+    /**
+     * <p>Constructs a copy of this {@code StepNeuron}.</p>
+     * @param neuron {@inheritDoc}
+     * @see com.riskybusiness.neural.Neuron#Neuron(Neuron)
+     */
+	public StepNeuron(StepNeuron neuron)
+	{
+		super(neuron);
+		this.threshold = neuron.threshold;
+	}
+		
     /**
      * <p>Constructs a {@code StepNeuron} with the given amount
      * of inputs for the {@code SigmoidNeuron}. The threshold

@@ -25,7 +25,10 @@ import com.riskybusiness.neural.StepNeuron;
 import com.riskybusiness.neural.Synapse;
 
 import java.io.Serializable;
+import java.lang.Class;
 import java.lang.Object;
+import java.lang.ReflectiveOperationException;
+import java.lang.reflect.Constructor;
 
 /**
  * <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A {@code NeuralNet} is a set of
@@ -326,8 +329,10 @@ public class NeuralNet extends Object implements Serializable
      */
 	public void train(float[] desired, float[][] inputs) throws InvalidNeuronOutputException
 	{
-		while(true)
+		int count = 0;
+		while(++count < 500000)
 		{
+			//Code found at:
 			//http://www.nnwj.de/backpropagation.html
 			float[] prediction = this.fire(inputs); //I have no idea what to do from here.
 			if(prediction.length != desired.length)
@@ -349,20 +354,76 @@ public class NeuralNet extends Object implements Serializable
 				break;
 			//End confusion.
 			
+			//Adjust the hidden and output layers
+			//Adjusting the weight during this loop will actually change the fire output for the neuron, making the training
+			//invalid. This may fix the issue.
+			Class<?> neuronClass;
+			Constructor<?> constructor;
+			Neuron n = new SigmoidNeuron(0);
+			try
+			{
+				neuronClass = this.synapses[this.synapses.length - 1].getReceiver().getClass();
+				constructor = neuronClass.getConstructor(neuronClass);
+				n = (Neuron)constructor.newInstance(this.synapses[this.synapses.length - 1].getReceiver());
+			}
+			catch(ReflectiveOperationException roe)
+			{
+				roe.printStackTrace();
+			}
+			
 			float adjustment;
 			for(int i = this.synapses.length - 1; i >= 0; i--)
 			{
-				adjustment = totalError * this.synapses[i].getSender().fire() * this.synapses[i].getReciever().fire() * (1 - this.synapses[i].getReciever().fire());
-				this.synapses[i].getReciever().adjustWeight(this.synapses[i].getNeuronIndex(), adjustment);
+				if(i != (this.synapses.length - 1) && this.synapses[i + 1].getReceiver().compareTo(this.synapses[i].getReceiver()) != 0)
+				{
+					try
+					{
+						neuronClass = this.synapses[i].getReceiver().getClass();
+						constructor = neuronClass.getConstructor(neuronClass);
+						assert (n instanceof Neuron);
+						n = (Neuron)constructor.newInstance(this.synapses[i].getReceiver());
+					}
+					catch(ReflectiveOperationException roe)
+					{
+						roe.printStackTrace();
+					}
+					//For Bias Weight Adjustment
+					adjustment = totalError * 1 * n.fire() * (1 - n.fire());
+					this.synapses[i].getReceiver().adjustWeight(this.synapses[i].getReceiver().getWeights().length - 1, adjustment);
+				}
+
+				adjustment = totalError * this.synapses[i].getSender().fire() * n.fire() * (1 - n.fire());
+				this.synapses[i].getReceiver().adjustWeight(this.synapses[i].getNeuronIndex(), adjustment);				
 			}
 			
-			//for Bias Weight adjustment
-			for(int i = this.neurons.length - 1; i >= 0; i--)
+			//Adjust input Neurons
+			float fireValue = 0;
+			for(int i = 0; i < inputs.length; i++)
 			{
-				adjustment = totalError * 1 * this.neurons[i].fire() * (1 - this.neurons[i].fire());
-				this.neurons[i].adjustWeight(this.neurons[i].getWeights().length - 1, adjustment);
+				fireValue = this.neurons[i].fire(inputs[i]);
+				for(int j = 0; j < inputs[i].length; j++)
+					this.neurons[i].adjustWeight(j, totalError * inputs[i][j] * fireValue * (1 - fireValue));
 			}
+			
 			this.clearNetwork();
 		}
+		
+		//Bad training time, need to change weights.
+		if(count >= 500000)
+		{
+			System.out.println("Bad Training data");
+			for(Neuron n : this.neurons)
+				n.randomizeWeights();
+		}
+	}
+	
+	@Override
+	public String toString()
+	{
+		String s = "";
+		for(Synapse t : this.synapses)
+			s += t.getLastOutput() + ", ";
+		s = s.substring(0, s.length() - 2);
+		return "A " + this.getClass().getSimpleName() + " with the synapses that just fired with values of " + s + ".";
 	}
 }
