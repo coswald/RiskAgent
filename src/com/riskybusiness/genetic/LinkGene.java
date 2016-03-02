@@ -26,12 +26,18 @@ public class LinkGene implements Serializable
     
     private static final long serialVersionUID = 1L;
     
+    //Represents the ID of the neuron the link/synapse is coming from
     private int     fromNeuron;
+    //Represents the ID of the neuron the link/synapse is going to
     private int     toNeuron;
-    private double  linkWeight;
+    //Represents the weight of the link
+    private double  linkWeight; //Not necassary at the moment?
+    //Represents if the link is enabled
     private boolean linkEnabled;
-    private boolean linkRecurrent;
-    private int     innovationID;
+    //Represents if the link is recurrent
+    private boolean linkRecurrent; //Not necassary right now but would be very useful
+    //Represents the innovation ID
+    private int     innovationID; //Still not sure what this does?
     
     //Create a LinkGene
     public LinkGene(int fNeuron, int tNeuron, int id, double weight, boolean recur)
@@ -42,9 +48,13 @@ public class LinkGene implements Serializable
         linkEnabled = true;
         linkRecurrent = recur;
         innovationID = id;
-        //I have no clue what to do with the innovationID. -K
-        //Neither do I! -C
     }
+
+    //Create a LinkGene
+    //public LinkGene(int fNeuron, int tNeuron, int id)
+    //{
+    //    this.LinkGene(fNeuron, tNeuron, id, .1, false);
+    //}
     
     //Get the ID of the link
     public int getID()
@@ -64,7 +74,6 @@ public class LinkGene implements Serializable
         return linkWeight;
     }
     
-    //Possibly combines these two?
     //Get the neuron the link goes to
     public int getToNeuron()
     {
@@ -95,30 +104,15 @@ public class LinkGene implements Serializable
         this.linkWeight = weight;
     }
     
+    //Set the from Neuron ID
     public void setFromNeuron(int neuron)
     {
         this.fromNeuron = neuron;
     }
 
+    //Set the to Neuron ID
     public void setToNeuron(int neuron)
     {
         this.toNeuron = neuron;
     }
-    
-    //Have it return a Synapse -C
-    public Synapse createSynapse()
-    {
-        //com.riskybusiness.neural.Synapse(//Not sure if this is correct but I think it is unique so should work for an id
-                                         //this.innovationID, this.fromNeuron, this.toNeuron);
-        /*
-         * It was correct! Just syntatical issues.
-         * The only other thing that I can see issue with is decoding the from neuron and to neuron from ints into actual
-         * Neurons that need to be present for the formation of a synapse. I think what will have to happen is the NeuronGenes
-         * will form first, and then a LinkGene will be formed using the neurons made from the NeuronGenes. I don't know how
-         * we'll do this, but I don't see a huge problem, just little phinicky things.
-         */
-        return new Synapse(this.innovationID, new com.riskybusiness.neural.SigmoidNeuron(this.fromNeuron), new com.riskybusiness.neural.SigmoidNeuron(this.toNeuron)); //make neurons with inputs for now.
-        
-    }
-
 }

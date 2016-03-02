@@ -121,35 +121,57 @@ public class NeuralNet extends Object implements Serializable
 	public NeuralNet(int inputLayerRows, int outputLayerRows, int... hiddenLayerRows)
 	{
         //Just go through and see what happens. I have a hard time explaining what all this does.
+		
+		//Add to the number of neurons inside the neural network
 		int sum = inputLayerRows + outputLayerRows;
+		//An array that represent the number of inputs for the given layer + 1
+		//I.E. connections[0] gives the number of inputs for a neuron in layer (0 + 1) or simply layer 1
 		int[] connections = new int[1 + hiddenLayerRows.length];
+		//Add to the connections array 
 		connections[0] = inputLayerRows;
+		//Calculate the number of synapses between the input layer and the first hidden layer
 		int synapseSum = inputLayerRows * hiddenLayerRows[0];
 		
+		//Loops through the hidden layers if there is more than 1 hidden layer
 		for(int i = 0; i < hiddenLayerRows.length - 1; i++)
 		{
+			//Add the number of neurons in the current hidden layer to the sum
 			sum += hiddenLayerRows[i];
+			//Add to the connections array
 			connections[i + 1] = hiddenLayerRows[i];
+			//Calculate the number of synapses between the current hidden layer and the next and add it to the sum
 			synapseSum += hiddenLayerRows[i] * hiddenLayerRows[i + 1];
 		}
 		
+		//Calculate the number of neurons in the last hidden layer and add it to the sum 
 		sum += hiddenLayerRows[hiddenLayerRows.length - 1];
+		//Add to the connections array
 		connections[connections.length - 1] = hiddenLayerRows[hiddenLayerRows.length - 1];
+		//Calculate the number of synapses between the last hidden layer and the output layer and add it to the sum
 		synapseSum += hiddenLayerRows[hiddenLayerRows.length - 1] * outputLayerRows;
 		
+		//Instantiate the arrays for the nuerons and synapses using the values calculated above
 		this.neurons = new Neuron[sum];
 		this.synapses = new Synapse[synapseSum];
 		
+		//
 		sum = inputLayerRows - 1;
+		//Loop through the neurons and create neurons until there are no more neurons
 		for(int i = 0, j = -1; i < neurons.length; i++)
 		{
+			//If the current neuron isn't in the output layer create a sigmoid neuron
+			//else create a step neuron 
 			if(neurons.length - i <= outputLayerRows)
 				neurons[i] = new StepNeuron(connections[j]);
 			else
+				//If there is no hidden layer then the number of connections is 1
 				neurons[i] = new SigmoidNeuron((j == -1) ? 1 : connections[j]);
+			//If i is greater than the sum then we have exceeded the number of neurons in the active layer
+			//and need to move on to the next layer. 
 			if(i >= sum)
 				sum += (++j < hiddenLayerRows.length) ? hiddenLayerRows[j] : outputLayerRows;
 		}
+		
 		
 		int levelIndex = 0;
 		int synapseIndex = 0;
@@ -164,7 +186,7 @@ public class NeuralNet extends Object implements Serializable
 				k++;
 				setLevel = false;
 			}
-			System.out.println("I: " + i + " : " + synapseIndex + " : " + j + " : " + k);
+			//System.out.println("I: " + i + " : " + synapseIndex + " : " + j + " : " + k);
 			synapses[i] = new Synapse(synapseIndex, neurons[j], neurons[k]);
 			
 			if(j >= synapseSum)

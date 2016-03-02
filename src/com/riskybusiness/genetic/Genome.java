@@ -30,14 +30,23 @@ public class Genome implements Serializable
     
     private static final long serialVersionUID = 1L;
 
+    //Represents the ID of the genome
     private int                   genomeID;
+    //Represents the list of neurons
     private ArrayList<NeuronGene> neuronGeneSet = new ArrayList<NeuronGene>();
+    //Represents the list of links
     private ArrayList<LinkGene>   linkGeneSet   = new ArrayList<LinkGene>();
+    //Represents the fitness of the genome
     private double                genomeFitness;
+    //Represents the fitness of the genome adjusted for the species of the genome
     private double                genomeAdjFitness;
+    //Represents the amount of children to spawn
     private double                amountToSpawn;
+    //Represents the number of input Neurons
     private int                   numInputs;
+    //Represents the number of output Neurons
     private int                   numOutputs;
+    //Represents the speciesID of the genome
     private int                   species;
 
      //This constructor creates a genome from a vector of SLinkGenes a vector of SNeuronGenes and an ID number
@@ -50,11 +59,13 @@ public class Genome implements Serializable
         numOutputs    = outputs;
      }
 
+     //Get the number of neurons in the genome
     public int getSizeNeuron()
     {
         return neuronGeneSet.size();
     }
 
+    //Get the number of links in the genome
     public int getSizeLink()
     {
         return linkGeneSet.size();
@@ -78,20 +89,27 @@ public class Genome implements Serializable
        return true;
     }
 
+    //Creates a nueron from a neuron gene
     public Neuron createNeuron(NeuronGene neuron)
     {
+        //Represents the number of input links to a neuron
         int numInputs = 0;
+        //Loop Control Variable
         int i;
-        //Need to figure out a way to determine amount of inputs. If I know my ID I
-        //may be able to look and see how many active links point to me but we would 
-        //have to account for links not yet created so maybe create neurons last.
+
+        //Loop through the link gene set and see how many links point to the neuron ID
         for (i = 0; i < linkGeneSet.size(); i++)
         {
             if (linkGeneSet.get(i).getToNeuron() == neuron.getID())
             {
-                numInputs++;
+                if (linkGeneSet.get(i).getEnabled()) 
+                {
+                    numInputs++;
+                }
             }
         }
+
+        //Fix this only works for XOR, may need to add value to neuron to specify type
         if (neuron.getID() == 1)
         {
             numInputs = 1;
@@ -101,8 +119,7 @@ public class Genome implements Serializable
             numInputs = 1;
         }
 
-        System.out.println("NeuronID: " + neuron.getID() + " NumInputs: " + numInputs); 
-
+        //Create a neuron dependent on its type
         if (neuron.getNeuronType().equals("Sigmoid"))
         {
             return new com.riskybusiness.neural.SigmoidNeuron (neuron.getActivationResponse(), numInputs);
@@ -113,17 +130,25 @@ public class Genome implements Serializable
         }
     }
 
+    //Creates a synapse from a synapse gene
     public Synapse createSynapse(LinkGene link)
     {
-        //Variables
+        //Represents the neuron the synapse is going to and coming from
         Neuron     toNeuron   = null;
         Neuron     fromNeuron = null;
+        //Represents the ID of the surrent neuron to be checked
         NeuronGene currentNeuron;
 
+        //Represents whether the neurons have been found and set yet
         boolean    toNeuronIsSet   = false;
         boolean    fromNeuronIsSet = false;
 
+        //Loop Control Variable
         int i;
+        //Turns to false after the first link has been found
+        boolean firstLink = true;
+        //Represetns the position of the link in the neuron
+        int linkPos = 0;
 
         for (i = 0;i < neuronGeneSet.size(); i++)
         {
@@ -163,7 +188,22 @@ public class Genome implements Serializable
         }
         if (toNeuronIsSet && fromNeuronIsSet)
         {
-            return new com.riskybusiness.neural.Synapse (link.getID(), fromNeuron, toNeuron);
+            for (i = 0; i < linkGeneSet.size(); i++)
+            {
+                if (linkGeneSet.get(i).getFromNeuron() == link.getFromNeuron())
+                {
+                    if (linkGeneSet.get(i).getID() == link.getID())
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        linkPos++;
+                    }
+                }
+            }
+            //System.out.println("Created Link: " + link.getID() + " with a link pos of: " + linkPos);
+            return new com.riskybusiness.neural.Synapse (linkPos, fromNeuron, toNeuron);
         }
         else
         {
@@ -182,11 +222,10 @@ public class Genome implements Serializable
         //Variables
         //These arrays hold the actual neurons and synapses of the neural network
         Synapse[] linkSet = new Synapse[linkGeneSet.size()];
-    
         Neuron[] neuronSet = new Neuron[neuronGeneSet.size()];
 
+        //Loop Control Variable
         int i;
-        int j;
 
         //This loop loops through the global neuronGeneSet and creates neurons from these genes
         //and then adds them to the neuronSet
@@ -196,9 +235,9 @@ public class Genome implements Serializable
         }
         
         //This loop does the same as above but converts the link genes into synapses
-        for (j = 0;j < linkGeneSet.size(); j++)
+        for (i = 0;i < linkGeneSet.size(); i++)
         {
-            linkSet[j] = createSynapse(linkGeneSet.get(j));
+            linkSet[i] = createSynapse(linkGeneSet.get(i));
         }
 
         //Combines the neurons and synapses into a neural network and returns the network

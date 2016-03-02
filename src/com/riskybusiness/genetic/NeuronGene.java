@@ -27,45 +27,22 @@ public class NeuronGene implements Serializable
     
     private static final long serialVersionUID = 1L;
     
-    //I apologize for anything I have changed that will offend you.
+    //Represents the ID of the Neuron
     private int     neuronID;
+    //Represents the type of the Neuron, sigmoid or step
     private String  neuronType; 
+    //Represents whether the neuron is recurrent
     private boolean neuronRecurrent;
+    //Represents the weight of the neuron
     private float   neuronActivationResponse;
     //private int     innovationNum;
 
+    //Create a neuron gene
     public NeuronGene(int id, String type, boolean recur, float activate)
     {
-        //Is their a way to make this unique and not have to provide it? Like an autoincrement -K
-        /*
-         * Short answer? No.
-         * Long asnwer? Well....It depends on how we implement certain aspects of not only innovation
-         * database, but the recurring population as well. It is possible, but you have to be
-         * persnicity, and as you can see in the NeuralNet class, this can lead to some problems.
-         * -C
-         */
         neuronID = id;
-        neuronType = type; //Sigmoid, Step
-         
-        //Do we want to add something to signify whether it is a step or sigmoid
-        /*
-         * The neuronType will be the classpath for the given neuron we want to use,
-         * and it won't describe input, hidden, or output, but will describe the type
-         * of neuron (SigmoidNeuron, StepNeuron). Unless you don't think that this is
-         * necessitated. There is no way to say input/output/hidden/output right now, 
-         * and I don't feel that it is necessary. Let's talk.
-         * -C
-         */
-        
-        //As for this sucker, I'm getting there. See the doc for the NeuralNet -C
+        neuronType = type;
         neuronRecurrent = recur;
-        
-        //What is this for? -C
-        /*
-         * Just answered my own question. See below.
-         * This, with my current understanding, is either the threshold for the StepNeuron
-         * or the divisor for the SigmoidNeuron. It makes sense.
-         */
         neuronActivationResponse = activate;
     }
 
@@ -93,12 +70,7 @@ public class NeuronGene implements Serializable
         return neuronRecurrent;
     }
     
-    /*
-     * I feel that the next two methods can be
-     * combined with a parameter. But it's your
-     * class; do with it what you will.
-     */
-    //Disable the recurrency of the neuron
+    //Set the recurrency of the neuron
     public void setRecurrency(boolean recur)
     {
         this.neuronRecurrent = recur;
@@ -115,55 +87,4 @@ public class NeuronGene implements Serializable
     {
         this.neuronActivationResponse = activate;
     }
-    
-    //Make it return a Neuron
-    public Neuron createNeuron()
-    {
-        //Need to figure out a way to determine amount of inputs. If I know my ID I
-        //may be able to look and see how many active links point to me but we would 
-        //have to account for links not yet created so maybe create neurons last.
-        if (neuronType == "Sigmoid")
-        {
-            return new SigmoidNeuron(this.neuronActivationResponse, 5);
-        }
-        else //if (neuronType == "Step") 
-        {
-            return new StepNeuron(this.neuronActivationResponse, 5);
-        }
-
-
-        
-        //I'm not sure if this is correct -K
-        //Let's make it right! -C
-        //com.riskybusiness.neural.SigmoidNeuron(/*Possible issues with double vs float*/
-                                                 //this.neuronActivationResponse,
-                                                 /*We don't currently have anything to express num inputs in the gene*/
-                                                 //5);
-        /*Neuron n;
-        //loops through all of the constructors for the given class and finds one with a float and int parameter combo.
-        try
-        {
-            java.lang.reflect.Constructor[] constructors = Class.forName(neuronType).getDeclaredConstructors();
-            java.lang.reflect.Constructor floatInt = constructors[0]; //initial setting
-            for(java.lang.reflect.Constructor c : constructors)
-            {
-                Class<?>[] parameters = c.getParameterTypes();
-                if(parameters.length == 2 && parameters[0] == float.class && parameters[1] == int.class)
-                {
-                   floatInt = c;
-                   break;
-                }
-            }
-            n = new com.riskybusiness.neural.SigmoidNeuron(4); //(Class.forName(neuronType)).cast(obj.newInstance(new Float(this.neuronActivationResponse), new Integer(5)));
-            //I tried to implement this over 2 hours...I tried.
-            return n;
-        }
-        catch(ReflectiveOperationException roe) //Trust me, this isn't going to be great.
-        {
-            roe.printStackTrace();
-            return null;
-        }*/
-
-    }
-    
 }
