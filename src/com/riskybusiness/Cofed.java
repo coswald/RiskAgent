@@ -41,26 +41,31 @@ public class Cofed extends LuxAgentAdapter
   @Override
   public void attackPhase()
   {
+    return this.agent.attackPhase();
   }
 
   @Override
   public void cardsPhase(Card[] cards)
   {
+    return this.agent.cardsPhase(cards);
   }
 
   @Override
   public void fortifyPhase()
   {
+    return this.agent.fortifyPhase();
   }
 
   @Override
-  public int message(String message, Object data)
+  public int message(String note, Object data)
   {
+    return this.agent.message(note, data);
   }
 
   @Override
   public int moveArmiesIn(int countryCodeAttacker, int countryCodeDefender)
   {
+    return this.agent.moveArmiesIn(countryCodeAttacker, countryCodeDefender);
   }
 
   @Override
@@ -72,11 +77,13 @@ public class Cofed extends LuxAgentAdapter
   @Override
   public void placeArmies()
   {
+    return this.agent.placeArmies();
   }
 
   @Override
   public void placeInitialArmies(int numberOfArmies)
   {
+    return this.agent.placeInitialArmies(numberOfArmies);
   }
 
   @Override
