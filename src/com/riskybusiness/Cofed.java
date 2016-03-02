@@ -43,7 +43,7 @@ public class Cofed extends LuxAgentAdapter
   }
 
   @Override
-  public void cardsPhase()
+  public void cardsPhase(Card[] cards)
   {
   }
 
@@ -53,19 +53,13 @@ public class Cofed extends LuxAgentAdapter
   }
 
   @Override
-  public int message()
+  public int message(java.lang.String message, java.lang.Object data)
   {
   }
 
   @Override
-  public int moveArmiesIn()
+  public int moveArmiesIn(int countryCodeAttacker, int countryCodeDefender)
   {
-  }
-
-  @Override
-  public String name()
-  {
-    return "WESTIN";
   }
 
   @Override
@@ -74,7 +68,17 @@ public class Cofed extends LuxAgentAdapter
   }
 
   @Override
-  public int placeArmies()
+  public void placeArmies()
+  {
+  }
+
+  @Override
+  public void placeInitialArmies(int numberOfArmies)
+  {
+  }
+
+  @Override
+  public java.lang.String youWon()
   {
   }
 }
