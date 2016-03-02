@@ -17,6 +17,7 @@
 
 package com.riskybusiness;
 
+import java.util.Random;
 import com.riskybusiness.LuxAgentAdapter;
 import com.sillysoft.lux.Board;
 import com.sillysoft.lux.Country;
@@ -53,7 +54,7 @@ public class Cofed extends LuxAgentAdapter
   }
 
   @Override
-  public int message(java.lang.String message, java.lang.Object data)
+  public int message(String message, Object data)
   {
   }
 
@@ -78,7 +79,7 @@ public class Cofed extends LuxAgentAdapter
   }
 
   @Override
-  public java.lang.String youWon()
+  public String youWon()
   {
     String[] answers = { "The world is now my footstool",
   		"Sucks to suck, suckers!",
@@ -96,6 +97,6 @@ public class Cofed extends LuxAgentAdapter
       "Onward to pierce the heavens!"
     };
 
-  	return answers[ rand.nextInt(answers.length) ];
+  	return answers[ Random.nextInt(answers.length) ];
   }
 }
