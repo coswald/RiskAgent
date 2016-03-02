@@ -66,6 +66,7 @@ public class Cofed extends LuxAgentAdapter
   @Override
   public int pickCountry()
   {
+      return this.agent.pickCountry();
   }
 
   @Override
