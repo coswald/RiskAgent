@@ -35,8 +35,11 @@ import java.util.Random;
  */
 public class Cofed extends LuxAgentAdapter
 {
+    private int fitness;
+
     public Cofed()
     {
+        fitness = 0;
     }
 
     @Override
@@ -47,12 +50,369 @@ public class Cofed extends LuxAgentAdapter
         this.agent.setPrefs(ID, board);
     }
 
+    private int attackHeuristic()
+    {
+        if (CanAttack)
+        {
+            if (PlayerID != 0)
+            {
+                if (OwnTroops == EnemyTroops)
+                {
+                    if (OwnTroops >= 15) // Odds of victory exceed 60%
+                    {
+                        Attack(CountryID); // ATTACK!!!!
+                        Fitness += 8;
+                    }
+
+                    else if (OwnTroops >= 5) // Odds of victory between 50% and 60%
+                    {
+                        if (LastCountryOfOpponent)
+                        {
+                            if ((OwnCards + EnemyCards) >= 5)
+                            {
+                                Attack(CountryID); // Obliterate & take cards for a turn-in!
+                                Fitness += 6;
+                            }
+                            else if (EnemyReinforcementsPerTurn >= OwnReinforcementsPerTurn)
+                            {
+                                Attack(CountryID); // Better to crush them before they become greater than you...
+                                Fitness += 6;
+                            }
+                            else if (OpponentThatCanAttackThemTroops > EnemyTroops &&
+                            (OpponentThatCanAttackThemCards + EnemyCards) >= 5)
+                            {
+                                Attack(CountryId); // Don't let them steal the glory and power!
+                                Fitness += 5;
+                            }
+                            else
+                            {
+                                DoNothing(); // Don't Attack- not worth the RISK... .... ... Or is it?
+                                Fitness += 4;
+                            }
+                        }
+
+                        else if (BreakContinentBonus) // Break bonus troop gains!
+                        {
+                            Attack(CountryID);
+                            Fitness += 7;
+                        }
+
+                        else // Save your troops and build up
+                        {
+                            DoNothing(); // Don't Attack
+                            Fitness += 5;
+                        }
+                    }
+
+                    else // Odds of victory are in favor of defender
+                    {
+                        DoNothing(); // Don't Attack
+                        Fitness += 6;
+                    }
+                }
+
+                else if (OwnTroops > EnemyTroops)
+                {
+                    if ((OwnTroops - EnemyTroops) >= 10) // The lowest odds are high with this....
+                    {
+                        Attack(CountryID); // ATTACK!!!! Slaughter!!!!
+                        Fitness += 10; // Best Scenario!
+                    }
+
+                    else if ((OwnTroops - EnemyTroops) >= 6) // The lowest odds are high with this....
+                    {
+                        Attack(CountryID); // ATTACK!!!! Slaughter!!!!
+                        Fitness += 8; // Great Scenario!
+                    }
+
+                    else if ((OwnTroops - EnemyTroops) >= 2) // The lowest odds are at 68% with this....
+                    {
+                        Attack(CountryID); // ATTACK!!!! Slaughter!!!!!
+                        Fitness += 6;
+                    }
+
+                    else // Only one more- odds are high-ish, but not quite exceptional.
+                    {
+                        if (LastCountryOfOpponent)
+                        {
+                            if ((OwnCards + EnemyCards) >= 5)
+                            {
+                                Attack(CountryID); // Obliterate & take cards for a turn-in!
+                                Fitness += 6;
+                            }
+                            else if (EnemyReinforcementsPerTurn >= OwnReinforcementsPerTurn)
+                            {
+                                Attack(CountryID); // Better to crush them before they become greater than you...
+                                Fitness += 5;
+                            }
+                            else if (OpponentThatCanAttackThemTroops > EnemyTroops &&
+                            (OpponentThatCanAttackThemCards + EnemyCards) >= 5)
+                            {
+                                Attack(CountryId); // Don't let them steal the glory and power!
+                                Fitness += 4;
+                            }
+                            else
+                            {
+                                DoNothing(); // Don't Attack- not worth the RISK... .... ... Or is it?
+                                Fitness += 3;
+                            }
+                        }
+
+                        else if (BreakContinentBonus) // Break bonus troop gains!
+                        {
+                            Attack(CountryID);
+                            Fitness += 7;
+                        }
+
+                        else // Save and build up troops
+                        {
+                            DoNothing(); // Don't Attack
+                            Fitness += 2;
+                        }
+                    }
+                }
+
+                else // Opponent has more troops- so odds are never exceptional
+                {
+                    if ((EnemyTroops - OwnTroops) <= 2) //There is hope!
+                    {
+                        if (OwnTroops >= 20) // The Power of the Three Dice In full!
+                        {
+                            Attack(CountryID); // Odds begin exceeding 60% at this point
+                            Fitness += 7;
+                        }
+
+                        else if (OwnTroops >= 13) // Odds are even at this point
+                        {
+                            if (LastCountryOfOpponent)
+                            {
+                                if ((OwnCards + EnemyCards) >= 5)
+                                {
+                                    Attack(CountryID); // Obliterate & take cards for a turn-in!
+                                    Fitness += 6;
+                                }
+
+                                else if (EnemyReinforcementsPerTurn >= OwnReinforcementsPerTurn)
+                                {
+                                    Attack(CountryID); // Better to crush them before they become greater than you...
+                                    Fitness += 5;
+                                }
+
+                                else if (OpponentThatCanAttackThemTroops > EnemyTroops &&
+                                (OpponentThatCanAttackThemCards + EnemyCards) >= 5)
+                                {
+                                    Attack(CountryId); // Don't let them steal the glory and power!
+                                    Fitness += 4;
+                                }
+
+                                else
+                                {
+                                    DoNothing(); // Don't Attack- not worth the RISK... .... ... Or is it?
+                                    Fitness += 4;
+                                }
+                            }
+
+                            else if (BreakContinentBonus) // Break bonus troop gains!
+                            {
+                                Attack(CountryID);
+                                Fitness += 6;
+                            }
+
+                            else // Save and build up troops
+                            {
+                                DoNothing(); // Don't Attack
+                                Fitness += 5;
+                            }
+                        }
+                    }
+
+                    else // The odds are almost never in your favor
+                    {
+                        DoNothing(); // Don't Attack for your own sake...
+                        Fitness += 9;
+                    }
+                }
+            }
+        }
+    }
+
+    private int defenseHeuristic()
+    {
+        if (OpponentCanAttack)
+        {
+            if (PlayerID == 0)
+            {
+
+                if (OwnTroops == EnemyTroops)
+                {
+                    if (OwnTroops <= 5)
+                    {
+                        if (OwnLastCountry)
+                        {
+                            if ((OwnCards + EnemyCards) >= 5)
+                            {
+                                DoNothing();
+                                Fitness += 4;
+                            }
+                            else if (EnemyReinforcementsPerTurn <= OwnReinforcementsPerTurn)
+                            {
+                                DoNothing();
+                                Fitness += 6;
+                            }
+                            else
+                            {
+                                DoNothing();
+                                Fitness += 5;
+                            }
+                        }
+                        else if (BreakContinentBonus)
+                        {
+                            DoNothing();
+                            Fitness += 3;
+                        }
+
+                        else
+                        {
+                            DoNothing();
+                            Fitness += 7;
+                        }
+                    }
+
+                    else if (OwnTroops <= 15)
+                    {
+                        Attack(CountryID);
+                        Fitness += 5;
+                    }
+
+                    else
+                    {
+                        Attack(CountryID);
+                        Fitness += 3;
+                    }
+                }
+
+                else if (OwnTroops > EnemyTroops)
+                {
+                    if ((OwnTroops - EnemyTroops) >= 10)
+                    {
+                        Attack(CountryID);
+                        Fitness += 10;
+                    }
+
+                    else if ((OwnTroops - EnemyTroops) >= 6)
+                    {
+                        Attack(CountryID);
+                        Fitness += 8;
+                    }
+
+                    else if ((OwnTroops - EnemyTroops) >= 2)
+                    {
+                        Attack(CountryID);
+                        Fitness += 6;
+                    }
+
+                    else
+                    {
+                        if (OwnLastCountry)
+                        {
+                            if ((OwnCards + EnemyCards) >= 5)
+                            {
+                                DoNothing();
+                                Fitness += 4;
+                            }
+                            else if (EnemyReinforcementsPerTurn <= OwnReinforcementsPerTurn)
+                            {
+                                Attack(CountryID);
+                                Fitness += 5;
+                            }
+                            else
+                            {
+                                DoNothing();
+                                Fitness += 5;
+                            }
+                        }
+
+                        else if (BreakContinentBonus)
+                        {
+                            DoNothing();
+                            Fitness += 4;
+                        }
+
+                        else
+                        {
+                            DoNothing();
+                            Fitness += 6;
+                        }
+                    }
+                }
+
+                else
+                {
+                    if ((EnemyTroops - OwnTroops) >= 2)
+                    {
+                        if (EnemyTroops >= 20)
+                        {
+                            DoNothing();
+                            Fitness += 3;
+                        }
+
+                        else if (EnemyTroops >= 13)
+                        {
+                            if (OwnLastCountry)
+                            {
+                                if ((OwnCards + EnemyCards) >= 5)
+                                {
+                                    DoNothing();
+                                    Fitness += 2;
+                                }
+
+                                else if (EnemyReinforcementsPerTurn <= OwnReinforcementsPerTurn)
+                                {
+                                    DoNothing();
+                                    Fitness += 5;
+                                }
+
+                                else
+                                {
+                                    Attack(CountryID);
+                                    Fitness += 6;
+                                }
+                            }
+
+                            else if (BreakContinentBonus)
+                            {
+                                DoNothing();
+                                Fitness += 4;
+                            }
+
+                            else
+                            {
+                                DoNothing();
+                                Fitness += 5;
+                            }
+                        }
+                    }
+
+                    else
+                    {
+                        Attack(CountryID);
+                        Fitness += 9;
+                    }
+                }
+            }
+        }
+    }
+
     @Override
     public void attackPhase()
     {
-        // This is here as filler. It will be altered to the appropriate
-        // attackPhase according to our own AI
-        return this.agent.attackPhase();
+        // Gather data from board
+        // Run attackHeuristic, save results
+        attackHeuristic();
+        // Run defenseHeuristic, save results
+        defenseHeuristic();
+        // Train NeuralNet
+        // Attack or don't attack
     }
 
     @Override
