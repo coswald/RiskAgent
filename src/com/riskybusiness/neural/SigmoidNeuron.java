@@ -67,6 +67,17 @@ public class SigmoidNeuron extends Neuron
 	}
 	
     /**
+     * <p>Constructs a copy of the given {@code SigmoidNeuron}.</p>
+     * @param neuron {@inheritDoc}
+     * @see com.riskybusiness.neural.Neuron#Neuron(Neuron)
+     */
+	public SigmoidNeuron(SigmoidNeuron neuron)
+	{
+		super(neuron);
+		this.summationDivisor = neuron.summationDivisor;
+	}
+	
+    /**
      * <p>Changes the number that is used to divide the sum by.</p>
      * @param summationDivisor The number to divide the sum by
      *              as it is sent into the activation function.

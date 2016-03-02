@@ -1,6 +1,7 @@
 /bin/
 /src/com/sillysoft/
 /src/org/
+/javadocs/
 sources
 makeDoc
 *.class

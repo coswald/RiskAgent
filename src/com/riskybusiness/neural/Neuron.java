@@ -163,6 +163,21 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	}
 	
 	/**
+	 * <p>Makes a copy of the given {@code Neuron}. This
+	 * does not use the clone method, nor does this class
+	 * implement {@link java.lang.Cloneable}, but this is
+	 * just a copy constructor.</p>
+	 * @param neuron The {@code Neuron} to copy.
+	 */
+	public Neuron(Neuron neuron)
+	{
+		this.inputs = neuron.inputs;
+		this.weights = neuron.weights;
+		this.learningRate = neuron.learningRate;
+		this.haveFired = neuron.haveFired;
+	}
+	
+	/**
 	 * <p>Fills a list with values, either 1, or a
 	 * random float between 0 and 1.</p>
 	 * @param random Determines which values to fill
@@ -408,7 +423,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	 * <br>
 	 * and is multiplied by the inputs that gave
 	 * the <b>NEURONOUTPUT</b>. This is done in
-	 * the {com.riskybusiness.neural.Neuron#train(float, float[]}
+	 * the {com.riskybusiness.neural.Neuron#train(float, float[])}
 	 * method, consiquentally calling this method
 	 * after doing this calculation.</p>
 	 * @param adjustments The list of adjustments
@@ -435,7 +450,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	
 	
 	/**
-	 * <p>Adjust the wieght given the learning
+	 * <p>Adjust the weight given the learning
 	 * rate and the weight index of this
 	 * {@code Neuron}.
 	 * @param index The weight index to adjust
@@ -451,6 +466,15 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 			throw new InvalidNeuronInputException("The index given is greater than the amount of weights!");
 		
 		this.weights[index] += (adjustment * this.learningRate);
+	}
+	
+	/**
+	 * <p>Adjusts all of the weights to random
+	 * values.</p>
+	 */
+	public void randomizeWeights()
+	{
+		Neuron.fillList(true, this.weights);
 	}
 	
 	/**
