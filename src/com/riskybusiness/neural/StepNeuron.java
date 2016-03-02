@@ -92,7 +92,7 @@ public class StepNeuron extends Neuron
 	
     /**
      * <p>Will fire if the summation variable is greater than the
-     * threshold, or it won't.
+     * threshold, or it won't.</p>
      * @param summation {@inheritDoc}
      * @return 1 if the sum was greater or equal to the threshold,
      *              0 otherwise.
@@ -101,5 +101,23 @@ public class StepNeuron extends Neuron
 	public float activate(float summation)
 	{
 		return (summation < threshold) ? 0F : 1F;
+	}
+	
+	/**
+     * <p>Will fire just as the step functions derivative. While
+	 * technically this is nothing, as the step function is not
+	 * continuous or differentiable, someone has proved that it
+	 * has a derivative given certain context. More can be read
+	 * <a href="http://mathworld.wolfram.com/HeavisideStepFunction.html">here</a>
+	 * . However, in this context, the threshold function is just
+	 * called again.</p>
+     * @param summation {@inheritDoc}
+     * @return 1 if the sum was greater or equal to the threshold,
+     *              0 otherwise.
+     */
+	@Override
+	public float activateDerivative(float num)
+	{
+		return this.activate(num);
 	}
 }

@@ -258,7 +258,7 @@ public class NeuralNet extends Object implements Serializable
      */
 	public float[] fire(float[][] inputs) throws InvalidNeuronInputException
 	{
-		//System.out.println("Inputs: " + inputs[0][0] + " " + inputs [1][0]);
+		this.clearNetwork(); //Just in case the network isn't clear before we start to fire.
 		if(inputs.length > neurons.length)
 			throw new InvalidNeuronInputException("The amount of inputs given are greater than the amount of neurons!");
 		
@@ -329,92 +329,26 @@ public class NeuralNet extends Object implements Serializable
      */
 	public void train(float[] desired, float[][] inputs) throws InvalidNeuronOutputException
 	{
-		int count = 0;
-		while(++count < 500000)
+		//Old code found at:
+		//http://www.nnwj.de/backpropagation.html
+		float[] prediction = this.fire(inputs); //I have no idea what to do from here.
+		if(prediction.length != desired.length)
+			throw new InvalidNeuronOutputException("The amount of outputs given is not equal to that of the outputs in the output layer!");
+		
+		//New code found at:
+		//http://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
+		
+		//Loop through the output layer to train it.
+		
+		for(int i = (this.neurons.length - 1); i >= (this.neurons.length - prediction.length); i--)
 		{
-			//Code found at:
-			//http://www.nnwj.de/backpropagation.html
-			float[] prediction = this.fire(inputs); //I have no idea what to do from here.
-			if(prediction.length != desired.length)
-				throw new InvalidNeuronOutputException("The amount of outputs given is not equal to that of the outputs in the output layer!");
-			float[] error = new float[prediction.length];
-			for(int i = 0; i < error.length; i++)
-			{
-				error[i] = desired[i] - prediction[i];
-				//System.out.println("Desired: " + desired[i] + "; Predicted: " + prediction[i] + "; Error: " + error[i]);
-			}
-			
-			//NOTE: Not sure if correct. I need a way to compute the total error, but I don't think that this is correct. -C
-			//Website listed above gives record of ways to compute total error with one output neuron. I know this value,
-			//but I don't know for multiple outputs. Wes, I'd appreciate a way to compute all of the output layers values.
-			float totalError = 0;
-			for(int i = 0; i < error.length; i++)
-				totalError += error[i];
-			if(totalError == 0)
-				break;
-			//End confusion.
-			
-			//Adjust the hidden and output layers
-			//Adjusting the weight during this loop will actually change the fire output for the neuron, making the training
-			//invalid. This may fix the issue.
-			Class<?> neuronClass;
-			Constructor<?> constructor;
-			Neuron n = new SigmoidNeuron(0);
-			try
-			{
-				neuronClass = this.synapses[this.synapses.length - 1].getReceiver().getClass();
-				constructor = neuronClass.getConstructor(neuronClass);
-				n = (Neuron)constructor.newInstance(this.synapses[this.synapses.length - 1].getReceiver());
-			}
-			catch(ReflectiveOperationException roe)
-			{
-				roe.printStackTrace();
-			}
-			
-			float adjustment;
-			for(int i = this.synapses.length - 1; i >= 0; i--)
-			{
-				if(i != (this.synapses.length - 1) && this.synapses[i + 1].getReceiver().compareTo(this.synapses[i].getReceiver()) != 0)
-				{
-					try
-					{
-						neuronClass = this.synapses[i].getReceiver().getClass();
-						constructor = neuronClass.getConstructor(neuronClass);
-						assert (n instanceof Neuron);
-						n = (Neuron)constructor.newInstance(this.synapses[i].getReceiver());
-					}
-					catch(ReflectiveOperationException roe)
-					{
-						roe.printStackTrace();
-					}
-					//For Bias Weight Adjustment
-					adjustment = totalError * 1 * n.fire() * (1 - n.fire());
-					this.synapses[i].getReceiver().adjustWeight(this.synapses[i].getReceiver().getWeights().length - 1, adjustment);
-				}
-
-				adjustment = totalError * this.synapses[i].getSender().fire() * n.fire() * (1 - n.fire());
-				this.synapses[i].getReceiver().adjustWeight(this.synapses[i].getNeuronIndex(), adjustment);				
-			}
-			
-			//Adjust input Neurons
-			float fireValue = 0;
-			for(int i = 0; i < inputs.length; i++)
-			{
-				fireValue = this.neurons[i].fire(inputs[i]);
-				for(int j = 0; j < inputs[i].length; j++)
-					this.neurons[i].adjustWeight(j, totalError * inputs[i][j] * fireValue * (1 - fireValue));
-			}
-			
-			this.clearNetwork();
+			//Delta Rule
+			//(out - target) * activateDerivative * OutputOFInputNeuron
+			for(int j = 0; j < this.neurons[i].getWeights().length; j++)
+				this.neurons[i].adjustWeight(j, (prediction[i] - desired[i]) * this.neurons[i].activateDerivative(prediction[i]) * this.neurons[i].getInputAt(j));
 		}
 		
-		//Bad training time, need to change weights.
-		if(count >= 500000)
-		{
-			System.out.println("Bad Training data");
-			for(Neuron n : this.neurons)
-				n.randomizeWeights();
-		}
+		this.clearNetwork();
 	}
 	
 	@Override

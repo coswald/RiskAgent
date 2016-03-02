@@ -100,4 +100,19 @@ public class SigmoidNeuron extends Neuron
 	{
 		return 1.0F / (1F + (float)Math.exp(-summation / summationDivisor));
 	}
+	
+	/**
+	 * <p>Describes the derivative of the sigmoid activation
+	 * function. This can be described in terms of the sigmoid
+	 * function; in this case, <b>s(x)</b>. The derivative of
+	 * <b>s(x)</b> (<b>s'(x)</b>) is <b>s(x)(1 - s(x))</b>.</p>
+	 * @param num {@inheritDoc}
+	 * @return {@inheritDoc}
+	 * @see com.riskybusiness.neural.SigmoidNeuron#activate(float)
+	 */
+	@Override
+	public float activateDerivative(float num)
+	{
+		return this.activate(num) * (1 - this.activate(num));
+	}
 }

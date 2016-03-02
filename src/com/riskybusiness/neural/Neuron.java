@@ -255,6 +255,23 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	}
 	
 	/**
+	 * <p>Returns the input given at the index provided</p>
+	 * @param index The index to retrieve the input from.
+	 * @return The input value for this {@code Neuron} at
+	 * 				the specified index.
+	 * @throws InvalidNeuronInputException When the index
+	 * 				is greater than the size of the array
+	 * 				holding the inputs or less than zero.
+	 * @see com.riskybusiness.neural.Neuron#inputs
+	 */
+	public float getInputAt(int index) throws InvalidNeuronInputException
+	{
+		if(index >= this.inputs.length || index < 0)
+			throw new InvalidNeuronInputException("Cannot access an invalid index!");
+		return this.inputs[index];
+	}
+	
+	/**
 	 * <p>Compared the output of this {@code Neuron}
 	 * to that of another. What is returned is the
 	 * difference between their outputs. If the
@@ -327,6 +344,18 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	public abstract float activate(float summation);
 	
 	/**
+	 * <p>Describes the derivative of the 
+	 * {@link com.riskybusiness.neural.Neuron#activate(float)}
+	 * function. This is used and can be used for training
+	 * a network or a {@code Neuron}.</p>
+	 * @param num The number to feed into the derivative
+	 * 				of the activation function.
+	 * @return The result of the derivative of the activation
+	 * 				function.
+	 */
+	 public abstract float activateDerivative(float num);
+	
+	/**
 	 * <p>Actually fires a value based on the
 	 * inputs. This is done by calling the classes
 	 * {@link com.riskybusiness.neural.Neuron#sum(float[])}
@@ -347,7 +376,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	{
 		if(inputs.length == this.inputs.length)
 		{
-			this.inputs = inputs;
+			//this.inputs = inputs;
 			haveFired = true;
 		}
 		return this.activate(this.sum(inputs));

@@ -139,16 +139,16 @@ public class Synapse extends Object implements Serializable
 			throw new NeuronCannotFireException(sender.toString() + " cannot fire!");
 		
 		float temp = this.lastOutput;
-                try
-                {
-                        this.lastOutput = sender.fire();
-                        receiver.addToInput(neuronIndex, this.lastOutput);
-                }
-                catch(Exception e)
-                {
-                        this.lastOutput = temp;
-                        throw e;
-                }
+		try
+		{
+				this.lastOutput = sender.fire();
+				receiver.addToInput(neuronIndex, this.lastOutput);
+		}
+		catch(Exception e)
+		{
+				this.lastOutput = temp;
+				throw e;
+		}
         //sender.clearInputs();
 	}
 	
