@@ -80,5 +80,22 @@ public class Cofed extends LuxAgentAdapter
   @Override
   public java.lang.String youWon()
   {
+    String[] answers = { "The world is now my footstool",
+  		"Sucks to suck, suckers!",
+  		"Lelouch vi Britannia has nothing on me!",
+  		"Can you smell that? That is the smell of sweet victory",
+  		"Your failure was secured from turn one",
+  		"My skills are without equal",
+  		"Next step: galactic conquest",
+  		"You ignorant fools thought you actually stood a chance?",
+  		"Join me, and I will spare you!\n \n Oh wait, you're already dead",
+  		"Even the Doctor can't save you now!",
+  		"Your head shall be added to my trophy room",
+  		"Now, I just need to make sure Goku stays out \n
+      of my way and I will be unstoppable!",
+      "Onward to pierce the heavens!"
+    };
+
+  	return answers[ rand.nextInt(answers.length) ];
   }
 }
