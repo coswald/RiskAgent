@@ -35,11 +35,8 @@ import java.util.Random;
  */
 public class Cofed extends LuxAgentAdapter
 {
-    private int fitness;
-
     public Cofed()
     {
-        fitness = 0;
     }
 
     @Override
@@ -52,6 +49,8 @@ public class Cofed extends LuxAgentAdapter
 
     private int attackHeuristic()
     {
+        private int fitness = 0;
+
         if (CanAttack)
         {
             if (PlayerID != 0)
@@ -234,10 +233,14 @@ public class Cofed extends LuxAgentAdapter
                 }
             }
         }
+
+        return fitness;
     }
 
     private int defenseHeuristic()
     {
+        private int fitness = 0;
+
         if (OpponentCanAttack)
         {
             if (PlayerID == 0)
@@ -401,6 +404,8 @@ public class Cofed extends LuxAgentAdapter
                 }
             }
         }
+
+        return fitness;
     }
 
     @Override
