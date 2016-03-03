@@ -19,6 +19,7 @@ package com.riskybusiness.genetic;
 
 import com.riskybusiness.neural.Neuron;
 import com.riskybusiness.neural.Synapse;
+
 import java.io.Serializable;
 
 public class LinkGene implements Serializable
@@ -42,12 +43,12 @@ public class LinkGene implements Serializable
     //Create a LinkGene
     public LinkGene(int fNeuron, int tNeuron, int id, double weight, boolean recur)
     {
-        fromNeuron = fNeuron;
-        toNeuron = tNeuron;
-        linkWeight = weight;
-        linkEnabled = true;
+        fromNeuron    = fNeuron;
+        toNeuron      = tNeuron;
+        linkWeight    = weight;
+        linkEnabled   = true;
         linkRecurrent = recur;
-        innovationID = id;
+        innovationID  = id;
     }
 
     //Create a LinkGene

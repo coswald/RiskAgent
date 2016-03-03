@@ -20,7 +20,8 @@ package com.riskybusiness.genetic;
 import com.riskybusiness.neural.Neuron;
 import com.riskybusiness.neural.StepNeuron;
 import com.riskybusiness.neural.SigmoidNeuron;
-import java.io.Serializable; //Don't forget to import.
+
+import java.io.Serializable;
 
 public class NeuronGene implements Serializable
 {

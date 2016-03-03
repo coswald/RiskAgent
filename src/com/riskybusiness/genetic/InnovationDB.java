@@ -15,8 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-//Iterable/Iterator
-
 package com.riskybusiness.genetic;
 
 import java.io.Serializable;
@@ -25,9 +23,12 @@ import java.util.ArrayList;
 public class InnovationDB implements Serializable
 {
 
-	private ArrayList<Innovation> innovationDB = new ArrayList<Innovation>();
-	private Innovation toFind;
-	private int innovationID = 0;
+	//Represents an array of innovations
+	private ArrayList<Innovation> 	innovationDB = new ArrayList<Innovation>();
+	//Represents the innovationto find in the database
+	private Innovation 				toFind;
+	//Represetns the innovationID
+	private int 					innovationID = 0;
 
 
 	/**

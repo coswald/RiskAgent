@@ -170,10 +170,7 @@ public class GeneticTest
 			{
 				for(int z = 0; z < trainers.length; z++)
 				{
-					System.out.println (trainers[z].getAnswer());
 					myNetworks[i].train(new float[] {trainers[z].getAnswer()}, new float[][] {new float[] {trainers[z].getInputs()[0]}, new float[] {trainers[z].getInputs()[1]}});
-					//Thread.sleep(1000);
-					//System.out.println("Training: " + i);
 					myNetworks[i].clearNetwork();
 				}
 				
