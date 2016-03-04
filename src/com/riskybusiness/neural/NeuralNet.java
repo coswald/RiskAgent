@@ -339,13 +339,12 @@ public class NeuralNet extends Object implements Serializable
 		//http://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
 		
 		//Loop through the output layer to train it.
-		
 		for(int i = (this.neurons.length - 1); i >= (this.neurons.length - prediction.length); i--)
 		{
 			//Delta Rule
 			//(out - target) * activateDerivative * OutputOFInputNeuron
 			for(int j = 0; j < this.neurons[i].getWeights().length; j++)
-				this.neurons[i].adjustWeight(j, (prediction[i] - desired[i]) * this.neurons[i].activateDerivative(prediction[i]) * this.neurons[i].getInputAt(j));
+				this.neurons[i].adjustWeight(j, -(prediction[i - (this.neurons.length - 1)] - desired[i - (this.neurons.length - 1)]) * this.neurons[i].activateDerivative(prediction[i - (this.neurons.length - 1)]) * this.neurons[i].getInputAt(j));
 		}
 		
 		this.clearNetwork();

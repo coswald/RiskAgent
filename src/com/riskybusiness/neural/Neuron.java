@@ -266,9 +266,9 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	 */
 	public float getInputAt(int index) throws InvalidNeuronInputException
 	{
-		if(index >= this.inputs.length || index < 0)
+		if(index >= (this.inputs.length + 1) || index < 0)
 			throw new InvalidNeuronInputException("Cannot access an invalid index!");
-		return this.inputs[index];
+		return (index >= this.inputs.length) ? 1 : this.inputs[index];
 	}
 	
 	/**
@@ -515,6 +515,16 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	public void setLearningRate(float learningRate)
 	{
 		this.learningRate = learningRate;
+	}
+	
+	/**
+	 * <p>Gets the learning rate for this
+	 * {@code Neuron}.</p>
+	 * @return The learning rate.
+	 */
+	public float getLearningRate()
+	{
+		return this.learningRate;
 	}
 	
 	/**
