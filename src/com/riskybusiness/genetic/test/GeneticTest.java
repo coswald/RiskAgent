@@ -152,48 +152,25 @@ public class GeneticTest
 			myNetworks[i] = population[i].createPhenotype();
 		}
 
-		Trainer[] trainers = new Trainer[2000];
-		float in1, in2;
-
-		for(i = 0 ; i < trainers.length; i++)
+		for (i = 0; i < populationSize; i++)
 		{
-			in1 = (Math.random() < .5) ? 0F : 1F;
-			in2 = (Math.random() < .5) ? 0F : 1F;
-			trainers[i] = new Trainer(((int)in1) ^ ((int)in2), in1, in2);
+			System.out.println(myNetworks[i]);
 		}
 
 		for (i = 0; i < populationSize; i++)
 		{
 
-			boolean trained = false;
-			while(!trained)
+			int amountWrong = 0;
+			outer:
+			for(float x = 0; x < 2; x++)
 			{
-				for(int z = 0; z < trainers.length; z++)
+				for(float y = 0; y < 2; y++)
 				{
-					myNetworks[i].train(new float[] {trainers[z].getAnswer()}, new float[][] {new float[] {trainers[z].getInputs()[0]}, new float[] {trainers[z].getInputs()[1]}});
-					myNetworks[i].clearNetwork();
+					System.out.println(myNetworks[i].fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
 				}
-				
-				float got = 0F;
-				int amountWrong = 0;
-				outer:
-				for(float x = 0; x < 2; x++)
-				{
-					for(float y = 0; y < 2; y++)
-					{
-						got = myNetworks[i].fire(new float[][] {new float[] {x}, new float[] {y}})[0];
-						myNetworks[i].clearNetwork();
-						if(myNetworks[i].fire(new float[][] {new float[] {x}, new float[] {y}})[0] != ((float)(((int)x) ^ ((int)y))))
-							amountWrong++;
-						myNetworks[i].clearNetwork();
-						//System.out.println("I: " + i + "; J: " + j + "; Got: " + got);
-					}
-				}
-				if(amountWrong == 0)
-					trained = true;
 			}
 
-			System.out.println("Network " + i + " trained!");
+			System.out.println("Network " + i + " fired!");
 		}
 	}
 }

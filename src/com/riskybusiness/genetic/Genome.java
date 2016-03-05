@@ -301,11 +301,8 @@ public class Genome implements Serializable
             //This loop will loop thorugh as many times as specified looking for a proper neuron to create a looped link with
             while(numTrysToFindLoop > 0)
             {
-                /**
                 //This needs to be a number between the number of inputs + 1 and the size of the neuron arraylist - 1
-                //Also will there be type issues with double and int will fix
-                **/
-                int neuronIndex = random.nextInt();
+                int neuronIndex = random.nextInt(neuronGeneSet.size() - numInputNeurons - 1) + numInputNeurons;
 
                 /**
                 We need to find a way to determine if a neuron is input, output, etc. I may add this to the neuron gene
