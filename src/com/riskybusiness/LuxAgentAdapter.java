@@ -68,12 +68,10 @@ public abstract class LuxAgentAdapter implements LuxAgent
     /**
      * <p>A constructor to determine version number, other behaviour,
      * description.</p>
-     * @param luxAgent The {@code LuxAgent} to use for the behaviours
-     *                 That the agent doesn't want to specify
      */
-    public LuxAgentAdapter(LuxAgent agent)
+    public LuxAgentAdapter()
     {
-        this.agent = agent;
+
     }
 
     /**
@@ -90,7 +88,6 @@ public abstract class LuxAgentAdapter implements LuxAgent
       this.ID = ID;
       this.board = board;
       this.countries = board.getCountries();
-      this.agent.setPrefs(ID, board);
     }
 
     /**

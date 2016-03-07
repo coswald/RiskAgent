@@ -47,11 +47,12 @@ public class Cofed extends LuxAgentAdapter
         this.agent.setPrefs(ID, board);
     }
 
-    private int attackHeuristic()
+    private int attackHeuristic(id)
     {
         private int fitness = 0;
+        private int attackValue = 0; // Default to not attack
 
-        if (CanAttack)
+        if (canAttack(id))
         {
             if (PlayerID != 0)
             {
@@ -59,7 +60,7 @@ public class Cofed extends LuxAgentAdapter
                 {
                     if (OwnTroops >= 15) // Odds of victory exceed 60%
                     {
-                        Attack(CountryID); // ATTACK!!!!
+                        attackValue += 1; //Attack
                         Fitness += 8;
                     }
 
@@ -69,43 +70,43 @@ public class Cofed extends LuxAgentAdapter
                         {
                             if ((OwnCards + EnemyCards) >= 5)
                             {
-                                Attack(CountryID); // Obliterate & take cards for a turn-in!
+                                attackValue += 1; //Attack
                                 Fitness += 6;
                             }
                             else if (EnemyReinforcementsPerTurn >= OwnReinforcementsPerTurn)
                             {
-                                Attack(CountryID); // Better to crush them before they become greater than you...
+                                attackValue += 1; //Attack
                                 Fitness += 6;
                             }
                             else if (OpponentThatCanAttackThemTroops > EnemyTroops &&
                             (OpponentThatCanAttackThemCards + EnemyCards) >= 5)
                             {
-                                Attack(CountryId); // Don't let them steal the glory and power!
+                                attackValue += 1; //Attack
                                 Fitness += 5;
                             }
                             else
                             {
-                                DoNothing(); // Don't Attack- not worth the RISK... .... ... Or is it?
+                                //Don't Attack
                                 Fitness += 4;
                             }
                         }
 
                         else if (BreakContinentBonus) // Break bonus troop gains!
                         {
-                            Attack(CountryID);
+                            attackValue += 1; //Attack
                             Fitness += 7;
                         }
 
                         else // Save your troops and build up
                         {
-                            DoNothing(); // Don't Attack
+                            //Don't Attack
                             Fitness += 5;
                         }
                     }
 
                     else // Odds of victory are in favor of defender
                     {
-                        DoNothing(); // Don't Attack
+                        //Don't Attack
                         Fitness += 6;
                     }
                 }
@@ -114,19 +115,19 @@ public class Cofed extends LuxAgentAdapter
                 {
                     if ((OwnTroops - EnemyTroops) >= 10) // The lowest odds are high with this....
                     {
-                        Attack(CountryID); // ATTACK!!!! Slaughter!!!!
+                        attackValue += 1; //Attack
                         Fitness += 10; // Best Scenario!
                     }
 
                     else if ((OwnTroops - EnemyTroops) >= 6) // The lowest odds are high with this....
                     {
-                        Attack(CountryID); // ATTACK!!!! Slaughter!!!!
+                        attackValue += 1; //Attack
                         Fitness += 8; // Great Scenario!
                     }
 
                     else if ((OwnTroops - EnemyTroops) >= 2) // The lowest odds are at 68% with this....
                     {
-                        Attack(CountryID); // ATTACK!!!! Slaughter!!!!!
+                        attackValue += 1; //Attack
                         Fitness += 6;
                     }
 
@@ -136,36 +137,36 @@ public class Cofed extends LuxAgentAdapter
                         {
                             if ((OwnCards + EnemyCards) >= 5)
                             {
-                                Attack(CountryID); // Obliterate & take cards for a turn-in!
+                                attackValue += 1; //Attack
                                 Fitness += 6;
                             }
                             else if (EnemyReinforcementsPerTurn >= OwnReinforcementsPerTurn)
                             {
-                                Attack(CountryID); // Better to crush them before they become greater than you...
+                                attackValue += 1; //Attack
                                 Fitness += 5;
                             }
                             else if (OpponentThatCanAttackThemTroops > EnemyTroops &&
                             (OpponentThatCanAttackThemCards + EnemyCards) >= 5)
                             {
-                                Attack(CountryId); // Don't let them steal the glory and power!
+                                attackValue += 1; //Attack
                                 Fitness += 4;
                             }
                             else
                             {
-                                DoNothing(); // Don't Attack- not worth the RISK... .... ... Or is it?
+                                //Don't Attack
                                 Fitness += 3;
                             }
                         }
 
                         else if (BreakContinentBonus) // Break bonus troop gains!
                         {
-                            Attack(CountryID);
+                            attackValue += 1; //Attack
                             Fitness += 7;
                         }
 
                         else // Save and build up troops
                         {
-                            DoNothing(); // Don't Attack
+                            //Don't Attack
                             Fitness += 2;
                         }
                     }
@@ -177,7 +178,7 @@ public class Cofed extends LuxAgentAdapter
                     {
                         if (OwnTroops >= 20) // The Power of the Three Dice In full!
                         {
-                            Attack(CountryID); // Odds begin exceeding 60% at this point
+                            attackValue += 1; //Attack
                             Fitness += 7;
                         }
 
@@ -187,39 +188,39 @@ public class Cofed extends LuxAgentAdapter
                             {
                                 if ((OwnCards + EnemyCards) >= 5)
                                 {
-                                    Attack(CountryID); // Obliterate & take cards for a turn-in!
+                                    attackValue += 1; //Attack
                                     Fitness += 6;
                                 }
 
                                 else if (EnemyReinforcementsPerTurn >= OwnReinforcementsPerTurn)
                                 {
-                                    Attack(CountryID); // Better to crush them before they become greater than you...
+                                    attackValue += 1; //Attack
                                     Fitness += 5;
                                 }
 
                                 else if (OpponentThatCanAttackThemTroops > EnemyTroops &&
                                 (OpponentThatCanAttackThemCards + EnemyCards) >= 5)
                                 {
-                                    Attack(CountryId); // Don't let them steal the glory and power!
+                                    attackValue += 1; //Attack
                                     Fitness += 4;
                                 }
 
                                 else
                                 {
-                                    DoNothing(); // Don't Attack- not worth the RISK... .... ... Or is it?
+                                    //Don't Attack
                                     Fitness += 4;
                                 }
                             }
 
                             else if (BreakContinentBonus) // Break bonus troop gains!
                             {
-                                Attack(CountryID);
+                                attackValue += 1; //Attack
                                 Fitness += 6;
                             }
 
                             else // Save and build up troops
                             {
-                                DoNothing(); // Don't Attack
+                                //Don't Attack
                                 Fitness += 5;
                             }
                         }
@@ -227,21 +228,22 @@ public class Cofed extends LuxAgentAdapter
 
                     else // The odds are almost never in your favor
                     {
-                        DoNothing(); // Don't Attack for your own sake...
+                        //Don't Attack
                         Fitness += 9;
                     }
                 }
             }
         }
 
-        return fitness;
+        return (id, fitness, attackValue);
     }
 
-    private int defenseHeuristic()
+    private int defenseHeuristic(id)
     {
         private int fitness = 0;
+        private int attackValue = 0; // Default to not attack
 
-        if (OpponentCanAttack)
+        if (canAttack(id))
         {
             if (PlayerID == 0)
             {
@@ -254,42 +256,42 @@ public class Cofed extends LuxAgentAdapter
                         {
                             if ((OwnCards + EnemyCards) >= 5)
                             {
-                                DoNothing();
+                                //Don't Attack
                                 Fitness += 4;
                             }
                             else if (EnemyReinforcementsPerTurn <= OwnReinforcementsPerTurn)
                             {
-                                DoNothing();
+                                //Don't Attack
                                 Fitness += 6;
                             }
                             else
                             {
-                                DoNothing();
+                                //Don't Attack
                                 Fitness += 5;
                             }
                         }
                         else if (BreakContinentBonus)
                         {
-                            DoNothing();
+                            //Don't Attack
                             Fitness += 3;
                         }
 
                         else
                         {
-                            DoNothing();
+                            //Don't Attack
                             Fitness += 7;
                         }
                     }
 
                     else if (OwnTroops <= 15)
                     {
-                        Attack(CountryID);
+                        attackValue += 1; //Attack
                         Fitness += 5;
                     }
 
                     else
                     {
-                        Attack(CountryID);
+                        attackValue += 1; //Attack
                         Fitness += 3;
                     }
                 }
@@ -298,19 +300,19 @@ public class Cofed extends LuxAgentAdapter
                 {
                     if ((OwnTroops - EnemyTroops) >= 10)
                     {
-                        Attack(CountryID);
+                        attackValue += 1; //Attack
                         Fitness += 10;
                     }
 
                     else if ((OwnTroops - EnemyTroops) >= 6)
                     {
-                        Attack(CountryID);
+                        attackValue += 1; //Attack
                         Fitness += 8;
                     }
 
                     else if ((OwnTroops - EnemyTroops) >= 2)
                     {
-                        Attack(CountryID);
+                        attackValue += 1; //Attack
                         Fitness += 6;
                     }
 
@@ -320,30 +322,30 @@ public class Cofed extends LuxAgentAdapter
                         {
                             if ((OwnCards + EnemyCards) >= 5)
                             {
-                                DoNothing();
+                                //Don't Attack
                                 Fitness += 4;
                             }
                             else if (EnemyReinforcementsPerTurn <= OwnReinforcementsPerTurn)
                             {
-                                Attack(CountryID);
+                                attackValue += 1; //Attack
                                 Fitness += 5;
                             }
                             else
                             {
-                                DoNothing();
+                                //Don't Attack
                                 Fitness += 5;
                             }
                         }
 
                         else if (BreakContinentBonus)
                         {
-                            DoNothing();
+                            //Don't Attack
                             Fitness += 4;
                         }
 
                         else
                         {
-                            DoNothing();
+                            //Don't Attack
                             Fitness += 6;
                         }
                     }
@@ -355,7 +357,7 @@ public class Cofed extends LuxAgentAdapter
                     {
                         if (EnemyTroops >= 20)
                         {
-                            DoNothing();
+                            //Don't Attack
                             Fitness += 3;
                         }
 
@@ -365,32 +367,32 @@ public class Cofed extends LuxAgentAdapter
                             {
                                 if ((OwnCards + EnemyCards) >= 5)
                                 {
-                                    DoNothing();
+                                    //Don't Attack
                                     Fitness += 2;
                                 }
 
                                 else if (EnemyReinforcementsPerTurn <= OwnReinforcementsPerTurn)
                                 {
-                                    DoNothing();
+                                    //Don't Attack
                                     Fitness += 5;
                                 }
 
                                 else
                                 {
-                                    Attack(CountryID);
+                                    attackValue += 1; //Attack
                                     Fitness += 6;
                                 }
                             }
 
                             else if (BreakContinentBonus)
                             {
-                                DoNothing();
+                                //Don't Attack
                                 Fitness += 4;
                             }
 
                             else
                             {
-                                DoNothing();
+                                //Don't Attack
                                 Fitness += 5;
                             }
                         }
@@ -398,26 +400,41 @@ public class Cofed extends LuxAgentAdapter
 
                     else
                     {
-                        Attack(CountryID);
+                        attackValue += 1; //Attack
                         Fitness += 9;
                     }
                 }
             }
         }
 
-        return fitness;
+        return (id, fitness, attackValue);
     }
 
     @Override
     public void attackPhase()
     {
+        // declare lists to save the results of the Heuristics
+        // stored in form (countryID, fitnessValue, attackValue)
+        attackList = list.empty();
+        defenseList = list.empty();
         // Gather data from board
-        // Run attackHeuristic, save results
-        attackHeuristic();
-        // Run defenseHeuristic, save results
-        defenseHeuristic();
+            // TODO
+        // Run & Save Heuristics
+        for (id = 0; id < 42; id++)
+        {
+            if (canAtack(id)) //if the country borders
+            {
+                // Run attackHeuristic, save results to attackList
+                attackList.add(attackHeuristic(id));
+                // Run defenseHeuristic, save results to defenseList
+                defenseList.add(defenseHeuristic(id));
+            }
+        }
+
         // Train NeuralNet
+            // TODO
         // Attack or don't attack
+            // TODO
     }
 
     @Override
@@ -465,7 +482,7 @@ public class Cofed extends LuxAgentAdapter
     @Override
     public String youWon()
     {
-        String[] answers = { "The world is now my footstool",
+        String[] answers = { "The world is my footstool- and my feet stink",
           "Sucks to suck, suckers!",
           "Lelouch vi Britannia has nothing on me!",
   		    "Can you smell that? That is the smell of sweet victory",
@@ -475,10 +492,10 @@ public class Cofed extends LuxAgentAdapter
   		    "You ignorant fools thought you actually stood a chance?",
   		    "Join me, and I will spare you!\n \n Oh wait, you're already dead",
   		    "Even the Doctor can't save you now!",
-  		    "Your head shall be added to my trophy room",
+  		    "Next I shall become King of the Pirates!",
   		    "Now, I just need to make sure Goku stays out \n
             of my way and I will be unstoppable!",
-          "Onward to pierce the heavens!"
+          "I am the drill that will pierce the heavens!"
         };
 
   	    return answers[ Random.nextInt(answers.length) ];
