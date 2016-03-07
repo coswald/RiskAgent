@@ -342,11 +342,16 @@ public class NeuralNet extends Object implements Serializable
 		for(int i = (this.neurons.length - 1); i >= (this.neurons.length - prediction.length); i--)
 		{
 			//Delta Rule
-			//(out - target) * activateDerivative * OutputOFInputNeuron
+			//(out - target) * activateDerivative * OutputOfInputNeuron
 			for(int j = 0; j < this.neurons[i].getWeights().length; j++)
 				this.neurons[i].adjustWeight(j, -(prediction[i - (this.neurons.length - 1)] - desired[i - (this.neurons.length - 1)]) * this.neurons[i].activateDerivative(prediction[i - (this.neurons.length - 1)]) * this.neurons[i].getInputAt(j));
 		}
 		
+		//Loop through the rest of the network to train it
+		for(;true;)
+		{
+		}
+			
 		this.clearNetwork();
 	}
 	
