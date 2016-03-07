@@ -94,17 +94,17 @@ public class GeneticTest
 			for (i = 0; i < summationNeuronsInLayer[1]; i++)
 			{
 				fweight = random.nextFloat();
-				neuronGenes.add(new NeuronGene(unique.getNextNeuronID(), "Sigmoid", false, fweight/**, INPUT**/)); 
+				neuronGenes.add(new NeuronGene(unique.getNextNeuronID(), "Sigmoid", false, fweight, "Input")); 
 			}
 			for (i = 0; i < summationNeuronsInLayer[(numHiddenLayers + 1)] - summationNeuronsInLayer[1]; i++)
 			{
 				fweight = random.nextFloat();
-				neuronGenes.add(new NeuronGene(unique.getNextNeuronID(), "Sigmoid", false, fweight/**, HIDDEN**/));
+				neuronGenes.add(new NeuronGene(unique.getNextNeuronID(), "Sigmoid", false, fweight, "Hidden"));
 			}
 			for (i = 0; i < summationNeuronsInLayer[(numHiddenLayers + 2)] - summationNeuronsInLayer[(numHiddenLayers + 1)]; i++)
 			{
 				fweight = random.nextFloat();
-				neuronGenes.add(new NeuronGene(unique.getNextNeuronID(), "Step", false, fweight/**, OUTPUT**/));
+				neuronGenes.add(new NeuronGene(unique.getNextNeuronID(), "Step", false, fweight, "Output"));
 			}
 
 			//Create links

@@ -50,16 +50,6 @@ public class InnovationDB implements Serializable
 
 	}
 
-	/**
-	private boolean innovationExists(InnovationType type, int in, int out, int id)
-	{
-		//Instantiate the inputs into an innovation to be compared throughout the database
-		toFind = new Innovation(type, to, from, id);
-		//See if the innovation datebase contains the toFind object
-		return (innovationDB.contains(toFind) == -1);
-
-	}
-	**/
 	public int addInnovation(InnovationType type, int to, int from, int id)
 	{
 		//Check to see if innovation exists
@@ -77,7 +67,7 @@ public class InnovationDB implements Serializable
 		}
 	}
 
-	public int nextNumber()
+	public int curID()
 	{
 		return innovationID;
 	}

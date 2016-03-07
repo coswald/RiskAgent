@@ -31,32 +31,36 @@ public class NeuronGene implements Serializable
     //Represents the ID of the Neuron
     private int     neuronID;
     //Represents the type of the Neuron, sigmoid or step
-    private String  neuronType; 
+    private String  neuronType;
     //Represents whether the neuron is recurrent
     private boolean neuronRecurrent;
     //Represents the weight of the neuron
     private float   neuronActivationResponse;
+    //Represents the layer of the neuron(used in the genome class)
+    private String  neuronLayer;
     //private int     innovationNum;
 
+
     //Create a neuron gene
-    public NeuronGene(int id, String type, boolean recur, float activate)
+    public NeuronGene(int id, String type, boolean recur, float activate, String layer)
     {
         neuronID = id;
         neuronType = type;
         neuronRecurrent = recur;
         neuronActivationResponse = activate;
+        neuronLayer = layer;
     }
 
     //Get the id of the neuron
     public int getID()
     {
-        return neuronID;
+        return this.neuronID;
     }
 
     //Get the neuron type
     public String getNeuronType()
     {
-        return neuronType;
+        return this.neuronType;
     }
 
     //Set the neuron type
@@ -68,7 +72,7 @@ public class NeuronGene implements Serializable
     //Return whether the link is recurrent
     public boolean isRecurrent()
     {
-        return neuronRecurrent;
+        return this.neuronRecurrent;
     }
     
     //Set the recurrency of the neuron
@@ -80,12 +84,24 @@ public class NeuronGene implements Serializable
     //Get the activation response of the neuron
     public float getActivationResponse()
     {
-        return neuronActivationResponse;
+        return this.neuronActivationResponse;
     }
     
     //Set the activation response of the neuron
     public void setActivationResponse(float activate)
     {
         this.neuronActivationResponse = activate;
+    }
+
+    //Get the layer of the neuron
+    public String getNeuronLayer()
+    {
+        return this.neuronLayer;
+    }
+
+    //Set the layer of the neuron
+    public void setNeuronLayer(String layer)
+    {
+        this.neuronLayer = layer;
     }
 }
