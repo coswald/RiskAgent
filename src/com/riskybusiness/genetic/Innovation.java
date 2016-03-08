@@ -22,18 +22,18 @@ public class Innovation extends Object
 	//Represents the innovation type
 	private InnovationType type;
 	//Represents the neuron id of the neuron coming in to another neuron or link
-	private int            neuronIn;
+	private int            fromNeuron;
 	//Represent the neuron id of the neuron coming out of another neuron or link
-	private int            neuronOut;
+	private int            toNeuron;
 	//Represents the ID of the neuron if its a neuron else -1 for links
 	private int            neuronID;
 	//private int            innovationNum;
 
-	public Innovation(InnovationType type, int in, int out, int id)
+	public Innovation(InnovationType type, int from, int to, int id)
 	{
 		this.type = type;
-		this.neuronIn = in;
-		this.neuronOut = out;
+		this.fromNeuron = from;
+		this.toNeuron = to;
 		this.neuronID = id;
 		//this.innovationNum = num;
 	}
@@ -42,7 +42,7 @@ public class Innovation extends Object
 	//@Override
 	public boolean equals(Innovation innovation)
 	{
-		return (this.type == innovation.type && this.neuronIn == innovation.neuronIn && this.neuronOut == innovation.neuronOut && this.neuronID == innovation.neuronID);
+		return (this.type == innovation.type && this.fromNeuron == innovation.fromNeuron && this.toNeuron == innovation.toNeuron && this.neuronID == innovation.neuronID);
 	}
 
 	//Get whether the innovation is a neuron or a link
@@ -52,15 +52,15 @@ public class Innovation extends Object
 	}
 
 	//Get synapse input neuronID, return -1 for neurons
-	public int getInNode() 
+	public int getFromNeuron() 
 	{
-		return this.neuronIn;
+		return this.fromNeuron;
 	}
 
 	//Get synapse output neuronID, return -1 for neurons
-	public int getOutNode()
+	public int getToNeuron()
 	{
-		return this.neuronOut;
+		return this.toNeuron;
 	}
 
 	//Get id of the neuron, will return -1 for links
@@ -75,15 +75,15 @@ public class Innovation extends Object
 	}
 
 	//Get synapse input neuronID, return -1 for neurons
-	public void setInNode(int in) 
+	public void setFromNeuron(int neuron) 
 	{
-		this.neuronIn = in;
+		this.fromNeuron = neuron;
 	}
 
 	//Get synapse output neuronID, return -1 for neurons
-	public void setOutNode(int out)
+	public void setToNeuron(int neuron)
 	{
-		this.neuronOut = out;
+		this.toNeuron = neuron;
 	}
 
 	//Get id of the neuron, will return -1 for links

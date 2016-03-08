@@ -51,17 +51,27 @@ public class Genome implements Serializable
     private int                     species;
     //Represents the number of genes in the genome
     private int                     numGenes;
-    //Represents the next neuronID to be added.
-    private int                     curNeuronID;
 
      //This constructor creates a genome from a vector of SLinkGenes a vector of SNeuronGenes and an ID number
-     public Genome(int id, ArrayList<NeuronGene> neurons, ArrayList<LinkGene> links, int inputs, int outputs)
+     public Genome(int id, ArrayList<NeuronGene> neurons, ArrayList<LinkGene> links, int inputs, int outputs, InnovationDB innovation)
      {
         genomeID         = id;
         neuronGeneSet    = neurons;
         linkGeneSet      = links;
         numInputNeurons  = inputs;
         numOutputNeurons = outputs;
+        numGenes         = links.size();
+
+        for (int i = 0;i < neuronGeneSet.size(); i++)
+        {
+            innovation.addInnovation(InnovationType.NEW_NEURON, -1, -1, (i + 1));
+        }
+        
+        //This loop does the same as above but converts the link genes into synapses
+        for (int i = 0;i < linkGeneSet.size(); i++)
+        {
+            innovation.addInnovation(InnovationType.NEW_LINK, linkGeneSet.get(i).getFromNeuron(), linkGeneSet.get(i).getToNeuron(), -1);
+        }
      }
 
      //Get the number of neurons in the genome
@@ -377,11 +387,12 @@ public class Genome implements Serializable
         Complete the code to determine if a link is recurrent
         **/
 
-        int test = innovation.addInnovation(InnovationType.NEW_LINK, toNeuronID, fromNeuronID, -1); //Need to figure out what to do with the innovation id -1
-        if (test == 0)
+        int innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, toNeuronID, fromNeuronID, -1); //Need to figure out what to do with the innovation id -1
+        if (innovationCheck == 0)
         {
             //Push the new gene into the array
             linkGeneSet.add(new LinkGene(fromNeuronID, toNeuronID, (linkGeneSet.size() + 1), random.nextDouble(), recurrent));
+            numGenes++;
         }
      }
 
@@ -422,9 +433,13 @@ public class Genome implements Serializable
                 /**
                 This needs to be a value between 0 and some weird number that I will determine later
                 **/
-                chosenLink = random.nextInt(numGenes - 1 - (int)Math.sqrt(numGenes));
+                System.out.println("Link = " + numGenes + " - 1 - " + (int)Math.sqrt(numGenes));
 
-                int fromNeuron =  linkGeneSet.get(chosenLink).getFromNeuron();
+                chosenLink = random.nextInt(numGenes - 1 - ((int)Math.sqrt(numGenes)));
+
+                //int fromNeuron =  linkGeneSet.get(chosenLink).getFromNeuron(); //?
+
+                System.out.println("Link :" + chosenLink);
 
                 if ((linkGeneSet.get(chosenLink).getEnabled())) //&&
                     //(!linkGeneSet.get(chosenLink).getRecurrent()))
@@ -441,21 +456,21 @@ public class Genome implements Serializable
                     return;
                 }
                 //I'm not entirely sure why this else statement is here
-                else
-                {
-                    while(!linkFound)
-                    {
-                        chosenLink = random.nextInt(numGenes - 1); //needs to be a number between 0 and the number of genes - 1
+                // else
+                // {
+                //     while(!linkFound)
+                //     {
+                //         chosenLink = random.nextInt(numGenes - 1); //needs to be a number between 0 and the number of genes - 1
 
-                        //Check that the link is enabled and not recurrent
-                        //If the link is enabled and not recurrent then we have found a candidate
-                        if ((linkGeneSet.get(chosenLink).getEnabled())) //&&
-                            //(linkGeneSet.get(chosenLink).getRecurrent()))
-                        {
-                            linkFound = true;
-                        }
-                    }
-                }
+                //         //Check that the link is enabled and not recurrent
+                //         //If the link is enabled and not recurrent then we have found a candidate
+                //         if ((linkGeneSet.get(chosenLink).getEnabled())) //&&
+                //             //(linkGeneSet.get(chosenLink).getRecurrent()))
+                //         {
+                //             linkFound = true;
+                //         }
+                //     }
+                // }
 
                 //Disable the original link gene
                 linkGeneSet.get(chosenLink).setLink(false);
@@ -478,10 +493,7 @@ public class Genome implements Serializable
                 /**
                 Add link
                 **/
-                int innovationCheck = innovation.addInnovation(InnovationType.NEW_NEURON,
-                                                               toNeuronID,
-                                                               fromNeuronID,
-                                                               -1);
+                int innovationCheck = innovation.addInnovation(InnovationType.NEW_NEURON, fromNeuronID, toNeuronID, (neuronGeneSet.size() + 1));
 
                 if (innovationCheck == 0)
                 {
@@ -489,6 +501,11 @@ public class Genome implements Serializable
                     neuronGeneSet.add(new NeuronGene((neuronGeneSet.size() + 1), "Sigmoid", false, random.nextFloat(), "Hidden"));
                     linkGeneSet.add(new LinkGene(fromNeuronID, neuronGeneSet.size(), (linkGeneSet.size() + 1 ), 1.0, false));
                     linkGeneSet.add(new LinkGene(neuronGeneSet.size(), toNeuronID, (linkGeneSet.size() + 1), originalWeight, false));
+                    innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, fromNeuronID, neuronGeneSet.size(), -1);
+                    innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, neuronGeneSet.size(), toNeuronID, -1);
+                    numGenes++;numGenes++;
+                    System.out.println("Created Stuff");
+                    return;
                 }
                 else //the innovation already exists
                 {

@@ -28,8 +28,13 @@ public class InnovationDB implements Serializable
 	//Represents the innovationto find in the database
 	private Innovation 				toFind;
 	//Represetns the innovationID
-	private int 					innovationID = 0;
+	private int 					innovationID;
 
+
+	public InnovationDB()
+	{
+		innovationID = 0;
+	}
 
 	/**
 	Fix these two function
@@ -70,5 +75,15 @@ public class InnovationDB implements Serializable
 	public int curID()
 	{
 		return innovationID;
+	}
+
+	public void printDatabase()
+	{
+		System.out.println("Printing Database...");
+		for (int i = 0; i < innovationDB.size(); i++)
+		{
+			Innovation toPrint = innovationDB.get(i);
+			System.out.println("Type: " + toPrint.getType() + " From Neuron: " + toPrint.getFromNeuron() + " To Neuron: " + toPrint.getToNeuron() + " ID: " + toPrint.getNeuronID());
+		}	
 	}
 }

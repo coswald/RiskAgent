@@ -50,6 +50,8 @@ public class GeneticTest
 		//Represents the weight to be assigned to the link
 		double dweight;
 		Genome genome;
+		//Represent the innovationDB
+		InnovationDB innovation = new InnovationDB();
 
 		System.out.println("How many hidden layers are there?");
 		numHiddenLayers = input.nextInt();
@@ -130,11 +132,20 @@ public class GeneticTest
 			}
 
 			//Create a genome!!
-			population[h] = new Genome(unique.getNextGenomeID(), neuronGenes, linkGenes, summationNeuronsInLayer[1], summationNeuronsInLayer[(numHiddenLayers + 2)] - summationNeuronsInLayer[(numHiddenLayers + 1)]);
+			population[h] = new Genome(unique.getNextGenomeID(), neuronGenes, linkGenes, summationNeuronsInLayer[1], summationNeuronsInLayer[(numHiddenLayers + 2)] - summationNeuronsInLayer[(numHiddenLayers + 1)], innovation);
+
+			innovation.printDatabase();
 
 			System.out.println("Created genome: " + unique.getCurGenomeID() + "!");
 			genome = population[h];
 			System.out.println("Neurons: " + genome.getSizeNeuron() + " Links: " + genome.getSizeLink());
+			for (int o = 0; o < 10; o++)
+			{
+				System.out.println("a");
+				genome.addNeuron(1.0, innovation, 10);
+			}
+
+			innovation.printDatabase();
 		}
 
 		/**
