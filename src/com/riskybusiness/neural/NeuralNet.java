@@ -133,7 +133,7 @@ public class NeuralNet extends Object implements Serializable
 		//Add to the connections array 
 		connections[0] = inputLayerRows;
 		//Calculate the number of synapses between the input layer and the first hidden layer
-		int synapseSum = inputLayerRows * hiddenLayerRows[0];
+		int synapseSum = inputLayerRows * ((hiddenLayerRows.length > 0) ? hiddenLayerRows[0] : 1);
 		
 		//Loops through the hidden layers if there is more than 1 hidden layer
 		for(int i = 0; i < hiddenLayerRows.length - 1; i++)
@@ -146,12 +146,15 @@ public class NeuralNet extends Object implements Serializable
 			synapseSum += hiddenLayerRows[i] * hiddenLayerRows[i + 1];
 		}
 		
-		//Calculate the number of neurons in the last hidden layer and add it to the sum 
-		sum += hiddenLayerRows[hiddenLayerRows.length - 1];
-		//Add to the connections array
-		connections[connections.length - 1] = hiddenLayerRows[hiddenLayerRows.length - 1];
-		//Calculate the number of synapses between the last hidden layer and the output layer and add it to the sum
-		synapseSum += hiddenLayerRows[hiddenLayerRows.length - 1] * outputLayerRows;
+		if(hiddenLayerRows.length > 0)
+		{
+			//Calculate the number of neurons in the last hidden layer and add it to the sum 
+			sum += hiddenLayerRows[hiddenLayerRows.length - 1];
+			//Add to the connections array
+			connections[connections.length - 1] = hiddenLayerRows[hiddenLayerRows.length - 1];
+			//Calculate the number of synapses between the last hidden layer and the output layer and add it to the sum
+			synapseSum += hiddenLayerRows[hiddenLayerRows.length - 1] * outputLayerRows;
+		}
 		
 		//Instantiate the arrays for the nuerons and synapses using the values calculated above
 		this.neurons = new Neuron[sum];
@@ -267,7 +270,7 @@ public class NeuralNet extends Object implements Serializable
 		//of the Synapses for the input layer have been exhausted, meaning the amount of
 		//inputs exceeds that of the amount given in the input layer.
 		int synapseIndex = 0;
-		for(int i = 0; !(this.synapses[synapseIndex].getSender().canFire()); i++, synapseIndex++)
+		for(int i = 0; synapseIndex < this.synapses.length && !(this.synapses[synapseIndex].getSender().canFire()); i++, synapseIndex++)
 		{
 			if(this.neurons[i].canFire())
 			{
@@ -345,6 +348,9 @@ public class NeuralNet extends Object implements Serializable
 		
 		//New code found at:
 		//http://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
+		
+		//Look and cry:
+		//http://www.informit.com/articles/article.aspx?p=30596&seqNum=6
 		
 		float[] errorValues;
 		int errorIndex = 0;
