@@ -11,6 +11,7 @@ import com.riskybusiness.genetic.InnovationType;
 import com.riskybusiness.genetic.LinkGene;
 import com.riskybusiness.genetic.NeuronGene;
 import com.riskybusiness.genetic.UniqueID;
+import com.riskybusiness.genetic.Species;
 
 import java.util.Random;
 import java.util.Scanner;
@@ -35,12 +36,6 @@ public class GeneticTest
 		int i;
 		int j;
 		int k;
-		//Represents the current id of the neuron to be added
-		//int neuronID = 1; //Also, this is a really piss poor way to address the issue that exists
-		//Represents the current id of the link to be added
-		//int linkID   = 1; //Also, this is a really piss poor way to address the issue that exists
-		//Represents the current id of the genome to be added
-		//int genomeID = 1; //Also, this is a really piss poor way to address the issue that exists
 		//Represent the class used to create the unique ID's for the neurons, links, and genomes
 		UniqueID unique = new UniqueID();
 		//Represents the variable used to create psuedorandom numbers
@@ -81,7 +76,8 @@ public class GeneticTest
 		populationSize = input.nextInt();
 
 		//Represents the population of genomes created
-		Genome[]    population  = new Genome[populationSize];
+		//Genome[]    population  = new Genome[populationSize];
+		ArrayList<Genome> population = new ArrayList<Genome>();
 		//Represents the neural network
 		NeuralNet[] myNetworks  = new NeuralNet[populationSize];
 
@@ -132,12 +128,14 @@ public class GeneticTest
 			}
 
 			//Create a genome!!
-			population[h] = new Genome(unique.getNextGenomeID(), neuronGenes, linkGenes, summationNeuronsInLayer[1], summationNeuronsInLayer[(numHiddenLayers + 2)] - summationNeuronsInLayer[(numHiddenLayers + 1)], innovation);
+			//population[h] = new Genome(unique.getNextGenomeID(), neuronGenes, linkGenes, summationNeuronsInLayer[1], summationNeuronsInLayer[(numHiddenLayers + 2)] - summationNeuronsInLayer[(numHiddenLayers + 1)], innovation);
+			population.add(new Genome(h + 1, neuronGenes, linkGenes, summationNeuronsInLayer[1], summationNeuronsInLayer[(numHiddenLayers + 2)] - summationNeuronsInLayer[(numHiddenLayers + 1)], innovation));
+
 
 			innovation.printDatabase();
 
 			System.out.println("Created genome: " + unique.getCurGenomeID() + "!");
-			genome = population[h];
+			genome = population.get(h);
 			System.out.println("Neurons: " + genome.getSizeNeuron() + " Links: " + genome.getSizeLink());
 			for (int o = 0; o < 10; o++)
 			{
@@ -148,6 +146,8 @@ public class GeneticTest
 			innovation.printDatabase();
 		}
 
+		Species mySpecies = new Species(population);
+
 		/**
 		 * Space to create testers for manipulating genome
 		 *
@@ -157,32 +157,32 @@ public class GeneticTest
 		 *
 		**/
 
-		//Create a neural network!!
-		for (i = 0; i < populationSize; i++)
-		{
-			myNetworks[i] = population[i].createPhenotype();
-		}
+		// //Create a neural network!!
+		// for (i = 0; i < populationSize; i++)
+		// {
+		// 	myNetworks[i] = population[i].createPhenotype();
+		// }
 
-		for (i = 0; i < populationSize; i++)
-		{
-			System.out.println(myNetworks[i]);
-		}
+		// for (i = 0; i < populationSize; i++)
+		// {
+		// 	System.out.println(myNetworks[i]);
+		// }
 
-		for (i = 0; i < populationSize; i++)
-		{
+		// for (i = 0; i < populationSize; i++)
+		// {
 
-			int amountWrong = 0;
-			outer:
-			for(float x = 0; x < 2; x++)
-			{
-				for(float y = 0; y < 2; y++)
-				{
-					System.out.println(myNetworks[i].fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
-				}
-			}
+		// 	int amountWrong = 0;
+		// 	outer:
+		// 	for(float x = 0; x < 2; x++)
+		// 	{
+		// 		for(float y = 0; y < 2; y++)
+		// 		{
+		// 			System.out.println(myNetworks[i].fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
+		// 		}
+		// 	}
 
-			System.out.println("Network " + i + " fired!");
-		}
+		// 	System.out.println("Network " + i + " fired!");
+		// }
 	}
 }
 

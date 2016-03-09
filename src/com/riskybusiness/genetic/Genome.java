@@ -22,7 +22,6 @@ import com.riskybusiness.neural.Synapse;
 import com.riskybusiness.neural.NeuralNet;
 
 import java.io.Serializable;
-import java.util.Random;
 import java.util.ArrayList;
 
 
@@ -51,6 +50,8 @@ public class Genome implements Serializable
     private int                     species;
     //Represents the number of genes in the genome
     private int                     numGenes;
+    //Represents the score given to speciate the genome
+    private int                     compatibilityScore;
 
      //This constructor creates a genome from a vector of SLinkGenes a vector of SNeuronGenes and an ID number
      public Genome(int id, ArrayList<NeuronGene> neurons, ArrayList<LinkGene> links, int inputs, int outputs, InnovationDB innovation)
@@ -529,8 +530,21 @@ public class Genome implements Serializable
      //public void mutateActivationResponse(double mutationRate, double MaxPertubation){?}
 
      //Calculates the compatibility score between this genome and another genome
-     //public double getCompatibilityScore(const CGenome &genome?);
+     public double getCompatibilityScore(Genome toCompare)
+     {
+        return 1.0;
+     }
      
      //Not sure
      //public void sortGenes();
+
+     public double getFitenss()
+     {
+        return this.genomeFitness;
+     }
+     public double getNumSpawns()
+     {
+        return this.amountToSpawn;
+     }
+
 }
