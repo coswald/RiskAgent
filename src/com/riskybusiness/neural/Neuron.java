@@ -98,6 +98,14 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	protected float learningRate;
 	
 	/**
+	 * <p>Describes the last total error of the {@code Neuron}.
+	 * This can be used in training and can be helpful for
+	 * accessing, but is not directly used in any of the methods
+	 * described in this class except it's accessor and mutator.</p>
+	 */
+	private float lastTotalError = 0F;
+	
+	/**
 	 * <p>Determines whether this {@code Neron} has fired
 	 * since it's inputs have been filled.</p>
 	 */
@@ -477,6 +485,34 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 			this.adjustWeight(i, adjustments[i]);
 	}
 	
+	/**
+	 * <p>Sets the last known error as described 
+	 * by the individual programmer. This is not
+	 * used directly by any calculation, but can
+	 * be defined to help in later implementations.
+	 * See {@link com.riskybusiness.neural.Neuron#lastTotalError}
+	 * for more details.</p>
+	 * @param lastKnownError The last known error.
+	 */
+	public void setLastTotalError(float lastTotalError)
+	{
+		this.lastTotalError = lastTotalError;
+		System.out.println("\t\tLastTotalError: " + this.lastTotalError);
+	}
+	
+	/**
+	 * <p>Gets the last known error as described 
+	 * by the individual programmer. This is not
+	 * used directly by any calculation, but can
+	 * be defined to help in later implementations.
+	 * See {@link com.riskybusiness.neural.Neuron#lastTotalError}
+	 * for more details.</p>
+	 * @return The last known total error.
+	 */
+	public float getLastTotalError()
+	{
+		return this.lastTotalError;
+	}
 	
 	/**
 	 * <p>Adjust the weight given the learning
