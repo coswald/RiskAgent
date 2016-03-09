@@ -31,7 +31,7 @@ public class XORTest extends Object
 	public static void main(String... args) throws Exception
 	{
 		NeuralNet xor = new NeuralNet(2, 1, 2);
-		Trainer[] trainers = new Trainer[50000];
+		Trainer[] trainers = new Trainer[2000];
 		float in1, in2;
 		for(int i = 0 ; i < trainers.length; i++)
 		{

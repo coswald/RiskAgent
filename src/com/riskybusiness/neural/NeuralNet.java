@@ -163,9 +163,10 @@ public class NeuralNet extends Object implements Serializable
 		for(int i = 0, j = -1; i < neurons.length; i++)
 		{
 			//If the current neuron isn't in the output layer create a sigmoid neuron
-			//else create a step neuron 
+			//else create a step neuron
+			//Temporarily made all neurons sigmoid neurons for trainin.
 			if(neurons.length - i <= outputLayerRows)
-				neurons[i] = new StepNeuron(connections[j]);
+				neurons[i] = new SigmoidNeuron(connections[j]);
 			else
 				//If there is no hidden layer then the number of connections is 1
 				neurons[i] = new SigmoidNeuron((j == -1) ? 1 : connections[j]);
@@ -345,50 +346,63 @@ public class NeuralNet extends Object implements Serializable
 		//New code found at:
 		//http://mattmazur.com/2015/03/17/a-step-by-step-backpropagation-example/
 		
+		float[] errorValues;
+		int errorIndex = 0;
+		for(Neuron n : this.neurons)
+			errorIndex += n.getWeights().length;
+		errorValues = new float[errorIndex];
+		errorIndex = 0;
+		
 		//Loop through the output layer to train it.
 		int i = (this.neurons.length - 1);
 		for(; i >= (this.neurons.length - prediction.length); i--)
 		{
-			System.out.println("Got in loop 1");
-			this.neurons[i].setLastTotalError(-(prediction[i - (this.neurons.length - 1)] - desired[i - (this.neurons.length - 1)]) *
+			this.neurons[i].setLastTotalError((prediction[i - (this.neurons.length - 1)] - desired[i - (this.neurons.length - 1)]) *
 				this.neurons[i].activateDerivative(prediction[i - (this.neurons.length - 1)]));
-			System.out.println("Updating Neuron " + i);
 			//Delta Rule
 			//(out - target) * activateDerivative * OutputOfInputNeuron
 			for(int j = 0; j < this.neurons[i].getWeights().length; j++)
 			{
-				this.neurons[i].adjustWeight(j,this.neurons[i].getLastTotalError() * this.neurons[i].getInputAt(j));
-				System.out.println("\tUpdated weight " + j + " with value " + this.neurons[i].getWeights()[j]);
+				//this.neurons[i].adjustWeight(j, -1 * this.neurons[i].getLastTotalError() * this.neurons[i].getInputAt(j));
+				errorValues[errorIndex] = this.neurons[i].getLastTotalError();
+				errorValues[errorIndex++] *= -1 * this.neurons[i].getInputAt(j);
 			}
 		}
 		
 		Synapse connection;
-		int error;
+		float error;
+		
 		//Loop through the rest of the network to train it
 		for(; i >= 0; i--)
 		{
-			System.out.println("Got in loop 2");
-			error = 0;
+			error = 0F;
 			connection = null;
-			System.out.println("Updating Neuron " + i);
 			for(Synapse s : this.synapses)
 			{
 				if(s.getSender() == this.neurons[i])
 				{
-					System.out.println("\tFound Connection! Error:" + s.getReceiver().getLastTotalError());
-					error += s.getReceiver().getLastTotalError();
+					error += s.getReceiver().getLastTotalError() * s.getReceiver().getWeights()[s.getNeuronIndex()];
 					connection = s;
 				}
 			}
 			if(connection != null)
-				this.neurons[i].setLastTotalError(-error * this.neurons[i].activateDerivative(connection.getLastOutput()));
+				this.neurons[i].setLastTotalError(error * this.neurons[i].activateDerivative(connection.getLastOutput()));
 			for(int j = 0; j < this.neurons[i].getWeights().length; j++)
 			{
-				this.neurons[i].adjustWeight(j, this.neurons[i].getLastTotalError() * this.neurons[i].getInputAt(j));
-				System.out.println("\tUpdated weight " + j + " with value " + (this.neurons[i].getLastTotalError() * this.neurons[i].getInputAt(j)));
+				//this.neurons[i].adjustWeight(j, -1 * this.neurons[i].getLastTotalError() * this.neurons[i].getInputAt(j));
+				errorValues[errorIndex] = this.neurons[i].getLastTotalError();
+				errorValues[errorIndex++] *= -1 * this.neurons[i].getInputAt(j);
 			}
 		}
-			
+		
+		errorIndex = 0;
+		i = this.neurons.length - 1;
+		for(; i >= 0; i--)
+		{
+			for(int j = 0; j < this.neurons[i].getWeights().length; j++)
+				this.neurons[i].adjustWeight(j, errorValues[errorIndex++]);
+		}
+		
 		this.clearNetwork();
 	}
 	

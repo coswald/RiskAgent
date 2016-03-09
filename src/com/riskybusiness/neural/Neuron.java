@@ -128,13 +128,13 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	
 	/**
 	 * <p>Constructs a {@code Neuron} which uses the
-	 * weights given and a learning rate of 1.0.</p>
+	 * weights given and a learning rate of .5.</p>
 	 * @param weights The initial weights for each input.
 	 * @see com.riskybusiness.neural.Neuron#Neuron(float[])
 	 */
 	public Neuron(float... weights)
 	{
-		this(0.1F, weights);
+		this(0.5F, weights);
 	}
 	
 	/**
@@ -159,7 +159,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	
 	/**
 	 * <p>Makes a {@code Neuron} with the given number
-	 * of inputs and a learning rate of 1.0. Also
+	 * of inputs and a learning rate of .5. Also
 	 * randomizes weights; see link below.</p>
 	 * @param inputNum The amount of inputs this neuron
 	 *				will recieve.
@@ -167,7 +167,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	 */
 	public Neuron(int inputNum)
 	{
-		this(0.1F, inputNum);
+		this(0.5F, inputNum);
 	}
 	
 	/**
@@ -497,7 +497,6 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	public void setLastTotalError(float lastTotalError)
 	{
 		this.lastTotalError = lastTotalError;
-		System.out.println("\t\tLastTotalError: " + this.lastTotalError);
 	}
 	
 	/**
