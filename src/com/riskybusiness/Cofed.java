@@ -415,19 +415,21 @@ public class Cofed extends LuxAgentAdapter
     {
         // declare lists to save the results of the Heuristics
         // stored in form (countryID, fitnessValue, attackValue)
-        attackList = list.empty();
-        defenseList = list.empty();
+        //ArrayList<Integer[]> attackList = new ArrayList<Integer[]>();
+        ArrayList<Integer[]> attackList = new ArrayList<Integer[]>();
+        ArrayList<Integer[]> defenseList = new ArrayList<Integer[]>();
         // Gather data from board
             // TODO
         // Run & Save Heuristics
-        for (id = 0; id < 42; id++)
+        for (int id = 0; id < board.(countries.length()); id++)
         {
-            if (canAtack(id)) //if the country borders
+            if (canAtack(countries[id])) //if the country borders
             {
                 // Run attackHeuristic, save results to attackList
-                attackList.add(attackHeuristic(id));
+                //attackList.add(new Integer(attackHeuristic(id)))
+                attackList.add(new Integer(attackHeuristic(countries[id])));
                 // Run defenseHeuristic, save results to defenseList
-                defenseList.add(defenseHeuristic(id));
+                defenseList.add(new Integer(defenseHeuristic(countries[id])));
             }
         }
 
