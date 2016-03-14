@@ -12,6 +12,7 @@ import com.riskybusiness.genetic.InnovationType;
 import com.riskybusiness.genetic.LinkGene;
 import com.riskybusiness.genetic.NeuronGene;
 import com.riskybusiness.genetic.UniqueID;
+import com.riskybusiness.genetic.Species;
 
 import java.util.Random;
 import java.util.Scanner;
@@ -27,6 +28,8 @@ public class Epoch
 		boolean	loadFile 	= false;
 		//Represents the users input
 		String 	userInput;
+		//Represents the debugging option
+		boolean debug 		= true;
 
 
 		/* Link Initialization Params */
@@ -41,7 +44,7 @@ public class Epoch
 		/* Parameters */
 
 		//Represents the size of the population
-		int 	populationSize 			= 1;
+		int 	populationSize 			= 10;
 		//Represents the number of input neurons
 		int 	numInputNeurons			= 2;
 		//Represents the number of output neurons
@@ -49,9 +52,9 @@ public class Epoch
 		//Represents the number of initial hidden layers
 		int 	numHiddenLayers			= 1;
 		//Represents the number of initial neurons in each hidden layer
-		int[]	hiddenLayers 			= new int[numHiddenLayers](1);
+		int[]	hiddenLayers 			= new int[numHiddenLayers];
 		//Represents the number of neurons in the genome up to the given index
-		int[] 	summationNeuronsInLayer	= new int[numHiddenLayers + 3](0, numInputNeurons, 2, numOutputNeurons);
+		int[] 	summationNeuronsInLayer	= new int[numHiddenLayers + 3];
 
 
 
@@ -61,6 +64,8 @@ public class Epoch
 		Random 	random 	= new Random();
 		//Represents the scanner to get user input
 		Scanner input 	= new Scanner(System.in);
+		//Represents the package used to create unique ID's
+		UniqueID unique = new UniqueID();
 
 
 		/* Population Items */
@@ -73,32 +78,47 @@ public class Epoch
    		ArrayList<Genome>		population 	= new ArrayList<Genome>();
    		//Represents the neural networks
    		ArrayList<NeuralNet>	myNetworks	= new ArrayList<NeuralNet>();
+   		//Represents the ID of the genome
+   		int 					genomeID 	= 0;
 
 
    		/* Historical Data */	
 
    		//Represents the historical changes of all the previous populations
-   		InnovationDB 			innovations	= new InnovationDB();		
+   		InnovationDB 			innovations	= new InnovationDB();
+   		//Represents the current generation
+   		int 					generation 	= 1;		
 
-   		System.out.println("Would you like to load[L] a file or start fresh[S]?")
+   		System.out.println("Would you like to load[L] a file or start fresh[S]?");
    		userInput = input.nextLine();
-   		while (userInput.toUpperCase() != "S" || userInput.toUpperCase() != "L")
+   		/*
+   		while (!(userInput == "S" || userInput == "L"))
    		{
-   			System.out.println("You need to enter either 'L' or 'S' to begin!")
-   			System.out.println("Would you like to load[L] a file or start fresh[S]?")
+   			System.out.println("You need to enter either 'L' or 'S' to begin!");
+   			System.out.println("Would you like to load[L] a file or start fresh[S]?");
    			userInput = input.nextLine();
    		}
    		
    		if (userInput == "L") loadFile = true;
 
 
-
+		*/
    		if (loadFile)
    		{
    			int temp = 0;
    		} 
    		else 
    		{
+   			//Initialize number of hidden layers
+   			hiddenLayers[0] = 1;
+
+   			//Initialize number of neurons
+   			summationNeuronsInLayer[0] = 0;
+   			summationNeuronsInLayer[1] = numInputNeurons;
+   			summationNeuronsInLayer[2] = numInputNeurons + 2;
+   			summationNeuronsInLayer[3] = numOutputNeurons + 2 + numInputNeurons;
+
+
 			//Create the initial genomes
 			for (int lcv = 0; lcv < populationSize; lcv++)
 			{
@@ -106,24 +126,33 @@ public class Epoch
 				neuronGenes.clear();
 				linkGenes.clear();
 
+				if (debug)
+				{
+					System.out.println("Creating Neurons...");
+				}
+
 				//The next three loops will create the neurons
 				//Currently, there is no need to seperate into three loops, but I am working on implementing different neuron types
 				for (int i = 0; i < numInputNeurons; i++)
 				{
-					fweight = random.nextFloat();
+					float fweight = random.nextFloat();
 					neuronGenes.add(new NeuronGene(unique.getNextNeuronID(), "Sigmoid", false, fweight, "Input")); 
 				}
 				for (int i = 0; i < summationNeuronsInLayer[(numHiddenLayers + 1)] - summationNeuronsInLayer[1]; i++)
 				{
-					fweight = random.nextFloat();
+					float fweight = random.nextFloat();
 					neuronGenes.add(new NeuronGene(unique.getNextNeuronID(), "Sigmoid", false, fweight, "Hidden"));
 				}
 				for (int i = 0; i < summationNeuronsInLayer[(numHiddenLayers + 2)] - summationNeuronsInLayer[(numHiddenLayers + 1)]; i++)
 				{
-					fweight = random.nextFloat();
+					float fweight = random.nextFloat();
 					neuronGenes.add(new NeuronGene(unique.getNextNeuronID(), "Step", false, fweight, "Output"));
 				}
 
+				if (debug)
+				{
+					System.out.println("Creating Links...");
+				}
 
 				//Create the link genes
 				//This behemoth of a triple nested loop inside a loop simply goes creates the links between all the neurons
@@ -141,7 +170,7 @@ public class Epoch
 							{
 								linksCreated++;
 								//Create random weight
-								dweight = random.nextDouble();
+								double dweight = random.nextDouble();
 								//Add the link to the link gene array
 				 				linkGenes.add(new LinkGene(j, k, unique.getNextLinkID(), dweight, false));
 							}
@@ -154,9 +183,16 @@ public class Epoch
 					}
 				}
 
-				population.add(new Genome(lcv + 1, neuronGenes, linkGenes, numInputNeurons, numOutputNeurons, innovations);
+				if (debug)
+				{
+					System.out.println("Adding genome to population");
+				}
+
+				population.add(new Genome(genomeID++, neuronGenes, linkGenes, numInputNeurons, numOutputNeurons, innovations));
 			}
 		}
+
+		System.out.println("Population size: " + population.size());
 
 		//Represents the newPopulation created from the old one
 		ArrayList<Genome> 	newPopulation 		= new ArrayList<Genome>();
@@ -167,9 +203,9 @@ public class Epoch
 		//Represents the number of children to spawn
 		int 				numberToSpawn 		= 10;
 		//Represents the child of a crossover
-		Genome 				child;
-		//Represents the survivor
-		Genome 				survivor;
+		Genome 				child 				= population.get(0);
+		//Represents the rate at which a genomes breed
+		double 				crossoverRate 		= 0.5;
 
 
 
@@ -179,39 +215,125 @@ public class Epoch
 		 *   Need to add more when I implement speciation
 		 */
 
-		for (int speciesID = 0; speciesID < species.getNumSpecies(); i++)
+		if (debug)
+		{
+			System.out.println("Number of species: " + species.getNumSpecies());
+		}
+
+		for (int speciesID = 0; speciesID < species.getNumSpecies(); speciesID++)
 		{
 			if (numChildrenSpawned < numberToSpawn)
 			{
-				for (int i = 0; i < species.getNumSpawns(speciesID); i++)
+				if (debug)
 				{
+					System.out.println("Number of spawns: " + species.getNumSpawns(speciesID));
+				}
+				for (double i = 0.0; i < species.getNumSpawns(speciesID); i++)
+				{
+					if (debug)
+					{
+						System.out.println ("Creating genome: " + (int)i);
+					}
 					//If this is our first pass then the first thing we want to do
 					//is grab the best member of the species and pass them along
-					if (i == 0)
+					if (i == 0.0)
 					{
-						survivor = species.getBestMember(speciesID);
+						if (debug)
+						{
+							System.out.println("Elitism Loop");
+						}
+						child = species.getBestMember(speciesID);
 					}
 					else
 					{
 						//If the size of the species is only 1 then we can't breed
 						if (species.getNumMembers(speciesID) == 1)
 						{
-							survivor = species.getMember(speciesID);
+							child = species.getMember(speciesID);
+							if (debug)
+							{
+								System.out.println("Grabbing the sole survivor!");
+							}
 						}
 						else
 						{
 							Genome mom = species.getMember(speciesID);
 
+							if (debug)
+							{
+								System.out.println("Grabbing mom, ID: " + mom.getID());
+							}
+
 							if (random.nextDouble() < crossoverRate)
 							{
+								Genome 	dad = species.getMember(speciesID);
+								if (debug)
+								{
+									System.out.println("Grabbing dad, ID: " + dad.getID());
+								}
 								
+								int 	lcv = 10;
+
+								while (dad.getID() == mom.getID())
+								{
+									if (debug)
+									{
+										System.out.println("Dad is the same as mom");
+									}
+									dad = species.getMember(speciesID);
+									lcv--;
+									if (lcv == 0)
+									{
+										break;
+									}
+								}
+
+								if (dad.getID() != mom.getID())
+								{
+									if (debug)
+									{
+										System.out.println("Breeding...");
+									}
+									child = mom.makeBabies(dad);
+								}
+								else
+								{
+									if (debug)
+									{
+										System.out.println("Couldn't breed");
+									}
+									child = mom;
+								}
 							}
+
+							child.setID(genomeID++);
+
+
+							//Do we want to set a limit on the number of nuerons?
+							//if ()
+
+							//child.addNeuron(0.8, innovations, 10);
+							//child.addLink(0.8, 0.15, innovations, 10, 20);
+							//child.mutateLinks(0.8);
+							//child.mutateNeurons(0.8);
 						}
+					}	
+					
+					if (debug)
+					{
+						System.out.println("Adding member to population");
 					}
+
+					newPopulation.add(child);
 				}
 			}
 		}
+		//Fancy ass math to determine if we met the required amount of children
+		//??
 
+		//Transfer the next generation
+		population = newPopulation;
 
+		generation++;
 	}
 }

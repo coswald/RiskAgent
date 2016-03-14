@@ -22,6 +22,7 @@ import com.riskybusiness.neural.Synapse;
 import com.riskybusiness.neural.NeuralNet;
 
 import java.io.Serializable;
+import java.util.Random;
 import java.util.ArrayList;
 
 
@@ -538,7 +539,7 @@ public class Genome implements Serializable
      //Not sure
      //public void sortGenes();
 
-     public double getFitenss()
+     public double getFitness()
      {
         return this.genomeFitness;
      }
@@ -547,4 +548,20 @@ public class Genome implements Serializable
         return this.amountToSpawn;
      }
 
+     public int getID()
+     {
+        return this.genomeID;
+     }
+
+     public void setID(int id)
+     {
+        this.genomeID = id;
+     }
+
+     public Genome makeBabies(Genome dad)
+     {
+        return dad;
+     }
+
+     
 }

@@ -40,22 +40,21 @@ public class Species implements Serializable
 					compatibilityRow.add(j, new Double(1.0));
 				}
 			}
-			System.out.println("!");
 			compatibilityTable.add(compatibilityRow);
 		}
 
-		for (int i = 0; i < population.size(); i++)
-		{
-			System.out.print("Row " + i + ":");
-			for (int j = 0; j < population.size(); j++)
-			{
-				if (i != j)
-				{
-					System.out.print(compatibilityTable.get(i).get(j) + " ");
-				}
-			}
-			System.out.println();
-		}
+		// for (int i = 0; i < population.size(); i++)
+		// {
+		// 	System.out.print("Row " + i + ":");
+		// 	for (int j = 0; j < population.size(); j++)
+		// 	{
+		// 		if (i != j)
+		// 		{
+		// 			System.out.print(compatibilityTable.get(i).get(j) + " ");
+		// 		}
+		// 	}
+		// 	System.out.println();
+		// }
 
 
 		//Using the compatibilty table determine the species
@@ -67,8 +66,10 @@ public class Species implements Serializable
 		// 	}
 		// }
 
-		speciesPop.add(population.get(0));
-		myPopulation.add(speciesPop);
+		//speciesPop.add(population);
+		//Until I can find a way to actually speciate the people the species is
+		//essentially going to be the population
+		myPopulation.add(population);
 
 
 	}
@@ -93,7 +94,8 @@ public class Species implements Serializable
 		}
 
 		//Return
-		return numToSpawn;
+		//return numToSpawn;
+		return 5.0;
 	}
 
 	//Returns the size of the given species
@@ -121,13 +123,18 @@ public class Species implements Serializable
 		}
 
 		//Return
-		return myPopulation.get(speciesID).get(genomeID);
+		return myPopulation.get(speciesID).get(fittestGenomeID);
 	}
 
 	//Figure out a way to return better people
 	//Returns a random member from the population
 	public Genome getMember(int speciesID)
 	{
-		return myPopulation.get(speciesID).get(random.nextInt(myPopulation.get(speciesID).size() - 1));
+		return myPopulation.get(speciesID).get(random.nextInt((myPopulation.get(speciesID).size() - 1)));
+	}
+
+	public int getNumMembers(int speciesID)
+	{
+		return myPopulation.get(speciesID).size();
 	}
 }
