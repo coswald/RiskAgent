@@ -34,6 +34,8 @@ public class Genome implements Serializable
     //Represents the ID of the genome
     private int                     genomeID;
     //Represents the list of links
+    private ArrayList<LinkGene>     neuronGeneSet = new ArrayList<LinkGene>();
+    //Represents the list of links
     private ArrayList<LinkGene>     linkGeneSet   = new ArrayList<LinkGene>();
     //Represents the fitness of the genome
     private double                  genomeFitness;
@@ -45,6 +47,8 @@ public class Genome implements Serializable
     private int                     numInputNeurons;
     //Represents the number of output Neurons
     private int                     numOutputNeurons;
+    //Represents the current number of layers of the genome
+    private int                     numLayers;
     //Represents the speciesID of the genome
     private int                     species;
     //Represents the number of genes in the genome
@@ -56,8 +60,7 @@ public class Genome implements Serializable
      public Genome(int id, ArrayList<NeuronGene> neurons, ArrayList<LinkGene> links, int inputs, int outputs, InnovationDB innovation)
      {
         genomeID         = id;
-        //Represents the list of neurons
-        private NeuronGeneSet           neuronGeneSet = new NeuronGeneSet();
+        neuronGeneSet    = neurons;
         linkGeneSet      = links;
         numInputNeurons  = inputs;
         numOutputNeurons = outputs;
@@ -217,18 +220,23 @@ public class Genome implements Serializable
             }
             //}
         }
+        //If both neurons have been set then find the position of the link on the neuron
         if (toNeuronIsSet && fromNeuronIsSet)
         {
+            //Loop through the linkGeneSet and determine the position of the link on the neuron
             for (i = 0; i < linkGeneSet.size(); i++)
             {
+                //If the links neuron = the passed in neuron then determine if we have a link match
                 if (linkGeneSet.get(i).getToNeuron() == link.getToNeuron())
                 {
+                    //If the link matches what we are looking for then break else increment the linkpos
                     if (linkGeneSet.get(i).getID() == link.getID())
                     {
                         break;
                     }
                     else
                     {
+                        //Do I need to check for a disabled link here?
                         linkPos++;
                     }
                 }
@@ -254,6 +262,7 @@ public class Genome implements Serializable
         //These arrays hold the actual neurons and synapses of the neural network
         Synapse[] linkSet = new Synapse[linkGeneSet.size()];
         Neuron[] neuronSet = new Neuron[neuronGeneSet.size()];
+        
         //Loop Control Variable
         int i;
 
@@ -495,9 +504,22 @@ public class Genome implements Serializable
 
                 if (innovationCheck == 0)
                 {
-                    
-                    //Innovation was new so add the genes to the genome
-                    neuronGeneSet.add(new NeuronGene((neuronGeneSet.size() + 1), "Sigmoid", false, random.nextFloat(), "Hidden"));
+                    //Determine Nueron layer
+
+                    //Find the   
+                    for (int i = 0; i < neuronGeneSet.size(); i++)
+                    {
+                         if (neuronGeneSet.get(i).getID() == fromNeuronID)
+                         {
+                            NeuronGene fromNeuron = neuronGeneSet.get(i);
+                         }
+                    }
+                    //Determine the layey of the fromNeuron and add 1 to get the neuron to be added layer
+                    int newNeuronLayer = fromNeuron.getNeuronLayer();
+                    //Add the new neuron to the gene set
+                    neuronGeneSet.add(new NeuronGene((neuronGeneSet.size() + 1), "Sigmoid", false, random.nextFloat(), newNeuronLayer));
+                    genomeHelper.sortNeuronArray(neuronGeneSet);
+                    genomeHelper.pushNeurons(neuronGeneSet, linkGeneSet);
                     linkGeneSet.add(new LinkGene(fromNeuronID, neuronGeneSet.size(), (linkGeneSet.size() + 1 ), 1.0, false));
                     linkGeneSet.add(new LinkGene(neuronGeneSet.size(), toNeuronID, (linkGeneSet.size() + 1), originalWeight, false));
                     innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, fromNeuronID, neuronGeneSet.size(), -1);

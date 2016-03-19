@@ -106,4 +106,10 @@ public class NeuronGene implements Serializable
     {
         this.neuronLayer = layer;
     }
+
+    //Increment the layer by one
+    public void pushLayer()
+    {
+        this.neuronLayer += 1;
+    }
 }

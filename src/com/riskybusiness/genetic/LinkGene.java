@@ -87,6 +87,12 @@ public class LinkGene implements Serializable
         return fromNeuron;
     }
 
+    //
+    public boolean getRecurrency()
+    {
+        return linkRecurrent;
+    }
+
     //Set the link to be enabled or disabled
     public void setLink(boolean enabled)
     {
