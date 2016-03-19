@@ -208,28 +208,32 @@ public class Epoch
 		double 				crossoverRate 		= 0.5;
 
 
-
-
 		//Start epoch
 		/* Note:
 		 *   Need to add more when I implement speciation
 		 */
 
+		//Debug function
 		if (debug)
 		{
 			System.out.println("Number of species: " + species.getNumSpecies());
 		}
 
+		//Loop through each species and spawn genomes from each species
 		for (int speciesID = 0; speciesID < species.getNumSpecies(); speciesID++)
 		{
+			//Check to see if we still need to spawn children
 			if (numChildrenSpawned < numberToSpawn)
 			{
+				//Debug function
 				if (debug)
 				{
 					System.out.println("Number of spawns: " + species.getNumSpawns(speciesID));
 				}
+				//Creates the number of children necassary for the species
 				for (double i = 0.0; i < species.getNumSpawns(speciesID); i++)
 				{
+					//Debug function
 					if (debug)
 					{
 						System.out.println ("Creating genome: " + (int)i);
@@ -238,10 +242,12 @@ public class Epoch
 					//is grab the best member of the species and pass them along
 					if (i == 0.0)
 					{
+						//Debug function
 						if (debug)
 						{
 							System.out.println("Elitism Loop");
 						}
+						//Use elitism and always take the best member from the population
 						child = species.getBestMember(speciesID);
 					}
 					else
@@ -249,7 +255,9 @@ public class Epoch
 						//If the size of the species is only 1 then we can't breed
 						if (species.getNumMembers(speciesID) == 1)
 						{
+							//Grab a member from the species
 							child = species.getMember(speciesID);
+							//Debug function
 							if (debug)
 							{
 								System.out.println("Grabbing the sole survivor!");
@@ -257,55 +265,78 @@ public class Epoch
 						}
 						else
 						{
+							//Grab a random member to breed with or mutate
 							Genome mom = species.getMember(speciesID);
 
+							//Debug function
 							if (debug)
 							{
 								System.out.println("Grabbing mom, ID: " + mom.getID());
 							}
 
+							//Decide whether to do crossover or not based on the crossover rate
 							if (random.nextDouble() < crossoverRate)
 							{
+								//Grab a random genome to breed with
 								Genome 	dad = species.getMember(speciesID);
+								
+								//Debug function
 								if (debug)
 								{
 									System.out.println("Grabbing dad, ID: " + dad.getID());
 								}
 								
+								//Represents th loop control variable
 								int 	lcv = 10;
 
+								//If the dad is the same as the mom then loop and try to find a
+								//new dad. Only do this as many times the lcv is initialized to.
 								while (dad.getID() == mom.getID())
 								{
+									//Debug function
 									if (debug)
 									{
 										System.out.println("Dad is the same as mom");
 									}
+
+									//Grab a random genome to breed with
 									dad = species.getMember(speciesID);
+									
+									//Decrement the lcv
 									lcv--;
+
+									//If the lcv is 0 then break out of the loop
 									if (lcv == 0)
 									{
 										break;
 									}
 								}
 
+								//If the dad genome does not equal the mom genome the breed
 								if (dad.getID() != mom.getID())
 								{
+									//Debug function
 									if (debug)
 									{
 										System.out.println("Breeding...");
 									}
+									//Breed the mom with the dad
 									child = mom.makeBabies(dad);
 								}
 								else
 								{
+									//Debug function
 									if (debug)
 									{
 										System.out.println("Couldn't breed");
 									}
+									//If the dad does equal the mom then simply set the child
+									//equal to mom.
 									child = mom;
 								}
 							}
 
+							//Set the id of the child to the next genome ID
 							child.setID(genomeID++);
 
 
@@ -319,11 +350,13 @@ public class Epoch
 						}
 					}	
 					
+					//Debug function
 					if (debug)
 					{
 						System.out.println("Adding member to population");
 					}
-
+					
+					//Add the child to the new population
 					newPopulation.add(child);
 				}
 			}
@@ -334,6 +367,7 @@ public class Epoch
 		//Transfer the next generation
 		population = newPopulation;
 
+		//Increment the generation counter
 		generation++;
 	}
 }

@@ -33,8 +33,6 @@ public class Genome implements Serializable
 
     //Represents the ID of the genome
     private int                     genomeID;
-    //Represents the list of neurons
-    private ArrayList<NeuronGene>   neuronGeneSet = new ArrayList<NeuronGene>();
     //Represents the list of links
     private ArrayList<LinkGene>     linkGeneSet   = new ArrayList<LinkGene>();
     //Represents the fitness of the genome
@@ -58,7 +56,8 @@ public class Genome implements Serializable
      public Genome(int id, ArrayList<NeuronGene> neurons, ArrayList<LinkGene> links, int inputs, int outputs, InnovationDB innovation)
      {
         genomeID         = id;
-        neuronGeneSet    = neurons;
+        //Represents the list of neurons
+        private NeuronGeneSet           neuronGeneSet = new NeuronGeneSet();
         linkGeneSet      = links;
         numInputNeurons  = inputs;
         numOutputNeurons = outputs;
@@ -245,12 +244,12 @@ public class Genome implements Serializable
         
     }
      
-     /**
-      * <p>This function converts the respective genome into a 
-      * neural network.</p>
-      **/
-     public NeuralNet createPhenotype()
-     {
+    /**
+     * <p>This function converts the respective genome into a 
+     * neural network.</p>
+     **/
+    public NeuralNet createPhenotype()
+    {
         //Variables
         //These arrays hold the actual neurons and synapses of the neural network
         Synapse[] linkSet = new Synapse[linkGeneSet.size()];
@@ -273,29 +272,29 @@ public class Genome implements Serializable
 
         //Combines the neurons and synapses into a neural network and returns the network
         return new com.riskybusiness.neural.NeuralNet(neuronSet, linkSet);
-     }
+    }
 
 
-     //Delete the neural network
-     //public void deletePhenotype(){?}
+    //Delete the neural network
+    //public void deletePhenotype(){?}
 
 
-     /**
-      * This functions adds a link to the genome dependent upon the mutation rate and other parameters.
-      * @param mutationRate The rate at which links can be added
-      * @param chanceOfLooped The chance a link has of being a looped link
-      * @param innovation This is simply the database that contains all the innovations
-      * @param numTrysToFindLoop This determines how many times the function will look to 
-      *                          create a looped link
-      * @param numTrysToAddLink This prevents the possibility of an infinite loop in the case
-      *                         where the all neurons are connected to each other and thus limits
-      *                         the amount of times the function will look for the opportunity to add a link
-      *
-     **/ 
+    /**
+     * This functions adds a link to the genome dependent upon the mutation rate and other parameters.
+     * @param mutationRate The rate at which links can be added
+     * @param chanceOfLooped The chance a link has of being a looped link
+     * @param innovation This is simply the database that contains all the innovations
+     * @param numTrysToFindLoop This determines how many times the function will look to 
+     *                          create a looped link
+     * @param numTrysToAddLink This prevents the possibility of an infinite loop in the case
+     *                         where the all neurons are connected to each other and thus limits
+     *                         the amount of times the function will look for the opportunity to add a link
+     *
+    **/ 
 
     
-     public void addLink(double mutationRate, double chanceOfLooped, InnovationDB innovation, int numTrysToFindLoop, int numTrysToAddLink)
-     {
+    public void addLink(double mutationRate, double chanceOfLooped, InnovationDB innovation, int numTrysToFindLoop, int numTrysToAddLink)
+    {
         //This variable describes a function to create random numbers
         Random random = new Random();
         //These two variables respresent the id's of the neurons the link will connect. If the id's are -1
@@ -328,7 +327,7 @@ public class Genome implements Serializable
                 int neuronIndex = random.nextInt(neuronGeneSet.size() - numInputNeurons - 1) + numInputNeurons;
 
                 //This if statement is supposed to ensure that the gene we are adding a looped link to isn't an input gene or output gene
-                if (neuronGeneSet.get(neuronIndex).getNeuronLayer() == "Hidden")
+                if (neuronGeneSet.get(neuronIndex).getNeuronLayer() != 1 && neuronGeneSet.get(neuronIndex).getNeuronLayer() != numLayers)
                 {
                     toNeuronID   = neuronGeneSet.get(neuronIndex).getID();
                     fromNeuronID = neuronGeneSet.get(neuronIndex).getID();
@@ -396,15 +395,15 @@ public class Genome implements Serializable
             linkGeneSet.add(new LinkGene(fromNeuronID, toNeuronID, (linkGeneSet.size() + 1), random.nextDouble(), recurrent));
             numGenes++;
         }
-     }
+    }
 
 
 
-     //Add a neuron to the genome dependent upon the mutation rate
-     //I need to find a way to create a pointer to the innovation db
+    //Add a neuron to the genome dependent upon the mutation rate
+    //I need to find a way to create a pointer to the innovation db
      
-     public void addNeuron(double mutationRate, InnovationDB innovation, int numTrysToFindOldLink) 
-     {
+    public void addNeuron(double mutationRate, InnovationDB innovation, int numTrysToFindOldLink) 
+    {
         //This variable describes a function to create random numbers
         Random random = new Random();
         //If a valid link is found to add a neuron to then this will be set to true
@@ -432,9 +431,6 @@ public class Genome implements Serializable
             //Loop through and try to find an old link to add a neuron to
             for (int i = numTrysToFindOldLink; i > 0; i--)
             {
-                /**
-                This needs to be a value between 0 and some weird number that I will determine later
-                **/
                 System.out.println("Link = " + numGenes + " - 1 - " + (int)Math.sqrt(numGenes));
 
                 chosenLink = random.nextInt(numGenes - 1 - ((int)Math.sqrt(numGenes)));
@@ -499,6 +495,7 @@ public class Genome implements Serializable
 
                 if (innovationCheck == 0)
                 {
+                    
                     //Innovation was new so add the genes to the genome
                     neuronGeneSet.add(new NeuronGene((neuronGeneSet.size() + 1), "Sigmoid", false, random.nextFloat(), "Hidden"));
                     linkGeneSet.add(new LinkGene(fromNeuronID, neuronGeneSet.size(), (linkGeneSet.size() + 1 ), 1.0, false));
@@ -516,12 +513,6 @@ public class Genome implements Serializable
                 }
             }
         }
-
-
-
-
-
-
      }
      
      //Function to mutate the connection weights
@@ -539,29 +530,61 @@ public class Genome implements Serializable
      //Not sure
      //public void sortGenes();
 
-     public double getFitness()
-     {
-        return this.genomeFitness;
-     }
-     public double getNumSpawns()
-     {
-        return this.amountToSpawn;
-     }
-
-     public int getID()
-     {
-        return this.genomeID;
-     }
-
-     public void setID(int id)
-     {
-        this.genomeID = id;
-     }
-
-     public Genome makeBabies(Genome dad)
-     {
-        return dad;
-     }
-
+    // //Represents the ID     compatibilityScore;
      
+    public int getID()
+    {
+       return this.genomeID;
+    }
+
+    public void setID(int id)
+    {
+       this.genomeID = id;
+    }
+
+    public double getAdjustedFitness()
+    {
+        return this.genomeAdjFitness;
+    }
+
+    public void setAdjustedFitness(double fitness)
+    {
+        this.genomeAdjFitness = fitness;
+    }
+
+    public double getFitness()
+    {
+       return this.genomeFitness;
+    }
+
+    public void determineFitness()
+    {
+        NeuralNet   toFire  = this.createPhenotype();
+
+        float[]     result  = new float[]{0};
+
+        float[][]   inputs  = new float[][]{{0},{0}};
+
+        //Turn the genome into a neural net and compare the output to Wes's heuristic
+        //I think we are to take the output and simulate the output and feed the results
+        //into the heuristic. Need more info. 
+
+        //For practice the fitness will essentially be how close the output is to 10.
+        //Because of the strict and definite nature of the fitness function we should
+        //see results and the genome conforming to 1.
+        result = toFire.fire(inputs);
+        System.out.println("Results: " + result[0]);
+    }
+
+    public double getNumSpawns()
+    {
+       return this.amountToSpawn;
+    }
+
+    public Genome makeBabies(Genome dad)
+    {
+       return dad;
+    }
+
+
 }

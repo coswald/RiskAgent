@@ -37,12 +37,14 @@ public class NeuronGene implements Serializable
     //Represents the weight of the neuron
     private float   neuronActivationResponse;
     //Represents the layer of the neuron(used in the genome class)
-    private String  neuronLayer;
+    //private String  neuronLayer;
     //private int     innovationNum;
+    //Represents the layer the neuron exists in
+    private int     neuronLayer;
 
 
     //Create a neuron gene
-    public NeuronGene(int id, String type, boolean recur, float activate, String layer)
+    public NeuronGene(int id, String type, boolean recur, float activate, int layer)
     {
         neuronID = id;
         neuronType = type;
@@ -100,7 +102,7 @@ public class NeuronGene implements Serializable
     }
 
     //Set the layer of the neuron
-    public void setNeuronLayer(String layer)
+    public void setNeuronLayer(int layer)
     {
         this.neuronLayer = layer;
     }

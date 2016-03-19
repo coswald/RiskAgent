@@ -66,12 +66,23 @@ public class Species implements Serializable
 		// 	}
 		// }
 
+		//Determine the adjusted fitness
+		//For now adjusted fitness is simply fitness
+
 		//speciesPop.add(population);
 		//Until I can find a way to actually speciate the people the species is
 		//essentially going to be the population
 		myPopulation.add(population);
 
-
+		//Determine the adjusted fitness
+		//For now adjusted fitness is simply fitness
+		for (int i = 0; i < this.myPopulation.size(); i++)
+		{
+			for (int j = 0; j < this.myPopulation.get(j).size(); i++)
+			{
+				myPopulation.get(i).get(j).setAdjustedFitness(myPopulation.get(i).get(j).getFitness());
+			}
+		}
 	}
 
 	//Returns the number of species
@@ -113,24 +124,47 @@ public class Species implements Serializable
 
 		//Loop through the genomes and compare the current genome to the fittest and 
 		//determine the fittest individual
-		for (int genomeID = 1; genomeID < myPopulation.get(speciesID).size(); genomeID++)
+		for (int genomeIndex = 1; genomeIndex < myPopulation.get(speciesID).size() + 1; genomeIndex++)
 		{
 			if (myPopulation.get(speciesID).get(fittestGenomeID).getFitness() < 
-				   myPopulation.get(speciesID).get(genomeID).getFitness())
+				   myPopulation.get(speciesID).get(genomeIndex).getFitness())
 			{
-				fittestGenomeID = genomeID;
+				fittestGenomeIndex = genomeIndex;
 			}
 		}
 
 		//Return
-		return myPopulation.get(speciesID).get(fittestGenomeID);
+		return myPopulation.get(speciesID).get(fittestGenomeIndex);
 	}
 
 	//Figure out a way to return better people
 	//Returns a random member from the population
 	public Genome getMember(int speciesID)
 	{
-		return myPopulation.get(speciesID).get(random.nextInt((myPopulation.get(speciesID).size() - 1)));
+		ArrayList<double> 	fitnessArray 	= new ArrayList<double>();
+
+		double 				myRandom 		= 0.0;
+
+		int  				genomeIndex 	= 1;
+
+		for (genomeIndex = 1; genomeIndex < myPopulation.get(speciesID).size() + 1; genomeIndex++)
+		{
+			fitnessArray += myPopulation.get(speciesID).get(genomeIndex).getFitness();
+		}
+
+		myRandom = random.nextDouble(/*Get the last value from the fitnessarray*/);
+
+		for (int genomeIndex = 0; genomeIndex < myPopulation.get.(speciesID).size(); genomeIndex++)
+		{
+			if (myRandom < myPopulation.get(speciesID).get(genomeIndex))
+			{
+				break;
+			}
+		}
+
+
+		return myPopulation.get(speciesID).get(genomeIndex);
+		//return myPopulation.get(speciesID).get(random.nextInt((myPopulation.get(speciesID).size() - 1)));
 	}
 
 	public int getNumMembers(int speciesID)
