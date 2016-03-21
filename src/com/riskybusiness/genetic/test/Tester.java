@@ -12,6 +12,7 @@ import com.riskybusiness.genetic.LinkGene;
 import com.riskybusiness.genetic.NeuronGene;
 import com.riskybusiness.genetic.UniqueID;
 import com.riskybusiness.genetic.Species;
+import com.riskybusiness.genetic.GenomeHelper;
 
 import java.util.Random;
 import java.util.Scanner;
@@ -30,7 +31,9 @@ public class Tester
 		//Tester variable
 		boolean printGenome = false;
 		//Tester variable
-		boolean testAddNeuron = true;
+		boolean testAddNeuron = false;
+		//Tester variable
+		boolean testPush 	= true;
 
 		/*User Params */
 		
@@ -161,6 +164,11 @@ public class Tester
 					float fweight = random.nextFloat();
 					neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", false, fweight, (numHiddenLayers + 2)));
 				}
+				
+				if (testPush)
+				{
+					neuronGenes.add(new NeuronGene(21, "Sigmoid", false, 1.0f, 2));
+    			}
 
 				if (debug)
 				{
@@ -198,6 +206,13 @@ public class Tester
 						**/
 					}
 				}
+
+				if (testPush)
+				{
+					//Represents the added links
+    				linkGenes.add(new LinkGene(1, 21, 56, 1.00, false));
+    				linkGenes.add(new LinkGene(21, 4, 57, 1.00, false));
+    			}
 
 				if (debug)
 				{
@@ -249,14 +264,26 @@ public class Tester
 			}
 		}
 
-		// if (testPush)
-		// {
+		if (testPush)
+		{
 
-		// 	//Represents the package that rpovide the genome with helper functions
-  //   		private GenomeHelper genomeHelper = new GenomeHelper();
+			//Represents the package that rpovide the genome with helper functions
+    		GenomeHelper genomeHelper = new GenomeHelper();
 
-		// 	genomeHelper.pushNeurons()
-		// }
+    		//Represents the neuron to be added
+    		NeuronGene neuronToAdd = new NeuronGene(21, "Sigmoid", false, 1.0f, 2);
+
+    		//Represents the added links
+    		// LinkGene linkToAdd1 = new LinkGene(1, 21, 56, 1.00, false);
+    		// LinkGene linkToAdd2 = new LinkGene(21, 4, 57, 1.00, false);
+
+    		// population.get(0).add(linkToAdd1);
+    		// population.get(0).add(linkToAdd2);
+
+    		population.get(0).print();
+			genomeHelper.pushNeurons(population.get(0).getNeurons(), population.get(0).getLinks(), neuronToAdd, 7);
+			population.get(0).print();
+		}
 
 		if (printGenome)
 		{

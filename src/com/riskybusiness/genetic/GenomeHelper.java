@@ -9,11 +9,12 @@ import java.util.ArrayList;
 
 public class GenomeHelper implements Serializable
 {
-
+	//Dummy Variable
 	private int myID;
 
 	public GenomeHelper()
 	{
+		//Just to put something here
 		myID = 1;
 	}
 
@@ -99,15 +100,15 @@ public class GenomeHelper implements Serializable
 			//If we have found a link that is enabled and not looped and comes from our neuron then check that links
 			//To neuron and see if it needs to be pushed back. Then recursivly call push neurons on that
 			//Neuron
-			if (linkGenes.get(i).getFromNeuron() == addedNeuron.getID() && linkGenes.get(i).getEnabled() && linkGenes.get(i).getRecurrency())
+			if ((linkGenes.get(i).getFromNeuron() == addedNeuron.getID()) && (linkGenes.get(i).getEnabled()) && !(linkGenes.get(i).getRecurrency()))
 			{
 				//Find the neuron gene that the link points to
 				for (int j = 0; j < neuronGenes.size(); j++)
                 {
-                     if (neuronGenes.get(i).getID() == linkGenes.get(i).getToNeuron())
-                     {
-                        toNeuron = neuronGenes.get(i);
-                     }
+                    if (neuronGenes.get(j).getID() == linkGenes.get(i).getToNeuron())
+                    {
+                       toNeuron = neuronGenes.get(j);
+                    }
                 }
 
 				//Check the neuron and see if it needs to be pushed back
@@ -126,8 +127,6 @@ public class GenomeHelper implements Serializable
 	//This function sorts the array of links by the layer they first appear.
 	public void sortLinkArray(ArrayList<NeuronGene> neuronGenes, ArrayList<LinkGene> linkGenes)
 	{
-<<<<<<< HEAD:src/com/riskybusiness/genetic/GenomeHelper.java
-
 		//Represents the sorted links
 		ArrayList<LinkGene> sortedLinkArray = new ArrayList<LinkGene>();
 
@@ -136,10 +135,6 @@ public class GenomeHelper implements Serializable
 
 		//Loops through the neuron gene set and finds the corresponding links to each neuron
 		for (int i = 0; i < neuronGenes.size(); i++)
-=======
-		/*
-		for (int i = 0; i < neuronGenes.size())
->>>>>>> origin/master:src/com/riskybusiness/neural/GenomeHelper.java
 		{
 			//Loops through all the links
 			for (int j = 0; j < unsortedLinkArray.size(); j++)
@@ -155,7 +150,6 @@ public class GenomeHelper implements Serializable
 				}
 			}
 		}
-<<<<<<< HEAD:src/com/riskybusiness/genetic/GenomeHelper.java
 
 		//Replace the current link array with the sorted one
 		linkGenes.clear();
@@ -182,8 +176,4 @@ public class GenomeHelper implements Serializable
 		return activeLinkGenes;
 	}
 }
-=======
-		*/
-	}
-}
->>>>>>> origin/master:src/com/riskybusiness/neural/GenomeHelper.java
+

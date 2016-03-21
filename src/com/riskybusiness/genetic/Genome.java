@@ -549,6 +549,9 @@ public class Genome implements Serializable
                     int newNeuronLayer = fromNeuron.getNeuronLayer();
                     //Add the new neuron to the gene set
                     neuronGeneSet.add(new NeuronGene((neuronGeneSet.size() + 1), "Sigmoid", false, random.nextFloat(), newNeuronLayer));
+                    linkGeneSet.add(new LinkGene(fromNeuronID, neuronGeneSet.size(), (linkGeneSet.size() + 1 ), 1.0, false));
+                    linkGeneSet.add(new LinkGene(neuronGeneSet.size(), toNeuronID, (linkGeneSet.size() + 1), originalWeight, false));
+
                     //Push back any neurons that were affected by the addition
                     /**
                     Figure out whether it should be size - 1 or size
@@ -581,8 +584,6 @@ public class Genome implements Serializable
                     Sometime I need to figure out whether numLayers is properly changed
                     **/
 
-                    linkGeneSet.add(new LinkGene(fromNeuronID, neuronGeneSet.size(), (linkGeneSet.size() + 1 ), 1.0, false));
-                    linkGeneSet.add(new LinkGene(neuronGeneSet.size(), toNeuronID, (linkGeneSet.size() + 1), originalWeight, false));
                     innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, fromNeuronID, neuronGeneSet.size(), -1);
                     innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, neuronGeneSet.size(), toNeuronID, -1);
                     numGenes++;numGenes++;
@@ -669,5 +670,13 @@ public class Genome implements Serializable
        return dad;
     }
 
+    public ArrayList<NeuronGene> getNeurons()
+    {
+        return this.neuronGeneSet;
+    }
 
+    public ArrayList<LinkGene> getLinks()
+    {
+        return this.linkGeneSet;
+    }
 }
