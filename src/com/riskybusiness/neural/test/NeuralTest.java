@@ -18,8 +18,7 @@
 package com.riskybusiness.neural.test;
 
 import com.riskybusiness.neural.NeuralNet;
-import com.riskybusiness.neural.SigmoidNeuron;
-import com.riskybusiness.neural.Synapse;
+import com.riskybusiness.util.Debug;
 
 import java.lang.Object;
 
@@ -27,13 +26,15 @@ public class NeuralTest extends Object
 {
 	public static void main(String[] args)
 	{
+		Debug.DEBUGGING = true;
+		//Debug.SHOWMESSAGE = false;
 		NeuralNet t = new NeuralNet(2, 1, 2);
 		float[][] inputs = new float[2][1];
 		inputs[0][0] = 1F;
 		inputs[1][0] = 1F;
 		float[] out = t.fire(inputs);
-		System.out.println("The network T has 3 layers, with 2 in input, 1 in output, and 2 in the hidden layer.");
-		System.out.println("The output for 1, 1 is " + out[0] + ".\n");
+		Debug.println("The network T has 3 layers, with 2 in input, 1 in output, and 2 in the hidden layer.");
+		Debug.println("The output for 1, 1 is " + out[0] + ".\n", 1);
 		
 		NeuralNet u = new NeuralNet(3, 2, 2);
 		inputs = new float[3][1];
@@ -41,8 +42,8 @@ public class NeuralTest extends Object
 		inputs[1][0] = 1F;
 		inputs[2][0] = 1F;
 		out = u.fire(inputs);
-		System.out.println("The network U has 3 layers, with 3 in input, 2 in output, and 2 in the hidden layer"); //, and 4 in the second hidden layer.");
-		System.out.println("The output for all ones are " + out[0] + " : " + out[1] + ".\n");
+		Debug.println("The network U has 3 layers, with 3 in input, 2 in output, and 2 in the hidden layer"); //, and 4 in the second hidden layer.");
+		Debug.println("The output for all ones are " + out[0] + " : " + out[1] + ".\n", 1);
 		
 		NeuralNet s = new NeuralNet(10, 3, 15, 4);
 		inputs = new float[10][1];
@@ -57,7 +58,9 @@ public class NeuralTest extends Object
 		inputs[8][0] = 1F;
 		inputs[9][0] = 1F;
 		out = s.fire(inputs);
-		System.out.println("The network S has 4 layers, with 10 in input, 3 in output, 15 in the first hidden layer and 4 in the second hidden layer.");
-		System.out.println("The output for all ones are " + out[0] + " : " + out[1] + " : " + out[2]);
+		Debug.println("The network S has 4 layers, with 10 in input, 3 in output, 15 in the first hidden layer and 4 in the second hidden layer.");
+		Debug.println("The output for all ones are " + out[0] + " : " + out[1] + " : " + out[2], 1);
+		
+		Debug.giveClose();
 	}
 }
