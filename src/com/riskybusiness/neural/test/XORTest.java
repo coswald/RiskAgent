@@ -19,6 +19,7 @@ package com.riskybusiness.neural.test;
 
 import com.riskybusiness.neural.NeuralNet;
 import com.riskybusiness.neural.Trainer;
+import com.riskybusiness.util.Debug;
 
 import java.lang.Exception;
 import static java.lang.Math.random;
@@ -30,6 +31,9 @@ public class XORTest extends Object
 {
 	public static void main(String... args) throws Exception
 	{
+		Debug.DEBUGGING = true;
+		Debug.giveClose();
+		
 		NeuralNet xor = new NeuralNet(2, 1, 2);
 		Trainer[] trainers = new Trainer[4000];
 		
@@ -45,9 +49,7 @@ public class XORTest extends Object
 		boolean trained = false;
 		while(!trained)
 		{
-			System.out.println("\rRound: " + ++round);
-			if(round % 1000 == 0)
-				xor = new NeuralNet(2, 1, 2);
+			Debug.println("\rRound: " + ++round);
 			//System.out.println(xor);
 			for(int i = 0; i < trainers.length; i++)
 			{
@@ -65,11 +67,10 @@ public class XORTest extends Object
 					got = xor.fire(new float[][] {new float[] {i}, new float[] {j}})[0];
 					if((float)(Math.round(got * 100.0F) / 100.0F) != ((float)(((int)i) ^ ((int)j))))
 						amountWrong++;
-					System.out.printf("I: " + i + "; J: " + j + "; Got: %.2f%n", (Math.round(got * 100.0F) / 100.0F));
+					Debug.println("I: " + i + "; J: " + j + "; Got: " + (Math.round(got * 100.0F) / 100.0F), 1);
 				}
 			}
-			System.out.println("Amount Wrong: " + amountWrong);
-			System.out.println();
+			Debug.println("Amount Wrong: " + amountWrong);
 			if(amountWrong == 0)
 				trained = true;
 		}

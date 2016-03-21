@@ -160,18 +160,26 @@ public class Debug
 	 */
 	public static void giveClose()
 	{
-		while(!Debug.hasExited())
-                {
-                        try
-                        {
-                                Thread.sleep(500);
-                        }
-                        catch(InterruptedException ie)
-                        {
-                                ie.printStackTrace();
-                                System.exit(1);
-                        }
-                }
-                System.exit(0);
+		Thread t = new Thread(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				while(!Debug.hasExited())
+                		{
+                		        try
+                		        {
+                		                Thread.sleep(500);
+                		        }
+                		        catch(InterruptedException ie)
+                		        {
+                		                ie.printStackTrace();
+                		                System.exit(1);
+                		        }
+                		}
+                		System.exit(0);
+			}
+		});
+		t.start();
 	}
 }
