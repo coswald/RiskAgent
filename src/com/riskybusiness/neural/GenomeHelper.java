@@ -124,8 +124,11 @@ public class GenomeHelper implements Serializable
 	//The function also requires that the push back function was called if a neuron was recently added
 	public ArrayList<LinkGene> sortLinkArray(ArrayList<NeuronGene> neuronGenes, ArrayList<LinkGene> linkGenes)
 	{
+		/*
 		for (int i = 0; i < neuronGenes.size())
 		{
 
 		}
+		*/
 	}
+}
