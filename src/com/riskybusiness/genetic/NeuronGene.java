@@ -42,6 +42,15 @@ public class NeuronGene implements Serializable
     //Represents the layer the neuron exists in
     private int     neuronLayer;
 
+    //Create a blank neuron gene
+    public NeuronGene()
+    {
+        neuronID = -1;
+        neuronType = "SIGMOID";
+        neuronRecurrent = false;
+        neuronActivationResponse = 0;
+        neuronLayer = 1;
+    }
 
     //Create a neuron gene
     public NeuronGene(int id, String type, boolean recur, float activate, int layer)
@@ -96,7 +105,7 @@ public class NeuronGene implements Serializable
     }
 
     //Get the layer of the neuron
-    public String getNeuronLayer()
+    public int getNeuronLayer()
     {
         return this.neuronLayer;
     }

@@ -171,15 +171,15 @@ public class GeneticTest
 		// for (i = 0; i < populationSize; i++)
 		// {
 
-		// 	int amountWrong = 0;
-		// 	outer:
-		// 	for(float x = 0; x < 2; x++)
+		// int amountWrong = 0;
+		// outer:
+		// for(float x = 0; x < 2; x++)
+		// {
+		// 	for(float y = 0; y < 2; y++)
 		// 	{
-		// 		for(float y = 0; y < 2; y++)
-		// 		{
-		// 			System.out.println(myNetworks[i].fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
-		// 		}
+		// 		System.out.println(myNetworks[i].fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
 		// 	}
+		// }
 
 		// 	System.out.println("Network " + i + " fired!");
 		// }

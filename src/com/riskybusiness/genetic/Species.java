@@ -120,13 +120,13 @@ public class Species implements Serializable
 	public Genome getBestMember(int speciesID)
 	{
 		//Represents the ID of the fittest genome
-		int fittestGenomeID = 0;
+		int fittestGenomeIndex = 0;
 
 		//Loop through the genomes and compare the current genome to the fittest and 
 		//determine the fittest individual
 		for (int genomeIndex = 1; genomeIndex < myPopulation.get(speciesID).size() + 1; genomeIndex++)
 		{
-			if (myPopulation.get(speciesID).get(fittestGenomeID).getFitness() < 
+			if (myPopulation.get(speciesID).get(fittestGenomeIndex).getFitness() < 
 				   myPopulation.get(speciesID).get(genomeIndex).getFitness())
 			{
 				fittestGenomeIndex = genomeIndex;
@@ -141,30 +141,30 @@ public class Species implements Serializable
 	//Returns a random member from the population
 	public Genome getMember(int speciesID)
 	{
-		ArrayList<double> 	fitnessArray 	= new ArrayList<double>();
+		// ArrayList<Double> 	fitnessArray 	= new ArrayList<Double>();
 
-		double 				myRandom 		= 0.0;
+		// double 				myRandom 		= 0.0;
 
-		int  				genomeIndex 	= 1;
+		// int  				genomeIndex 	= 1;
 
-		for (genomeIndex = 1; genomeIndex < myPopulation.get(speciesID).size() + 1; genomeIndex++)
-		{
-			fitnessArray += myPopulation.get(speciesID).get(genomeIndex).getFitness();
-		}
+		// for (genomeIndex = 1; genomeIndex < myPopulation.get(speciesID).size() + 1; genomeIndex++)
+		// {
+		// 	fitnessArray += myPopulation.get(speciesID).get(genomeIndex).getFitness();
+		// }
 
-		myRandom = random.nextDouble(/*Get the last value from the fitnessarray*/);
+		// myRandom = random.nextDouble(/*Get the last value from the fitnessarray*/);
 
-		for (int genomeIndex = 0; genomeIndex < myPopulation.get.(speciesID).size(); genomeIndex++)
-		{
-			if (myRandom < myPopulation.get(speciesID).get(genomeIndex))
-			{
-				break;
-			}
-		}
+		// for (int genomeIndex = 0; genomeIndex < myPopulation.get(speciesID).size(); genomeIndex++)
+		// {
+		// 	if (myRandom < myPopulation.get(speciesID).get(genomeIndex))
+		// 	{
+		// 		break;
+		// 	}
+		// }
 
 
-		return myPopulation.get(speciesID).get(genomeIndex);
-		//return myPopulation.get(speciesID).get(random.nextInt((myPopulation.get(speciesID).size() - 1)));
+		// return myPopulation.get(speciesID).get(genomeIndex);
+		return myPopulation.get(speciesID).get(random.nextInt((myPopulation.get(speciesID).size() - 1)));
 	}
 
 	public int getNumMembers(int speciesID)

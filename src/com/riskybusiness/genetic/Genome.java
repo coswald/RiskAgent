@@ -34,7 +34,7 @@ public class Genome implements Serializable
     //Represents the ID of the genome
     private int                     genomeID;
     //Represents the list of links
-    private ArrayList<LinkGene>     neuronGeneSet = new ArrayList<LinkGene>();
+    private ArrayList<NeuronGene>   neuronGeneSet = new ArrayList<NeuronGene>();
     //Represents the list of links
     private ArrayList<LinkGene>     linkGeneSet   = new ArrayList<LinkGene>();
     //Represents the fitness of the genome
@@ -51,20 +51,31 @@ public class Genome implements Serializable
     private int                     numLayers;
     //Represents the speciesID of the genome
     private int                     species;
-    //Represents the number of genes in the genome
+    //Represents the number of link genes in the genome
     private int                     numGenes;
     //Represents the score given to speciate the genome
     private int                     compatibilityScore;
+    //Represents the package that rpovide the genome with helper functions
+    private GenomeHelper            genomeHelper = new GenomeHelper();
 
-     //This constructor creates a genome from a vector of SLinkGenes a vector of SNeuronGenes and an ID number
+     //This constructor creates a genome from a vector of LinkGenes a vector of NeuronGenes and an ID number
      public Genome(int id, ArrayList<NeuronGene> neurons, ArrayList<LinkGene> links, int inputs, int outputs, InnovationDB innovation)
      {
         genomeID         = id;
-        neuronGeneSet    = neurons;
-        linkGeneSet      = links;
+        //Create a deep copy of the passed in array
+        for (int i = 0; i < neurons.size(); i++)
+        {
+            neuronGeneSet.add(neurons.get(i));
+        }
+        //Create a deep copy of the passed in array
+        for (int i = 0; i < links.size(); i++)
+        {
+            linkGeneSet.add(links.get(i));
+        }
         numInputNeurons  = inputs;
         numOutputNeurons = outputs;
         numGenes         = links.size();
+        numLayers        = neurons.get((neurons.size() - 1)).getNeuronLayer();
 
         for (int i = 0;i < neuronGeneSet.size(); i++)
         {
@@ -78,7 +89,23 @@ public class Genome implements Serializable
         }
      }
 
-     //Get the number of neurons in the genome
+    public void print()
+    { 
+        System.out.println("Genome ID: " + genomeID + " Genome has " + numLayers + " layers, has " + numInputNeurons + " input neurons, has " + numOutputNeurons + " and has " + numGenes + " total Genes!");
+        System.out.println("The neurons inside this genome are: ");
+        for (int i = 0; i < neuronGeneSet.size(); i++)
+        {
+            System.out.println("   Neuron ID: " + neuronGeneSet.get(i).getID() + " Neuron Layer: " + neuronGeneSet.get(i).getNeuronLayer());
+        }
+        System.out.println("The links inside this genome are: ");
+        for (int i = 0; i < linkGeneSet.size(); i++)
+        {
+            System.out.println("   Link ID: " + linkGeneSet.get(i).getID() + " comes from Neuron: " + linkGeneSet.get(i).getFromNeuron() + " and goes to Neuron: " + linkGeneSet.get(i).getToNeuron());
+        }
+        System.out.println();
+    }
+
+    //Get the number of neurons in the genome
     public int getSizeNeuron()
     {
         return neuronGeneSet.size();
@@ -105,11 +132,11 @@ public class Genome implements Serializable
         return false;
     }
 
-    //Given a neuron id this function just finds its position in m_vecNeurons
-    public int getElementPos(int neuronId)
-    {
-        return 0;
-    }
+    //Given a neuron id this function just finds its position in the neuron list
+    // public int getElementPos(int neuronId)
+    // {
+    //     return 0;
+    // }
 
     //Tests if the passed ID is the same as any existing neuron IDs. Used in AddNeuron
     public boolean alreadyHaveThisNeuronID(int ID)
@@ -425,6 +452,7 @@ public class Genome implements Serializable
         int toNeuronID;
         int fromNeuronID;
 
+        this.print();
 
         //If the random value doesn't exceed the probability threshold then exit by returning
         if (random.nextDouble() > mutationRate)
@@ -432,7 +460,7 @@ public class Genome implements Serializable
             return;
         }
 
-        int sizeThreshold = numInputNeurons + numOutputNeurons + 5;
+        int sizeThreshold = numInputNeurons + numOutputNeurons + 500;
 
         //Not quite sure what the size threshold is yet but it prevents the chaining effect so I will implement it
         if (linkGeneSet.size() < sizeThreshold)
@@ -442,6 +470,7 @@ public class Genome implements Serializable
             {
                 System.out.println("Link = " + numGenes + " - 1 - " + (int)Math.sqrt(numGenes));
 
+                //Prevents the chaining problem
                 chosenLink = random.nextInt(numGenes - 1 - ((int)Math.sqrt(numGenes)));
 
                 //int fromNeuron =  linkGeneSet.get(chosenLink).getFromNeuron(); //?
@@ -506,20 +535,52 @@ public class Genome implements Serializable
                 {
                     //Determine Nueron layer
 
+                    NeuronGene fromNeuron = new NeuronGene();
+
                     //Find the   
-                    for (int i = 0; i < neuronGeneSet.size(); i++)
+                    for (int j = 0; j < neuronGeneSet.size(); j++)
                     {
-                         if (neuronGeneSet.get(i).getID() == fromNeuronID)
-                         {
-                            NeuronGene fromNeuron = neuronGeneSet.get(i);
-                         }
+                        if (neuronGeneSet.get(j).getID() == fromNeuronID)
+                        {
+                           fromNeuron = neuronGeneSet.get(j);
+                        }
                     }
                     //Determine the layey of the fromNeuron and add 1 to get the neuron to be added layer
                     int newNeuronLayer = fromNeuron.getNeuronLayer();
                     //Add the new neuron to the gene set
                     neuronGeneSet.add(new NeuronGene((neuronGeneSet.size() + 1), "Sigmoid", false, random.nextFloat(), newNeuronLayer));
-                    genomeHelper.sortNeuronArray(neuronGeneSet);
-                    genomeHelper.pushNeurons(neuronGeneSet, linkGeneSet);
+                    //Push back any neurons that were affected by the addition
+                    /**
+                    Figure out whether it should be size - 1 or size
+                    **/
+
+                    System.out.println("before push");
+                    this.print();
+
+                    genomeHelper.pushNeurons(neuronGeneSet, linkGeneSet, neuronGeneSet.get((neuronGeneSet.size() - 1)), numLayers);
+                    
+                    System.out.println("after push");
+                    this.print();
+                    System.out.println("before neuron sort");
+
+                    //Sort the neuron array
+                    genomeHelper.sortNeuronArray(neuronGeneSet, numLayers);
+
+                    System.out.println("after neuron sort");
+                    this.print();
+                    System.out.println("before link sort");
+
+
+                    //Sort the link genes
+                    genomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
+                    
+                    System.out.println("after link sort");
+                    this.print();
+
+                    /**
+                    Sometime I need to figure out whether numLayers is properly changed
+                    **/
+
                     linkGeneSet.add(new LinkGene(fromNeuronID, neuronGeneSet.size(), (linkGeneSet.size() + 1 ), 1.0, false));
                     linkGeneSet.add(new LinkGene(neuronGeneSet.size(), toNeuronID, (linkGeneSet.size() + 1), originalWeight, false));
                     innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, fromNeuronID, neuronGeneSet.size(), -1);

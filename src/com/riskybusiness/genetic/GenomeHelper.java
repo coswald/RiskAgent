@@ -5,6 +5,7 @@ import com.riskybusiness.neural.StepNeuron;
 import com.riskybusiness.neural.SigmoidNeuron;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class GenomeHelper implements Serializable
 {
@@ -17,7 +18,7 @@ public class GenomeHelper implements Serializable
 	}
 
 	//This function takes in an array of neuron genes and seperates them by layer
-	public ArrayList<ArrayList<NeuronGene>> seperate(ArrayLsit<NeuronGene> genes, int numLayers)
+	public ArrayList<ArrayList<NeuronGene>> seperate(ArrayList<NeuronGene> genes, int numLayers)
 	{
 		//Represents the individual layers of the neural network
 		ArrayList<NeuronGene> layer = new ArrayList<NeuronGene>();
@@ -68,7 +69,7 @@ public class GenomeHelper implements Serializable
 		//This loop brings the array back together.
 		for (int i = 0; i < numLayers; i++)
 		{
-			for (int j = 0; j < geneSet.get(i).size; j++)
+			for (int j = 0; j < geneSet.get(i).size(); j++)
 			{
 				sortedNeuronArray.add(geneSet.get(i).get(j));
 			}
@@ -82,14 +83,14 @@ public class GenomeHelper implements Serializable
 	//Assumes the neuron passed in has the correct layer
 	//This fucntion takes in a recently added neuron and then determines if the neurons that
 	//proceed that added neuron need to be pushed back to a new layer
-	public ArrayList<NeuronGene> pushNeurons(ArrayList<NeuronGene> neuronGenes, ArrayList<LinkGene> linkGenes, NeuronGene addedNeuron, int numLayers) 
+	public void pushNeurons(ArrayList<NeuronGene> neuronGenes, ArrayList<LinkGene> linkGenes, NeuronGene addedNeuron, int numLayers) 
 	{
-
-		//Represents the new array of neurons with the neurons pushed back
-		ArrayList<NeuronGene> pushedBackArray = new ArrayList<NeuronGene>();
 
 		//Represents the fill neural network seperated by layers
 		ArrayList<ArrayList<NeuronGene>> geneSet = new ArrayList<ArrayList<NeuronGene>>();
+
+		//Represents the neuron that a link points to
+		NeuronGene toNeuron = new NeuronGene();
 
 		//Recursivly find the next neuron to push back
 		//Loop through each link on a neuron and push back that neurons neurons from that neurons links.
@@ -105,7 +106,7 @@ public class GenomeHelper implements Serializable
                 {
                      if (neuronGenes.get(i).getID() == linkGenes.get(i).getToNeuron())
                      {
-                        NeuronGene toNeuron = neuronGenes.get(i);
+                        toNeuron = neuronGenes.get(i);
                      }
                 }
 
@@ -113,7 +114,7 @@ public class GenomeHelper implements Serializable
 				if(toNeuron.getNeuronLayer() == addedNeuron.getNeuronLayer())
 				{
 					toNeuron.pushLayer();
-					pushNeurons(neuronGenes, linkGenes, toNeuron, numLayers);
+					this.pushNeurons(neuronGenes, linkGenes, toNeuron, numLayers);
 				}
 				//else is one of the base cases(the neuron doesn't need to be pushed back)
 			}
@@ -122,10 +123,56 @@ public class GenomeHelper implements Serializable
 
 	//This function requires the incoming neuron genes to be sorted in order to properly sort the links
 	//The function also requires that the push back function was called if a neuron was recently added
-	public ArrayList<LinkGene> sortLinkArray(ArrayList<NeuronGene> neuronGenes, ArrayList<LinkGene> linkGenes)
+	//This function sorts the array of links by the layer they first appear.
+	public void sortLinkArray(ArrayList<NeuronGene> neuronGenes, ArrayList<LinkGene> linkGenes)
 	{
-		for (int i = 0; i < neuronGenes.size())
-		{
 
+		//Represents the sorted links
+		ArrayList<LinkGene> sortedLinkArray = new ArrayList<LinkGene>();
+
+		//Represents the unsorted links
+		ArrayList<LinkGene> unsortedLinkArray = linkGenes; //Create a real copy?
+
+		//Loops through the neuron gene set and finds the corresponding links to each neuron
+		for (int i = 0; i < neuronGenes.size(); i++)
+		{
+			//Loops through all the links
+			for (int j = 0; j < unsortedLinkArray.size(); j++)
+			{
+				//If the links from neuron is equal to the current neuron then add it to the sorted array and remove it from the unsorted list
+				if (neuronGenes.get(i).getID() == unsortedLinkArray.get(j).getFromNeuron())
+				{
+					//Add the link to the sorted array
+					sortedLinkArray.add(unsortedLinkArray.get(j));
+
+					//Remove the link from the unsorted array(variable trash doesn't do anything)
+					LinkGene trash = unsortedLinkArray.remove(j);
+				}
+			}
 		}
+
+		//Replace the current link array with the sorted one
+		linkGenes.clear();
+		linkGenes = sortedLinkArray;
 	}
+
+	public ArrayList<LinkGene> removeDisabledLinks(ArrayList<LinkGene> linkGenes)
+	{
+
+		//Represents the link array of only active links
+		ArrayList<LinkGene> activeLinkGenes = linkGenes;
+
+		//Loops through all the links
+		for (int i = 0; i < linkGenes.size(); i++)
+		{
+			if (!(linkGenes.get(i).getEnabled()))
+			{
+				//If the link is disable remove it
+				LinkGene trash = activeLinkGenes.remove(i);
+			}
+		}
+
+		//Return the array of active links
+		return activeLinkGenes;
+	}
+}

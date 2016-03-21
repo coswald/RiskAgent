@@ -55,6 +55,10 @@ public class Epoch
 		int[]	hiddenLayers 			= new int[numHiddenLayers];
 		//Represents the number of neurons in the genome up to the given index
 		int[] 	summationNeuronsInLayer	= new int[numHiddenLayers + 3];
+		//Represents the current neuron ID 
+		int 	curNeuronID 			= 0;
+		//Represents the current link ID
+		int 	curLinkID 				= 0;
 
 
 
@@ -136,17 +140,17 @@ public class Epoch
 				for (int i = 0; i < numInputNeurons; i++)
 				{
 					float fweight = random.nextFloat();
-					neuronGenes.add(new NeuronGene(unique.getNextNeuronID(), "Sigmoid", false, fweight, "Input")); 
+					neuronGenes.add(new NeuronGene(unique.getNextNeuronID(), "Sigmoid", false, fweight, 1)); 
 				}
 				for (int i = 0; i < summationNeuronsInLayer[(numHiddenLayers + 1)] - summationNeuronsInLayer[1]; i++)
 				{
 					float fweight = random.nextFloat();
-					neuronGenes.add(new NeuronGene(unique.getNextNeuronID(), "Sigmoid", false, fweight, "Hidden"));
+					neuronGenes.add(new NeuronGene(unique.getNextNeuronID(), "Sigmoid", false, fweight, 2));
 				}
 				for (int i = 0; i < summationNeuronsInLayer[(numHiddenLayers + 2)] - summationNeuronsInLayer[(numHiddenLayers + 1)]; i++)
 				{
 					float fweight = random.nextFloat();
-					neuronGenes.add(new NeuronGene(unique.getNextNeuronID(), "Step", false, fweight, "Output"));
+					neuronGenes.add(new NeuronGene(unique.getNextNeuronID(), "Step", false, fweight, 3));
 				}
 
 				if (debug)
@@ -160,11 +164,11 @@ public class Epoch
 				for (int i = 0; i < numHiddenLayers + 1; i++)
 				{
 					//This loop goes through each neuron in the active layer
-					for (int j = summationNeuronsInLayer[i] + 1; j <= summationNeuronsInLayer[(i + 1)]; j++)
+					for (int j = summationNeuronsInLayer[i]; j < summationNeuronsInLayer[(i + 1)]; j++)
 					{
 						linksCreated = 0;
 						//This loop goes through each neuron in the layer that comes after the active layer
-						for (int k = summationNeuronsInLayer[(i + 1)] + 1; k <= summationNeuronsInLayer[(i + 2)]; k++)
+						for (int k = summationNeuronsInLayer[(i + 1)]; k < summationNeuronsInLayer[(i + 2)]; k++)
 						{
 							if (fullLink || random.nextDouble() <= chanceOfLink)
 							{
@@ -172,7 +176,7 @@ public class Epoch
 								//Create random weight
 								double dweight = random.nextDouble();
 								//Add the link to the link gene array
-				 				linkGenes.add(new LinkGene(j, k, unique.getNextLinkID(), dweight, false));
+				 				linkGenes.add(new LinkGene(neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), ++curLinkID, dweight, false));
 							}
 						}
 						//Still have to deal with the fact that this way results in some neurons not getting links
