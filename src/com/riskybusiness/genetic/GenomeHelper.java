@@ -21,9 +21,6 @@ public class GenomeHelper implements Serializable
 	//This function takes in an array of neuron genes and seperates them by layer
 	public ArrayList<ArrayList<NeuronGene>> seperate(ArrayList<NeuronGene> genes, int numLayers)
 	{
-		//Represents the individual layers of the neural network
-		ArrayList<NeuronGene> layer = new ArrayList<NeuronGene>();
-		
 		//Represents the fill neural network seperated by layers
 		ArrayList<ArrayList<NeuronGene>> seperatedNeuronArray = new ArrayList<ArrayList<NeuronGene>>();
 
@@ -31,8 +28,8 @@ public class GenomeHelper implements Serializable
 		//Loop through the layers
 		for (int i = 0; i < numLayers; i++)
 		{
-			//Clear the layer first
-			layer.clear();
+			//Represents the individual layers of the neural network
+			ArrayList<NeuronGene> layer = new ArrayList<NeuronGene>();
 
 			//Loop through each neuron in the neuron gene set
 			for (int j = 0; j < genes.size(); j++)
@@ -40,6 +37,7 @@ public class GenomeHelper implements Serializable
 				//If the neuron belongs to the current layer then add it to the layer array
 				if (genes.get(j).getNeuronLayer() == (i + 1))
 				{
+
 					//Add the neuron to the layer array
 					layer.add(genes.get(j));
 					/**
@@ -47,6 +45,7 @@ public class GenomeHelper implements Serializable
 					**/
 				}
 			}
+
 			//Once all the neuron have been checked add the layer to the final genome
 			seperatedNeuronArray.add(layer);
 		}
@@ -54,7 +53,7 @@ public class GenomeHelper implements Serializable
 		return seperatedNeuronArray;
 	}
 
-	public ArrayList<NeuronGene> sortNeuronArray(ArrayList<NeuronGene> genes, int numLayers)
+	public void sortNeuronArray(ArrayList<NeuronGene> genes, int numLayers)
 	{
 
 		//Represents the array to return to the calling function
@@ -76,7 +75,12 @@ public class GenomeHelper implements Serializable
 			}
 		}
 
-		return sortedNeuronArray;
+		genes.clear();
+
+		for (int i = 0; i < sortedNeuronArray.size(); i++)
+		{
+			genes.add(sortedNeuronArray.get(i));
+		}
 	}
 
 	//Should this be void since everything we pass in is the actual copy of it? 
@@ -84,7 +88,7 @@ public class GenomeHelper implements Serializable
 	//Assumes the neuron passed in has the correct layer
 	//This fucntion takes in a recently added neuron and then determines if the neurons that
 	//proceed that added neuron need to be pushed back to a new layer
-	public void pushNeurons(ArrayList<NeuronGene> neuronGenes, ArrayList<LinkGene> linkGenes, NeuronGene addedNeuron, int numLayers) 
+	public int pushNeurons(ArrayList<NeuronGene> neuronGenes, ArrayList<LinkGene> linkGenes, NeuronGene addedNeuron, int numLayers) 
 	{
 
 		//Represents the fill neural network seperated by layers
@@ -92,6 +96,9 @@ public class GenomeHelper implements Serializable
 
 		//Represents the neuron that a link points to
 		NeuronGene toNeuron = new NeuronGene();
+
+		//Represents whether the output layer was affect as special things need to happen if this happens
+		boolean outputLayerPushed = false;
 
 		//Recursivly find the next neuron to push back
 		//Loop through each link on a neuron and push back that neurons neurons from that neurons links.
@@ -114,12 +121,19 @@ public class GenomeHelper implements Serializable
 				//Check the neuron and see if it needs to be pushed back
 				if(toNeuron.getNeuronLayer() == addedNeuron.getNeuronLayer())
 				{
+					if (toNeuron.getNeuronLayer() == numLayers)
+					{
+						outputLayerPushed = true;
+					}
+
 					toNeuron.pushLayer();
 					this.pushNeurons(neuronGenes, linkGenes, toNeuron, numLayers);
 				}
 				//else is one of the base cases(the neuron doesn't need to be pushed back)
 			}
 		}
+		
+		return (numLayers + 1);
 	}
 
 	//This function requires the incoming neuron genes to be sorted in order to properly sort the links

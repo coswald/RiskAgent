@@ -468,8 +468,6 @@ public class Genome implements Serializable
             //Loop through and try to find an old link to add a neuron to
             for (int i = numTrysToFindOldLink; i > 0; i--)
             {
-                System.out.println("Link = " + numGenes + " - 1 - " + (int)Math.sqrt(numGenes));
-
                 //Prevents the chaining problem
                 chosenLink = random.nextInt(numGenes - 1 - ((int)Math.sqrt(numGenes)));
 
@@ -546,43 +544,25 @@ public class Genome implements Serializable
                         }
                     }
                     //Determine the layey of the fromNeuron and add 1 to get the neuron to be added layer
-                    int newNeuronLayer = fromNeuron.getNeuronLayer();
+                    int newNeuronLayer = fromNeuron.getNeuronLayer() + 1;
                     //Add the new neuron to the gene set
                     neuronGeneSet.add(new NeuronGene((neuronGeneSet.size() + 1), "Sigmoid", false, random.nextFloat(), newNeuronLayer));
                     linkGeneSet.add(new LinkGene(fromNeuronID, neuronGeneSet.size(), (linkGeneSet.size() + 1 ), 1.0, false));
                     linkGeneSet.add(new LinkGene(neuronGeneSet.size(), toNeuronID, (linkGeneSet.size() + 1), originalWeight, false));
 
                     //Push back any neurons that were affected by the addition
-                    /**
-                    Figure out whether it should be size - 1 or size
-                    **/
-
-                    System.out.println("before push");
-                    this.print();
-
-                    genomeHelper.pushNeurons(neuronGeneSet, linkGeneSet, neuronGeneSet.get((neuronGeneSet.size() - 1)), numLayers);
-                    
-                    System.out.println("after push");
-                    this.print();
-                    System.out.println("before neuron sort");
-
+                    numLayers = genomeHelper.pushNeurons(neuronGeneSet, linkGeneSet, neuronGeneSet.get((neuronGeneSet.size() - 1)), numLayers);
                     //Sort the neuron array
                     genomeHelper.sortNeuronArray(neuronGeneSet, numLayers);
 
-                    System.out.println("after neuron sort");
                     this.print();
                     System.out.println("before link sort");
-
 
                     //Sort the link genes
                     genomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
                     
                     System.out.println("after link sort");
                     this.print();
-
-                    /**
-                    Sometime I need to figure out whether numLayers is properly changed
-                    **/
 
                     innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, fromNeuronID, neuronGeneSet.size(), -1);
                     innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, neuronGeneSet.size(), toNeuronID, -1);

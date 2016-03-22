@@ -31,9 +31,11 @@ public class Tester
 		//Tester variable
 		boolean printGenome = false;
 		//Tester variable
-		boolean testAddNeuron = false;
+		boolean testAddNeuron = true;
 		//Tester variable
-		boolean testPush 	= true;
+		boolean testPush 	= false;
+		//Tester variable
+		boolean testSortNeurons = false;
 
 		/*User Params */
 		
@@ -283,6 +285,14 @@ public class Tester
     		population.get(0).print();
 			genomeHelper.pushNeurons(population.get(0).getNeurons(), population.get(0).getLinks(), neuronToAdd, 7);
 			population.get(0).print();
+
+			if (testSortNeurons)
+			{
+			
+				population.get(0).print();
+				genomeHelper.sortNeuronArray(population.get(0).getNeurons(), 8);
+				population.get(0).print();
+			}
 		}
 
 		if (printGenome)
