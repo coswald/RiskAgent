@@ -63,9 +63,9 @@ public class Tester
 		//Represents the number of output neurons
 		int 	numOutputNeurons		= 1;
 		//Represents the number of initial hidden layers
-		int 	numHiddenLayers			= 5;
+		int 	numHiddenLayers			= 1;
 		//Represents the number of initial neurons in each hidden layer
-		int[]	hiddenLayers 			= {4, 3, 4, 3, 2};
+		int[]	hiddenLayers 			= {4};
 		//Represents the number of neurons in the genome up to the given index
 		int[] 	summationNeuronsInLayer	= new int[numHiddenLayers + 3];
 		//Represents the current neuron ID 
@@ -212,8 +212,8 @@ public class Tester
 				if (testPush)
 				{
 					//Represents the added links
-    				linkGenes.add(new LinkGene(1, 21, 56, 1.00, false));
-    				linkGenes.add(new LinkGene(21, 4, 57, 1.00, false));
+    				linkGenes.add(new LinkGene(1, 21, 56, 1.0, false));
+    				linkGenes.add(new LinkGene(21, 4, 57, 1.0, false));
     			}
 
 				if (debug)
@@ -262,7 +262,29 @@ public class Tester
 		{
 			for (int i = 0; i <  population.size(); i++)
 			{
+				for(float x = 0; x < 2; x++)
+				{
+					for(float y = 0; y < 2; y++)
+					{
+						System.out.println("Output 1: " + myNetworks.get(i).fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
+					}
+				}
+			}
+
+			for (int i = 0; i <  population.size(); i++)
+			{
 				population.get(i).addNeuron(1, innovations, 20);
+			}
+
+			for (int i = 0; i <  population.size(); i++)
+			{
+				for(float x = 0; x < 2; x++)
+				{
+					for(float y = 0; y < 2; y++)
+					{
+						System.out.println("Output 2: " + myNetworks.get(i).fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
+					}
+				}
 			}
 		}
 
@@ -273,14 +295,9 @@ public class Tester
     		GenomeHelper genomeHelper = new GenomeHelper();
 
     		//Represents the neuron to be added
-    		NeuronGene neuronToAdd = new NeuronGene(21, "Sigmoid", false, 1.0f, 2);
+    		NeuronGene neuronToAdd = new NeuronGene(21, "Sigmoid", false, 0.0f, 2);
 
-    		//Represents the added links
-    		// LinkGene linkToAdd1 = new LinkGene(1, 21, 56, 1.00, false);
-    		// LinkGene linkToAdd2 = new LinkGene(21, 4, 57, 1.00, false);
 
-    		// population.get(0).add(linkToAdd1);
-    		// population.get(0).add(linkToAdd2);
 
     		population.get(0).print();
 			genomeHelper.pushNeurons(population.get(0).getNeurons(), population.get(0).getLinks(), neuronToAdd, 7);

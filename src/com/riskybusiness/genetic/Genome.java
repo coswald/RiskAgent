@@ -100,7 +100,7 @@ public class Genome implements Serializable
         System.out.println("The links inside this genome are: ");
         for (int i = 0; i < linkGeneSet.size(); i++)
         {
-            System.out.println("   Link ID: " + linkGeneSet.get(i).getID() + " comes from Neuron: " + linkGeneSet.get(i).getFromNeuron() + " and goes to Neuron: " + linkGeneSet.get(i).getToNeuron());
+            System.out.println("   Link ID: " + linkGeneSet.get(i).getID() + " comes from Neuron: " + linkGeneSet.get(i).getFromNeuron() + " and goes to Neuron: " + linkGeneSet.get(i).getToNeuron() + " and is " + ((linkGeneSet.get(i).getEnabled()) ? "enabled!" : "disabled!"));
         }
         System.out.println();
     }
@@ -555,14 +555,8 @@ public class Genome implements Serializable
                     //Sort the neuron array
                     genomeHelper.sortNeuronArray(neuronGeneSet, numLayers);
 
-                    this.print();
-                    System.out.println("before link sort");
-
                     //Sort the link genes
                     genomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
-                    
-                    System.out.println("after link sort");
-                    this.print();
 
                     innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, fromNeuronID, neuronGeneSet.size(), -1);
                     innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, neuronGeneSet.size(), toNeuronID, -1);

@@ -160,14 +160,17 @@ public class GenomeHelper implements Serializable
 					sortedLinkArray.add(unsortedLinkArray.get(j));
 
 					//Remove the link from the unsorted array(variable trash doesn't do anything)
-					LinkGene trash = unsortedLinkArray.remove(j);
+					//LinkGene trash = unsortedLinkArray.remove(j);
 				}
 			}
 		}
 
 		//Replace the current link array with the sorted one
 		linkGenes.clear();
-		linkGenes = sortedLinkArray;
+		for (int i = 0; i < sortedLinkArray.size(); i++)
+		{
+			linkGenes.add(sortedLinkArray.get(i));
+		}
 	}
 
 	public ArrayList<LinkGene> removeDisabledLinks(ArrayList<LinkGene> linkGenes)
