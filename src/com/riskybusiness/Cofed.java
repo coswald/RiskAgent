@@ -8,7 +8,7 @@
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * MERCHANTABILITY or fitness FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
@@ -38,7 +38,7 @@ import java.util.Random;
 public class Cofed extends LuxAgentAdapter
 {
     protected NeuralNet nn;
-    
+
     public Cofed()
     {
     }
@@ -50,7 +50,7 @@ public class Cofed extends LuxAgentAdapter
         this.agent = new EvilPixie();
         this.agent.setPrefs(ID, board);
 	//Setup NeuralNet
-	
+
 	/*
 	 * Finds the number of country neurons.
 	 * Each country must have a CountryID,
@@ -62,7 +62,7 @@ public class Cofed extends LuxAgentAdapter
 	 * ordered in the manner presented above.
 	 */
 	int inputNeurons = this.countries.length * 6;
-	
+
 	/*
 	 * Finds the number of player neurons.
 	 * These are after the country neurons
@@ -73,7 +73,7 @@ public class Cofed extends LuxAgentAdapter
 	 * turn.
 	 */
 	inputNeurons += this.board.getNumberOfPlayers() * 3;
-	
+
 	/*
 	 * Simple algorithm to calculate how many
 	 * bits it will take to represent the amount
@@ -88,7 +88,7 @@ public class Cofed extends LuxAgentAdapter
 	    outputNeurons++;
 	    countryCounter = countryCounter >> 1;
 	}
-	
+
 	//Create a neural network
 	//For now, the network will have 6 layers
 	//in total. All four of the hidden layers
@@ -100,183 +100,187 @@ public class Cofed extends LuxAgentAdapter
     private int[] attackHeuristic(Country country)
     {
 	//setup variables.
-        int Fitness = 0;
+        int fitness = 0;
         int attackValue = 0; // Default to not attack
 	boolean canAttack = false;
 	outer:
 	for(int i : country.getHostileAdjoiningCodeList())
 	{
-	    for(int j : this.countries)
+	    for(Country j : this.countries)
 	    {
-	        if(j.getOwner() == this.ID && j != i && j.canGoto(i))
+	        if(j.getOwner() == this.ID && j.getCode() != i && j.canGoto(i))
 		{
 		    canAttack = true;
 		    break outer;
 		}
 	    }
 	}
-	int OwnTroops = BoardHelper.getPlayerArmies(this.ID, this.countries);
-	int OwnCards = 0;
-	int EnemyTroops = country.getArmies();
-	
+	int ownTroops = BoardHelper.getPlayerArmies(this.ID, this.countries);
+	int ownCards = this.board.getPlayerCards(this.ID);
+	int enemyTroops = country.getArmies();
+  int enemyCards = this.board.getPlayerCards(country.getOwner());
+  boolean opponentLastCountry = (BoardHelper.getPlayerCountries(country.getOwner(), this.countries) == 1) ? true : false;
+  int ownReinforcementsPerTurn = this.getPlayerIncome(this.ID);
+  int enemyReinforcementsPerTurn = this.getPlayerIncome(country.getOwner());
+
         if(canAttack)
         {
-            if(OwnTroops == EnemyTroops)
+            if(ownTroops == enemyTroops)
             {
-                if(OwnTroops >= 15) // Odds of victory exceed 60%
+                if(ownTroops >= 15) // Odds of victory exceed 60%
                 {
                     attackValue += 1; //Attack
-                    Fitness += 8;
+                    fitness += 8;
                 }
-                else if(OwnTroops >= 5) // Odds of victory between 50% and 60%
+                else if(ownTroops >= 5) // Odds of victory between 50% and 60%
                 {
-                    if(LastCountryOfOpponent)
+                    if(opponentLastCountry)
                     {
-                        if((OwnCards + EnemyCards) >= 5)
+                        if((ownCards + enemyCards) >= 5)
                         {
                             attackValue += 1; //Attack
-                            Fitness += 6;
+                            fitness += 6;
                         }
-                        else if(EnemyReinforcementsPerTurn >= OwnReinforcementsPerTurn)
+                        else if(enemyReinforcementsPerTurn >= ownReinforcementsPerTurn)
                         {
                             attackValue += 1; //Attack
-                            Fitness += 6;
+                            fitness += 6;
                         }
-                        else if(OpponentThatCanAttackThemTroops > EnemyTroops &&
-                        (OpponentThatCanAttackThemCards + EnemyCards) >= 5)
+                        else if(OpponentThatCanAttackThemTroops > enemyTroops &&
+                        (OpponentThatCanAttackThemCards + enemyCards) >= 5)
                         {
                             attackValue += 1; //Attack
-                            Fitness += 5;
+                            fitness += 5;
                         }
                         else
                         {
                             //Don't Attack
-                            Fitness += 4;
+                            fitness += 4;
                         }
                     }
                     else if(BreakContinentBonus) // Break bonus troop gains!
                     {
                         attackValue += 1; //Attack
-                        Fitness += 7;
+                        fitness += 7;
                     }
                     else // Save your troops and build up
                     {
                         //Don't Attack
-                        Fitness += 5;
+                        fitness += 5;
                     }
                 }
                 else // Odds of victory are in favor of defender
                 {
                     //Don't Attack
-                    Fitness += 6;
+                    fitness += 6;
                 }
             }
-            else if(OwnTroops > EnemyTroops)
+            else if(ownTroops > enemyTroops)
             {
-                if((OwnTroops - EnemyTroops) >= 10) // The lowest odds are high with this....
+                if((ownTroops - enemyTroops) >= 10) // The lowest odds are high with this....
                 {
                     attackValue += 1; //Attack
-                    Fitness += 10; // Best Scenario!
+                    fitness += 10; // Best Scenario!
                 }
-                else if((OwnTroops - EnemyTroops) >= 6) // The lowest odds are high with this....
+                else if((ownTroops - enemyTroops) >= 6) // The lowest odds are high with this....
                 {
                     attackValue += 1; //Attack
-                    Fitness += 8; // Great Scenario!
+                    fitness += 8; // Great Scenario!
                 }
-                else if((OwnTroops - EnemyTroops) >= 2) // The lowest odds are at 68% with this....
+                else if((ownTroops - enemyTroops) >= 2) // The lowest odds are at 68% with this....
                 {
                     attackValue += 1; //Attack
-                    Fitness += 6;
+                    fitness += 6;
                 }
                 else // Only one more- odds are high-ish, but not quite exceptional.
                 {
-                    if(LastCountryOfOpponent)
+                    if(opponentLastCountry)
                     {
-                        if((OwnCards + EnemyCards) >= 5)
+                        if((ownCards + enemyCards) >= 5)
                         {
                             attackValue += 1; //Attack
-                            Fitness += 6;
+                            fitness += 6;
                         }
-                        else if(EnemyReinforcementsPerTurn >= OwnReinforcementsPerTurn)
+                        else if(enemyReinforcementsPerTurn >= ownReinforcementsPerTurn)
                         {
                             attackValue += 1; //Attack
-                            Fitness += 5;
+                            fitness += 5;
                         }
-                        else if(OpponentThatCanAttackThemTroops > EnemyTroops &&
-                        (OpponentThatCanAttackThemCards + EnemyCards) >= 5)
+                        else if(OpponentThatCanAttackThemTroops > enemyTroops &&
+                        (OpponentThatCanAttackThemCards + enemyCards) >= 5)
                         {
                             attackValue += 1; //Attack
-                            Fitness += 4;
+                            fitness += 4;
                         }
                         else
                         {
                             //Don't Attack
-                            Fitness += 3;
+                            fitness += 3;
                         }
                     }
                     else if(BreakContinentBonus) // Break bonus troop gains!
                     {
                         attackValue += 1; //Attack
-                        Fitness += 7;
+                        fitness += 7;
                     }
                     else // Save and build up troops
                     {
                         //Don't Attack
-                        Fitness += 2;
+                        fitness += 2;
                     }
                 }
             }
             else // Opponent has more troops- so odds are never exceptional
             {
-                if((EnemyTroops - OwnTroops) <= 2) //There is hope!
+                if((enemyTroops - ownTroops) <= 2) //There is hope!
                 {
-                    if(OwnTroops >= 20) // The Power of the Three Dice In full!
+                    if(ownTroops >= 20) // The Power of the Three Dice In full!
                     {
                         attackValue += 1; //Attack
-                        Fitness += 7;
+                        fitness += 7;
                     }
-                    else if(OwnTroops >= 13) // Odds are even at this point
+                    else if(ownTroops >= 13) // Odds are even at this point
                     {
-                        if(LastCountryOfOpponent)
+                        if(opponentLastCountry)
                         {
-                            if((OwnCards + EnemyCards) >= 5)
+                            if((ownCards + enemyCards) >= 5)
                             {
                                 attackValue += 1; //Attack
-                                Fitness += 6;
+                                fitness += 6;
                             }
-                            else if(EnemyReinforcementsPerTurn >= OwnReinforcementsPerTurn)
+                            else if(enemyReinforcementsPerTurn >= ownReinforcementsPerTurn)
                             {
                                 attackValue += 1; //Attack
-                                Fitness += 5;
+                                fitness += 5;
                             }
-                            else if(OpponentThatCanAttackThemTroops > EnemyTroops &&
-                            (OpponentThatCanAttackThemCards + EnemyCards) >= 5)
+                            else if(OpponentThatCanAttackThemTroops > enemyTroops &&
+                            (OpponentThatCanAttackThemCards + enemyCards) >= 5)
                             {
                                 attackValue += 1; //Attack
-                                Fitness += 4;
+                                fitness += 4;
                             }
                             else
                             {
                                 //Don't Attack
-                                Fitness += 4;
+                                fitness += 4;
                             }
                         }
                         else if(BreakContinentBonus) // Break bonus troop gains!
                         {
                             attackValue += 1; //Attack
-                            Fitness += 6;
+                            fitness += 6;
                         }
                         else // Save and build up troops
                         {
                             //Don't Attack
-                            Fitness += 5;
+                            fitness += 5;
                         }
                     }
                 }
                 else // The odds are almost never in your favor
                 {
                     //Don't Attack
-                    Fitness += 9;
+                    fitness += 9;
                 }
             }
         }
@@ -294,152 +298,152 @@ public class Cofed extends LuxAgentAdapter
             if (PlayerID == 0)
             {
 
-                if (OwnTroops == EnemyTroops)
+                if (ownTroops == enemyTroops)
                 {
-                    if (OwnTroops <= 5)
+                    if (ownTroops <= 5)
                     {
                         if (OwnLastCountry)
                         {
-                            if ((OwnCards + EnemyCards) >= 5)
+                            if ((ownCards + enemyCards) >= 5)
                             {
                                 //Don't Attack
-                                Fitness += 4;
+                                fitness += 4;
                             }
-                            else if (EnemyReinforcementsPerTurn <= OwnReinforcementsPerTurn)
+                            else if (enemyReinforcementsPerTurn <= ownReinforcementsPerTurn)
                             {
                                 //Don't Attack
-                                Fitness += 6;
+                                fitness += 6;
                             }
                             else
                             {
                                 //Don't Attack
-                                Fitness += 5;
+                                fitness += 5;
                             }
                         }
                         else if (BreakContinentBonus)
                         {
                             //Don't Attack
-                            Fitness += 3;
+                            fitness += 3;
                         }
 
                         else
                         {
                             //Don't Attack
-                            Fitness += 7;
+                            fitness += 7;
                         }
                     }
 
-                    else if (OwnTroops <= 15)
+                    else if (ownTroops <= 15)
                     {
                         attackValue += 1; //Attack
-                        Fitness += 5;
+                        fitness += 5;
                     }
 
                     else
                     {
                         attackValue += 1; //Attack
-                        Fitness += 3;
+                        fitness += 3;
                     }
                 }
 
-                else if (OwnTroops > EnemyTroops)
+                else if (ownTroops > enemyTroops)
                 {
-                    if ((OwnTroops - EnemyTroops) >= 10)
+                    if ((ownTroops - enemyTroops) >= 10)
                     {
                         attackValue += 1; //Attack
-                        Fitness += 10;
+                        fitness += 10;
                     }
 
-                    else if ((OwnTroops - EnemyTroops) >= 6)
+                    else if ((ownTroops - enemyTroops) >= 6)
                     {
                         attackValue += 1; //Attack
-                        Fitness += 8;
+                        fitness += 8;
                     }
 
-                    else if ((OwnTroops - EnemyTroops) >= 2)
+                    else if ((ownTroops - enemyTroops) >= 2)
                     {
                         attackValue += 1; //Attack
-                        Fitness += 6;
+                        fitness += 6;
                     }
 
                     else
                     {
                         if (OwnLastCountry)
                         {
-                            if ((OwnCards + EnemyCards) >= 5)
+                            if ((ownCards + enemyCards) >= 5)
                             {
                                 //Don't Attack
-                                Fitness += 4;
+                                fitness += 4;
                             }
-                            else if (EnemyReinforcementsPerTurn <= OwnReinforcementsPerTurn)
+                            else if (enemyReinforcementsPerTurn <= ownReinforcementsPerTurn)
                             {
                                 attackValue += 1; //Attack
-                                Fitness += 5;
+                                fitness += 5;
                             }
                             else
                             {
                                 //Don't Attack
-                                Fitness += 5;
+                                fitness += 5;
                             }
                         }
 
                         else if (BreakContinentBonus)
                         {
                             //Don't Attack
-                            Fitness += 4;
+                            fitness += 4;
                         }
 
                         else
                         {
                             //Don't Attack
-                            Fitness += 6;
+                            fitness += 6;
                         }
                     }
                 }
 
                 else
                 {
-                    if ((EnemyTroops - OwnTroops) >= 2)
+                    if ((enemyTroops - ownTroops) >= 2)
                     {
-                        if (EnemyTroops >= 20)
+                        if (enemyTroops >= 20)
                         {
                             //Don't Attack
-                            Fitness += 3;
+                            fitness += 3;
                         }
 
-                        else if (EnemyTroops >= 13)
+                        else if (enemyTroops >= 13)
                         {
                             if (OwnLastCountry)
                             {
-                                if ((OwnCards + EnemyCards) >= 5)
+                                if ((ownCards + enemyCards) >= 5)
                                 {
                                     //Don't Attack
-                                    Fitness += 2;
+                                    fitness += 2;
                                 }
 
-                                else if (EnemyReinforcementsPerTurn <= OwnReinforcementsPerTurn)
+                                else if (enemyReinforcementsPerTurn <= ownReinforcementsPerTurn)
                                 {
                                     //Don't Attack
-                                    Fitness += 5;
+                                    fitness += 5;
                                 }
 
                                 else
                                 {
                                     attackValue += 1; //Attack
-                                    Fitness += 6;
+                                    fitness += 6;
                                 }
                             }
 
                             else if (BreakContinentBonus)
                             {
                                 //Don't Attack
-                                Fitness += 4;
+                                fitness += 4;
                             }
 
                             else
                             {
                                 //Don't Attack
-                                Fitness += 5;
+                                fitness += 5;
                             }
                         }
                     }
@@ -447,7 +451,7 @@ public class Cofed extends LuxAgentAdapter
                     else
                     {
                         attackValue += 1; //Attack
-                        Fitness += 9;
+                        fitness += 9;
                     }
                 }
             }
@@ -465,9 +469,9 @@ public class Cofed extends LuxAgentAdapter
         ArrayList<Integer[]> attackList = new ArrayList<Integer[]>();
         ArrayList<Integer[]> defenseList = new ArrayList<Integer[]>();
         // Gather data from board
-        
-	
-	
+
+
+
         // Run & Save Heuristics
         for (int id = 0; id < board.(countries.length()); id++)
         {
@@ -484,7 +488,7 @@ public class Cofed extends LuxAgentAdapter
         // Train NeuralNet
             // TODO
         // Attack or don't attack
-	
+
     }
 
     @Override
