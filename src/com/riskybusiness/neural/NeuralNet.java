@@ -23,12 +23,10 @@ import com.riskybusiness.neural.Neuron;
 import com.riskybusiness.neural.SigmoidNeuron;
 import com.riskybusiness.neural.StepNeuron;
 import com.riskybusiness.neural.Synapse;
+import com.riskybusiness.util.Debug;
 
 import java.io.Serializable;
-import java.lang.Class;
 import java.lang.Object;
-import java.lang.ReflectiveOperationException;
-import java.lang.reflect.Constructor;
 
 /**
  * <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;A {@code NeuralNet} is a set of
@@ -227,7 +225,7 @@ public class NeuralNet extends Object implements Serializable
 	{
 		return this.synapses;
 	}
-
+	
     /**
      * <p>Clears the networks {@code Neuron}s of input
      * values.</p>
@@ -363,8 +361,12 @@ public class NeuralNet extends Object implements Serializable
 		int i = (this.neurons.length - 1);
 		for(; i >= (this.neurons.length - prediction.length); i--)
 		{
-			this.neurons[i].setLastTotalError((prediction[i - (this.neurons.length - 1)] - desired[i - (this.neurons.length - 1)]) *
-				this.neurons[i].activateDerivative(prediction[i - (this.neurons.length - 1)]));
+			Debug.println("Neuron " + i);
+			Debug.println("(out - target):\t" + (prediction[Math.abs(i - (this.neurons.length - 1))] - desired[Math.abs(i - (this.neurons.length - 1))]), 1);
+			Debug.println("out(1 - out):\t" + this.neurons[i].activateDerivative(prediction[Math.abs(i - (this.neurons.length - 1))]), 1);
+			
+			this.neurons[i].setLastTotalError((prediction[Math.abs(i - (this.neurons.length - 1))] - desired[Math.abs(i - (this.neurons.length - 1))]) *
+				this.neurons[i].activateDerivative(prediction[Math.abs(i - (this.neurons.length - 1))]));
 			//Delta Rule
 			//(out - target) * activateDerivative * OutputOfInputNeuron
 			for(int j = 0; j < this.neurons[i].getWeights().length; j++)
@@ -372,6 +374,7 @@ public class NeuralNet extends Object implements Serializable
 				//this.neurons[i].adjustWeight(j, -1 * this.neurons[i].getLastTotalError() * this.neurons[i].getInputAt(j));
 				errorValues[errorIndex] = this.neurons[i].getLastTotalError();
 				errorValues[errorIndex++] *= -1 * this.neurons[i].getInputAt(j);
+				Debug.println("outh:\t" + this.neurons[i].getInputAt(j), 2);
 			}
 		}
 		
@@ -406,7 +409,12 @@ public class NeuralNet extends Object implements Serializable
 		for(; i >= 0; i--)
 		{
 			for(int j = 0; j < this.neurons[i].getWeights().length; j++)
+			{
+				Debug.println("Old Weight: " + this.neurons[i].getWeights()[j]);
 				this.neurons[i].adjustWeight(j, errorValues[errorIndex++]);
+				Debug.println("Adjusting Weight " + j + " on neuron " + i + " by the value " + errorValues[errorIndex - 1], 1);
+				Debug.println("New Weight: " + this.neurons[i].getWeights()[j], 1);
+			}
 		}
 		
 		this.clearNetwork();

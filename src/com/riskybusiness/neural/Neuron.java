@@ -444,9 +444,16 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	 * @param weights The list containing all of the
 	 * 				weights.
 	 * @see com.riskybusiness.neural.Neuron#weights
+	 * @throws InvalidNeuronInputException If the
+	 * 			weight length is not the same as the
+	 * 			original weight length.
 	 */
-	public void setWeights(float... weights)
+	public void setWeights(float... weights) throws InvalidNeuronInputException
 	{
+		if(weights.length != this.weights.length)
+		{
+			throw new InvalidNeuronInputException("The amount of weights given is invalid! Make sure to include the bias weight!");
+		}
 		this.weights = weights;
 	}
 	
