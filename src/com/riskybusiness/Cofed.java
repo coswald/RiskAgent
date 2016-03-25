@@ -61,7 +61,7 @@ public class Cofed extends LuxAgentAdapter
 	 * inputs are each their own neuron,
 	 * ordered in the manner presented above.
 	 */
-	int inputNeurons = this.countries.length * 6;
+	       int inputNeurons = this.countries.length * 6;
 
 	/*
 	 * Finds the number of player neurons.
@@ -72,7 +72,7 @@ public class Cofed extends LuxAgentAdapter
 	 * of reinforcements that player has per
 	 * turn.
 	 */
-	inputNeurons += this.board.getNumberOfPlayers() * 3;
+	       inputNeurons += this.board.getNumberOfPlayers() * 3;
 
 	/*
 	 * Simple algorithm to calculate how many
@@ -81,47 +81,51 @@ public class Cofed extends LuxAgentAdapter
 	 * one to say attack or not. This will be
 	 * the output layer of the network.
 	 */
-	int outputNeurons = 1;
-	int countryCounter = this.countries.length;
-	while(countryCounter > 0)
-	{
-	    outputNeurons++;
-	    countryCounter = countryCounter >> 1;
-	}
+	       int outputNeurons = 1;
+	       int countryCounter = this.countries.length;
+	       while(countryCounter > 0)
+	       {
+	           outputNeurons++;
+	           countryCounter = countryCounter >> 1;
+	       }
 
 	//Create a neural network
 	//For now, the network will have 6 layers
 	//in total. All four of the hidden layers
 	//will contain 12 neurons for consistencies
 	//sake.
-	this.nn = new NeuralNet(inputNeurons, outputNeurons, 12, 12, 12, 12);
+	       this.nn = new NeuralNet(inputNeurons, outputNeurons, 12, 12, 12, 12);
     }
 
     private int[] attackHeuristic(Country country)
     {
-	//setup variables.
+        //setup variables.
         int fitness = 0;
         int attackValue = 0; // Default to not attack
-	boolean canAttack = false;
-	outer:
-	for(int i : country.getHostileAdjoiningCodeList())
-	{
-	    for(Country j : this.countries)
-	    {
-	        if(j.getOwner() == this.ID && j.getCode() != i && j.canGoto(i))
-		{
-		    canAttack = true;
-		    break outer;
-		}
-	    }
-	}
-	int ownTroops = BoardHelper.getPlayerArmies(this.ID, this.countries);
-	int ownCards = this.board.getPlayerCards(this.ID);
-	int enemyTroops = country.getArmies();
-  int enemyCards = this.board.getPlayerCards(country.getOwner());
-  boolean opponentLastCountry = (BoardHelper.getPlayerCountries(country.getOwner(), this.countries) == 1) ? true : false;
-  int ownReinforcementsPerTurn = this.getPlayerIncome(this.ID);
-  int enemyReinforcementsPerTurn = this.getPlayerIncome(country.getOwner());
+        boolean canAttack = false;
+        outer:
+        for(int i : country.getHostileAdjoiningCodeList())
+        {
+            for(Country j : this.countries)
+            {
+                if(j.getOwner() == this.ID && j.getCode() != i && j.canGoto(i))
+                {
+                    canAttack = true;
+                    break outer;
+                }
+            }
+        }
+
+        int ownTroops = BoardHelper.getPlayerArmies(this.ID, this.countries);
+        int ownCards = this.board.getPlayerCards(this.ID);
+        int enemyTroops = country.getArmies();
+        int enemyCards = this.board.getPlayerCards(country.getOwner());
+        int ownReinforcementsPerTurn = this.getPlayerIncome(this.ID);
+        int enemyReinforcementsPerTurn = this.getPlayerIncome(country.getOwner());
+        int opponentThatCanAttackThemTroops = opponentThatCanAttackThem;
+        int opponentThatCanAttackThemCards = this.board.getPlayerCards(opponentThatCanAttackThem);
+        boolean opponentLastCountry = (BoardHelper.getPlayerCountries(country.getOwner(), this.countries) == 1) ? true : false;
+        boolean breakContinentBonus = BoardHelper.anyPlayerOwnsContinent(country.getContinent(), this.countries);
 
         if(canAttack)
         {
@@ -158,7 +162,7 @@ public class Cofed extends LuxAgentAdapter
                             fitness += 4;
                         }
                     }
-                    else if(BreakContinentBonus) // Break bonus troop gains!
+                    else if(breakContinentBonus) // Break bonus troop gains!
                     {
                         attackValue += 1; //Attack
                         fitness += 7;
@@ -218,7 +222,7 @@ public class Cofed extends LuxAgentAdapter
                             fitness += 3;
                         }
                     }
-                    else if(BreakContinentBonus) // Break bonus troop gains!
+                    else if(breakContinentBonus) // Break bonus troop gains!
                     {
                         attackValue += 1; //Attack
                         fitness += 7;
@@ -265,7 +269,7 @@ public class Cofed extends LuxAgentAdapter
                                 fitness += 4;
                             }
                         }
-                        else if(BreakContinentBonus) // Break bonus troop gains!
+                        else if(breakContinentBonus) // Break bonus troop gains!
                         {
                             attackValue += 1; //Attack
                             fitness += 6;
@@ -288,12 +292,34 @@ public class Cofed extends LuxAgentAdapter
         return new int[] {id, fitness, attackValue};
     }
 
-    private int defenseHeuristic(id)
+    private int defenseHeuristic(Country country)
     {
         private int fitness = 0;
         private int attackValue = 0; // Default to not attack
+        boolean canAttack = false;
+        outer:
+        for(int i : country.getHostileAdjoiningCodeList())
+        {
+            for(Country j : this.countries)
+            {
+                if(j.getOwner() == this.ID && j.getCode() != i && j.canGoto(i))
+                {
+                    canAttack = true;
+                    break outer;
+                }
+            }
+        }
 
-        if (canAttack(id))
+        int ownTroops = BoardHelper.getPlayerArmies(this.ID, this.countries);
+        int ownCards = this.board.getPlayerCards(this.ID);
+        int enemyTroops = country.getArmies();
+        int enemyCards = this.board.getPlayerCards(country.getOwner());
+        int ownReinforcementsPerTurn = this.getPlayerIncome(this.ID);
+        int enemyReinforcementsPerTurn = this.getPlayerIncome(country.getOwner());
+        boolean ownLastCountry = (BoardHelper.getPlayerCountries(this.ID, this.countries) == 1) ? true : false;
+        boolean breakContinentBonus = BoardHelper.anyPlayerOwnsContinent(country.getContinent(), this.countries);
+
+        if (canAttack)
         {
             if (PlayerID == 0)
             {
@@ -302,7 +328,7 @@ public class Cofed extends LuxAgentAdapter
                 {
                     if (ownTroops <= 5)
                     {
-                        if (OwnLastCountry)
+                        if (ownLastCountry)
                         {
                             if ((ownCards + enemyCards) >= 5)
                             {
@@ -320,7 +346,7 @@ public class Cofed extends LuxAgentAdapter
                                 fitness += 5;
                             }
                         }
-                        else if (BreakContinentBonus)
+                        else if (breakContinentBonus)
                         {
                             //Don't Attack
                             fitness += 3;
@@ -368,7 +394,7 @@ public class Cofed extends LuxAgentAdapter
 
                     else
                     {
-                        if (OwnLastCountry)
+                        if (ownLastCountry)
                         {
                             if ((ownCards + enemyCards) >= 5)
                             {
@@ -387,7 +413,7 @@ public class Cofed extends LuxAgentAdapter
                             }
                         }
 
-                        else if (BreakContinentBonus)
+                        else if (breakContinentBonus)
                         {
                             //Don't Attack
                             fitness += 4;
@@ -413,7 +439,7 @@ public class Cofed extends LuxAgentAdapter
 
                         else if (enemyTroops >= 13)
                         {
-                            if (OwnLastCountry)
+                            if (ownLastCountry)
                             {
                                 if ((ownCards + enemyCards) >= 5)
                                 {
@@ -434,7 +460,7 @@ public class Cofed extends LuxAgentAdapter
                                 }
                             }
 
-                            else if (BreakContinentBonus)
+                            else if (breakContinentBonus)
                             {
                                 //Don't Attack
                                 fitness += 4;
