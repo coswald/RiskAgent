@@ -1,3 +1,20 @@
+/* 
+ * Copyright (C) 2016  Coved Oswald, Kaleb Luse, and Weston Miller
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.riskybusiness.genetic.test;
 
 import com.riskybusiness.neural.Neuron;
@@ -31,11 +48,18 @@ public class Tester
 		//Tester variable
 		boolean printGenome = false;
 		//Tester variable
-		boolean testAddNeuron = true;
+		boolean testAddNeuron = false;
 		//Tester variable
 		boolean testPush 	= false;
 		//Tester variable
 		boolean testSortNeurons = false;
+		//Tester variable
+		boolean testAddLink	= false;
+		//Tester variable
+		boolean testFitnessFunction = false;
+		//Tester variable
+		boolean testMutators = false;
+
 
 		/*User Params */
 		
@@ -57,15 +81,15 @@ public class Tester
 		/* Parameters */
 
 		//Represents the size of the population
-		int 	populationSize 			= 1;
+		int 	populationSize 			= 10;
 		//Represents the number of input neurons
-		int 	numInputNeurons			= 3;
+		int 	numInputNeurons			= 5;
 		//Represents the number of output neurons
 		int 	numOutputNeurons		= 1;
 		//Represents the number of initial hidden layers
 		int 	numHiddenLayers			= 1;
 		//Represents the number of initial neurons in each hidden layer
-		int[]	hiddenLayers 			= {4};
+		int[]	hiddenLayers 			= {2};
 		//Represents the number of neurons in the genome up to the given index
 		int[] 	summationNeuronsInLayer	= new int[numHiddenLayers + 3];
 		//Represents the current neuron ID 
@@ -95,9 +119,6 @@ public class Tester
    		ArrayList<LinkGene>   	linkGenes  	= new ArrayList<LinkGene>();
    		//Represents the genomes of the population
    		ArrayList<Genome>		population 	= new ArrayList<Genome>();
-   		//Represents the neural networks
-   		ArrayList<NeuralNet>	myNetworks	= new ArrayList<NeuralNet>();
-
 
    		/* Historical Data */	
 
@@ -150,26 +171,26 @@ public class Tester
 				//Currently, there is no need to seperate into three loops, but I am working on implementing different neuron types
 				for (int i = 0; i < numInputNeurons; i++)
 				{
-					float fweight = random.nextFloat();
-					neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", false, fweight, 1)); 
+					double dweight = random.nextDouble();
+					neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", false, dweight, 1)); 
 				}
 				for (int i = 0; i < numHiddenLayers; i++)
 				{
 					for (int j = summationNeuronsInLayer[i + 1]; j < summationNeuronsInLayer[i + 2]; j++)
 					{
-						float fweight = random.nextFloat();
-						neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", false, fweight, (i + 2)));
+						double dweight = random.nextDouble();
+						neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", false, dweight, (i + 2)));
 					}
 				}
 				for (int i = 0; i < numOutputNeurons; i++)
 				{
-					float fweight = random.nextFloat();
-					neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", false, fweight, (numHiddenLayers + 2)));
+					double dweight = random.nextDouble();
+					neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", false, dweight, (numHiddenLayers + 2)));
 				}
 				
 				if (testPush)
 				{
-					neuronGenes.add(new NeuronGene(21, "Sigmoid", false, 1.0f, 2));
+					neuronGenes.add(new NeuronGene(21, "Sigmoid", false, 1.0, 2));
     			}
 
 				if (debug)
@@ -230,29 +251,24 @@ public class Tester
 		{
 			for (int i = 0; i <  population.size(); i++)
 			{
-				population.get(i).print();
+    			System.out.println(population.get(i));
 			}
 		}
 
 		for (int i = 0; i <  population.size(); i++)
 		{
-			myNetworks.add(population.get(i).createPhenotype());
+			population.get(i).createPhenotype();
 		}
 
 		if (testFire)
 		{
-
-			// float[] outputs = new float[numOutputNeurons];
-
-			// float[][] inputs = new float[numInputNeurons][1];
-
 			for (int i = 0; i <  population.size(); i++)
 			{
 				for(float x = 0; x < 2; x++)
 				{
 					for(float y = 0; y < 2; y++)
 					{
-						System.out.println(myNetworks.get(i).fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
+						System.out.println(population.get(i).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
 					}
 				}
 			}
@@ -266,14 +282,18 @@ public class Tester
 				{
 					for(float y = 0; y < 2; y++)
 					{
-						System.out.println("Output 1: " + myNetworks.get(i).fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
+						System.out.println("Output 1: " + population.get(0).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
 					}
 				}
 			}
 
 			for (int i = 0; i <  population.size(); i++)
 			{
-				population.get(i).addNeuron(1, innovations, 20);
+				for (int j = 0; j < 10; j++)
+				{
+					population.get(i).addNeuron(1, innovations, 20);
+					population.get(i).createPhenotype();
+				}
 			}
 
 			for (int i = 0; i <  population.size(); i++)
@@ -282,7 +302,27 @@ public class Tester
 				{
 					for(float y = 0; y < 2; y++)
 					{
-						System.out.println("Output 2: " + myNetworks.get(i).fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
+						System.out.println("Output 2: " + population.get(0).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
+					}
+				}
+			}
+		}
+
+		if (testAddLink)
+		{
+    		System.out.println(population.get(0));
+			for (int i = 0; i < 10; i++)
+			{
+				population.get(0).addLink(1.0, 0.0, innovations, 10, 20);
+			}			
+    		System.out.println(population.get(0));
+			for (int i = 0; i <  population.size(); i++)
+			{
+				for(float x = 0; x < 2; x++)
+				{
+					for(float y = 0; y < 2; y++)
+					{
+						System.out.println("Output 2: " + population.get(i).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
 					}
 				}
 			}
@@ -295,20 +335,20 @@ public class Tester
     		GenomeHelper genomeHelper = new GenomeHelper();
 
     		//Represents the neuron to be added
-    		NeuronGene neuronToAdd = new NeuronGene(21, "Sigmoid", false, 0.0f, 2);
+    		NeuronGene neuronToAdd = new NeuronGene(21, "Sigmoid", false, 0.0, 2);
 
 
 
-    		population.get(0).print();
+    		System.out.println(population.get(0));
 			genomeHelper.pushNeurons(population.get(0).getNeurons(), population.get(0).getLinks(), neuronToAdd, 7);
-			population.get(0).print();
+    		System.out.println(population.get(0));
 
 			if (testSortNeurons)
 			{
 			
-				population.get(0).print();
+    			System.out.println(population.get(0));
 				genomeHelper.sortNeuronArray(population.get(0).getNeurons(), 8);
-				population.get(0).print();
+    			System.out.println(population.get(0));
 			}
 		}
 
@@ -316,10 +356,48 @@ public class Tester
 		{
 			for (int i = 0; i <  population.size(); i++)
 			{
-				population.get(i).print();
+    			System.out.println(population.get(i));
 			}
 		}
 
-		System.out.println("Population size: " + population.size());
+		if(testFitnessFunction)
+		{
+			for (int i = 0; i < population.size(); i++)
+			{
+				population.get(i).determineFitness();
+			}
+		}
+
+		if (testMutators)
+		{
+			for (int i = 0; i <  population.size(); i++)
+			{
+				for(float x = 0; x < 2; x++)
+				{
+					for(float y = 0; y < 2; y++)
+					{
+						System.out.println("Output 2: " + population.get(0).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
+					}
+				}
+			}
+			for (int i = 0; i < population.size(); i++)
+			{
+				population.get(i).mutateLinkWeights();
+				population.get(i).mutateNeuronWeights();
+				population.get(i).createPhenotype();
+			}
+			for (int i = 0; i <  population.size(); i++)
+			{
+				for(float x = 0; x < 2; x++)
+				{
+					for(float y = 0; y < 2; y++)
+					{
+						System.out.println("Output 2: " + population.get(0).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
+					}
+				}
+			}
+		}
+
+		//System.out.println("Population size: " + population.size());
 	}
 }

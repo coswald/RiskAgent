@@ -40,6 +40,11 @@ public class LinkGene implements Serializable
     //Represents the innovation ID
     private int     innovationID; //Still not sure what this does?
     
+    public LinkGene()
+    {
+        innovationID = 0;
+    }
+
     //Create a LinkGene
     public LinkGene(int fNeuron, int tNeuron, int id, double weight, boolean recur)
     {

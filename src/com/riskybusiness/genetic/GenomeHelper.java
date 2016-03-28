@@ -1,25 +1,41 @@
+/* 
+ * Copyright (C) 2016  Coved Oswald, Kaleb Luse, and Weston Miller
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.riskybusiness.genetic;
 
 import com.riskybusiness.neural.Neuron;
 import com.riskybusiness.neural.StepNeuron;
 import com.riskybusiness.neural.SigmoidNeuron;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
-public class GenomeHelper implements Serializable
+public class GenomeHelper
 {
 	//Dummy Variable
-	private int myID;
+	//private int myID;
 
 	public GenomeHelper()
 	{
 		//Just to put something here
-		myID = 1;
+		//myID = 1;
 	}
 
 	//This function takes in an array of neuron genes and seperates them by layer
-	public ArrayList<ArrayList<NeuronGene>> seperate(ArrayList<NeuronGene> genes, int numLayers)
+	public static ArrayList<ArrayList<NeuronGene>> seperate(ArrayList<NeuronGene> genes, int numLayers)
 	{
 		//Represents the fill neural network seperated by layers
 		ArrayList<ArrayList<NeuronGene>> seperatedNeuronArray = new ArrayList<ArrayList<NeuronGene>>();

@@ -35,7 +35,7 @@ public class NeuronGene implements Serializable
     //Represents whether the neuron is recurrent
     private boolean neuronRecurrent;
     //Represents the weight of the neuron
-    private float   neuronActivationResponse;
+    private double   neuronActivationResponse;
     //Represents the layer of the neuron(used in the genome class)
     //private String  neuronLayer;
     //private int     innovationNum;
@@ -48,12 +48,12 @@ public class NeuronGene implements Serializable
         neuronID = -1;
         neuronType = "SIGMOID";
         neuronRecurrent = false;
-        neuronActivationResponse = 0;
+        neuronActivationResponse = 0.0;
         neuronLayer = 1;
     }
 
     //Create a neuron gene
-    public NeuronGene(int id, String type, boolean recur, float activate, int layer)
+    public NeuronGene(int id, String type, boolean recur, double activate, int layer)
     {
         neuronID = id;
         neuronType = type;
@@ -93,13 +93,13 @@ public class NeuronGene implements Serializable
     }
     
     //Get the activation response of the neuron
-    public float getActivationResponse()
+    public double getActivationResponse()
     {
         return this.neuronActivationResponse;
     }
     
     //Set the activation response of the neuron
-    public void setActivationResponse(float activate)
+    public void setActivationResponse(double activate)
     {
         this.neuronActivationResponse = activate;
     }

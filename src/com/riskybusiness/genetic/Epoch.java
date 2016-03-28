@@ -1,4 +1,20 @@
-////////////////////////////////////////////////////////////////////////////////////////////////////
+/* 
+ * Copyright (C) 2016  Coved Oswald, Kaleb Luse, and Weston Miller
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package com.riskybusiness.genetic.test;
 
 import com.riskybusiness.neural.Neuron;
@@ -80,8 +96,6 @@ public class Epoch
    		ArrayList<LinkGene>   	linkGenes  	= new ArrayList<LinkGene>();
    		//Represents the genomes of the population
    		ArrayList<Genome>		population 	= new ArrayList<Genome>();
-   		//Represents the neural networks
-   		ArrayList<NeuralNet>	myNetworks	= new ArrayList<NeuralNet>();
    		//Represents the ID of the genome
    		int 					genomeID 	= 0;
 
