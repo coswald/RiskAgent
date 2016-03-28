@@ -103,6 +103,19 @@ public class Cofed extends LuxAgentAdapter
         int fitness = 0;
         int attackValue = 0; // Default to not attack
         boolean canAttack = false;
+        int strongAttackingOpponentTroops = 0;
+        int strongAttackingOpponentCards = 0;
+
+        for(int i : country.getHostileAdjoiningCodeList())
+            for(Country j : this.countries)
+                if(j.getOwner() != this.ID && j.getCode() != i && j.canGoto(i))
+                {
+                    if(j.getArmies() > strongAttackingOpponentTroops)
+                    {
+                        strongAttackingOpponentTroops = j.getArmies();
+                        strongAttackingOpponentCards = this.board.getPlayerCards(j.getOwner());
+                    }
+                }
         outer:
         for(int i : country.getHostileAdjoiningCodeList())
         {
@@ -122,8 +135,6 @@ public class Cofed extends LuxAgentAdapter
         int enemyCards = this.board.getPlayerCards(country.getOwner());
         int ownReinforcementsPerTurn = this.getPlayerIncome(this.ID);
         int enemyReinforcementsPerTurn = this.getPlayerIncome(country.getOwner());
-        int opponentThatCanAttackThemTroops = opponentThatCanAttackThem;
-        int opponentThatCanAttackThemCards = this.board.getPlayerCards(opponentThatCanAttackThem);
         boolean opponentLastCountry = (BoardHelper.getPlayerCountries(country.getOwner(), this.countries) == 1) ? true : false;
         boolean breakContinentBonus = BoardHelper.anyPlayerOwnsContinent(country.getContinent(), this.countries);
 
@@ -150,8 +161,8 @@ public class Cofed extends LuxAgentAdapter
                             attackValue += 1; //Attack
                             fitness += 6;
                         }
-                        else if(OpponentThatCanAttackThemTroops > enemyTroops &&
-                        (OpponentThatCanAttackThemCards + enemyCards) >= 5)
+                        else if(strongAttackingOpponentTroops > enemyTroops &&
+                        (strongAttackingOpponentCards + enemyCards) >= 5)
                         {
                             attackValue += 1; //Attack
                             fitness += 5;
@@ -210,8 +221,8 @@ public class Cofed extends LuxAgentAdapter
                             attackValue += 1; //Attack
                             fitness += 5;
                         }
-                        else if(OpponentThatCanAttackThemTroops > enemyTroops &&
-                        (OpponentThatCanAttackThemCards + enemyCards) >= 5)
+                        else if(strongAttackingOpponentTroops > enemyTroops &&
+                        (strongAttackingOpponentCards + enemyCards) >= 5)
                         {
                             attackValue += 1; //Attack
                             fitness += 4;
@@ -257,8 +268,8 @@ public class Cofed extends LuxAgentAdapter
                                 attackValue += 1; //Attack
                                 fitness += 5;
                             }
-                            else if(OpponentThatCanAttackThemTroops > enemyTroops &&
-                            (OpponentThatCanAttackThemCards + enemyCards) >= 5)
+                            else if(strongAttackingOpponentTroops > enemyTroops &&
+                            (strongAttackingOpponentCards + enemyCards) >= 5)
                             {
                                 attackValue += 1; //Attack
                                 fitness += 4;
@@ -483,8 +494,8 @@ public class Cofed extends LuxAgentAdapter
             }
         }
 
-        return (id, fitness, attackValue);
-    }
+          return new int[] {id, fitness, attackValue};
+      }
 
     @Override
     public void attackPhase()
@@ -499,15 +510,18 @@ public class Cofed extends LuxAgentAdapter
 
 
         // Run & Save Heuristics
-        for (int id = 0; id < board.(countries.length()); id++)
+        for(Country i : this.countries)
         {
-            if (canAtack(countries[id])) //if the country borders
+            if(i.getOwner() == this.ID)
             {
-                // Run attackHeuristic, save results to attackList
-                //attackList.add(new Integer(attackHeuristic(id)))
-                attackList.add(new Integer(attackHeuristic(countries[id])));
-                // Run defenseHeuristic, save results to defenseList
-                defenseList.add(new Integer(defenseHeuristic(countries[id])));
+                for(Country j : this.countries)
+                {
+                    if(j.getCode() != i.getCode() && j.canGoto(i))
+                    {
+                        attackList.add(attackHeuristic(j));
+                        defenseList.add(defenseHeuristic(j));
+                    }
+                }
             }
         }
 
