@@ -52,6 +52,12 @@ public class SigmoidNeuron extends Neuron
 		super(inputNum);
 		this.setSummationDivisor(summationDivisor);
 	}
+
+	public SigmoidNeuron(float summationDivisor, float... weights)
+	{
+		super(weights);
+		this.setSummationDivisor(summationDivisor);
+	}
 	
     /**
      * <p>Constructs a {@code SigmoidNeuron} with the given

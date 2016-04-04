@@ -78,13 +78,13 @@ public class Genome implements Serializable
         //Create a deep copy of the passed in ArrayList of neurons
         for (int i = 0; i < neurons.size(); i++)
         {
-            neuronGeneSet.add(neurons.get(i));
+            neuronGeneSet.add(new NeuronGene(neurons.get(i).getID(), neurons.get(i).getNeuronType(), neurons.get(i).getLayerType(), false, neurons.get(i).getActivationResponse(), neurons.get(i).getNeuronLayer()));
         }
 
         //Create a deep copy of the passed in ArrayList of links
         for (int i = 0; i < links.size(); i++)
         {
-            linkGeneSet.add(links.get(i));
+            linkGeneSet.add(new LinkGene(links.get(i).getFromNeuron(), links.get(i).getToNeuron(), links.get(i).getID(), links.get(i).getWeight(), false));
         }
 
         //Set the genome parameters with information passed in
@@ -232,19 +232,32 @@ public class Genome implements Serializable
 
         float weight = (float)neuron.getActivationResponse();
 
-        //Create a neuron dependent on its type
-        if (neuron.getNeuronType().equals("Sigmoid"))
+        if (neuron.getID() <= numInputNeurons)
         {
-            return new com.riskybusiness.neural.SigmoidNeuron (weight, numInputs);
-        }
-        else if (neuron.getNeuronType().equals("Step")) 
-        {
-            return new com.riskybusiness.neural.StepNeuron (weight, numInputs);
+            float[] weights = new float[2];
+            for (int i = 0; i < 2; i++)
+            {
+                weights[i] = 1.0f;
+            }
+
+            return new com.riskybusiness.neural.SigmoidNeuron (weight, weights);
         }
         else
         {
-            //throw some error
-            return new com.riskybusiness.neural.StepNeuron (weight, numInputs);
+            //Create a neuron dependent on its type
+            if (neuron.getNeuronType().equals("Sigmoid"))
+            {
+                return new com.riskybusiness.neural.SigmoidNeuron (weight, numInputs);
+            }
+            else if (neuron.getNeuronType().equals("Step")) 
+            {
+                return new com.riskybusiness.neural.StepNeuron (weight, numInputs);
+            }
+            else
+            {
+                //throw some error
+                return new com.riskybusiness.neural.StepNeuron (weight, numInputs);
+            }
         }
     }
 
@@ -327,10 +340,14 @@ public class Genome implements Serializable
                     }
                 }
             }
+            neuronSet[toNeuronID].setWeight(linkPos, (float)link.getWeight());
+            System.out.println("link " + link.getID() + "\n" + link.getWeight());
+
             return new com.riskybusiness.neural.Synapse (linkPos, neuronSet[fromNeuronID], neuronSet[toNeuronID]);
         }
         else
         {
+            neuronSet[toNeuronID].setWeight(linkPos, (float)link.getWeight());
             //throw some error
             return new com.riskybusiness.neural.Synapse (link.getID(), neuronSet[fromNeuronID], neuronSet[toNeuronID]);
         }
@@ -670,7 +687,7 @@ public class Genome implements Serializable
         // genomeFitness = 2 - result[0];
         // return genomeFitness;
 
-        this.createPhenotype();
+        //this.createPhenotype();
 
         for(float x = 0; x < 2; x++)
         {

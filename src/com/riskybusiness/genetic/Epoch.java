@@ -242,7 +242,7 @@ public class Epoch
 		 *   Need to add more when I implement speciation
 		 */
 
-		for (int generation = 1; generation < 100; generation++)
+		for (int generation = 1; generation < 10; generation++)
 		{
 			//Represents the population, but classified into their corresponding species
 			Species 			species 			= new Species(population);
@@ -276,7 +276,7 @@ public class Epoch
 							}
 							//If this is our first pass then the first thing we want to do
 							//is grab the best member of the species and pass them along
-							if (i == 0.0 || i == 1.0)
+							if (i == 0.0)
 							{
 								//Debug function
 								if (debug)
@@ -285,9 +285,22 @@ public class Epoch
 								}
 
 								toCopy = species.getBestMember(speciesID);
+								for (int f = 0; f < 5;f++)
+								{
+									//System.out.println(toCopy.getNeurons().get(f).getActivationResponse());
+								}
+
+								//System.out.println("fitness " + toCopy.determineFitness());
+								//System.out.println("fitness " + toCopy.determineFitness());
 
 								//Use elitism and always take the best member from the species
 								child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs(), innovations);
+								for (int f = 0; f < 5;f++)
+								{
+									//System.out.println(child.getNeurons().get(f).getActivationResponse());
+								}
+
+								//System.out.println("fitness " + child.determineFitness());
 							}
 							else
 							{
