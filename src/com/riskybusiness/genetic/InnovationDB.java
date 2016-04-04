@@ -36,6 +36,19 @@ public class InnovationDB implements Serializable
 		innovationID = 0;
 	}
 
+	public int getInnovationID(int fromNeuron, int toNeuron)
+	{
+		for (int i = 0; i < innovationDB.size(); i++)
+		{
+			if (innovationDB.get(i).isEqual(InnovationType.NEW_LINK, fromNeuron, toNeuron, -1))
+			{
+				return i;
+			}
+		}
+
+		return -1;
+	}
+
 	/**
 	Fix these two function
 	**///Also the id may not be necassary

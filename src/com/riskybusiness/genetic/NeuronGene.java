@@ -41,6 +41,8 @@ public class NeuronGene implements Serializable
     //private int     innovationNum;
     //Represents the layer the neuron exists in
     private int     neuronLayer;
+    //Represents whether the neuron is a hidden neuron, input, or output
+    private String  neuronLayerType;
 
     //Create a blank neuron gene
     public NeuronGene()
@@ -53,10 +55,11 @@ public class NeuronGene implements Serializable
     }
 
     //Create a neuron gene
-    public NeuronGene(int id, String type, boolean recur, double activate, int layer)
+    public NeuronGene(int id, String type, String layerType, boolean recur, double activate, int layer)
     {
         neuronID = id;
         neuronType = type;
+        neuronLayerType = layerType;
         neuronRecurrent = recur;
         neuronActivationResponse = activate;
         neuronLayer = layer;
@@ -120,5 +123,10 @@ public class NeuronGene implements Serializable
     public void pushLayer()
     {
         this.neuronLayer += 1;
+    }
+
+    public String getLayerType()
+    {
+        return this.neuronLayerType;
     }
 }

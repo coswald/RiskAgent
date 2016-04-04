@@ -23,16 +23,9 @@ import com.riskybusiness.neural.SigmoidNeuron;
 
 import java.util.ArrayList;
 
-public class GenomeHelper
+public final class GenomeHelper extends Object
 {
-	//Dummy Variable
-	//private int myID;
-
-	public GenomeHelper()
-	{
-		//Just to put something here
-		//myID = 1;
-	}
+	private GenomeHelper(){}
 
 	//This function takes in an array of neuron genes and seperates them by layer
 	public static ArrayList<ArrayList<NeuronGene>> seperate(ArrayList<NeuronGene> genes, int numLayers)
@@ -69,7 +62,7 @@ public class GenomeHelper
 		return seperatedNeuronArray;
 	}
 
-	public void sortNeuronArray(ArrayList<NeuronGene> genes, int numLayers)
+	public static void sortNeuronArray(ArrayList<NeuronGene> genes, int numLayers)
 	{
 
 		//Represents the array to return to the calling function
@@ -79,7 +72,7 @@ public class GenomeHelper
 		ArrayList<ArrayList<NeuronGene>> geneSet = new ArrayList<ArrayList<NeuronGene>>();
 
 		//Seperate the given neuron gene array into an array of layers
-		geneSet = this.seperate(genes, numLayers);
+		geneSet = seperate(genes, numLayers);
 
 		//Now that the genome has been seperated by layer and sorted, 
 		//This loop brings the array back together.
@@ -99,31 +92,22 @@ public class GenomeHelper
 		}
 	}
 
-	//Should this be void since everything we pass in is the actual copy of it? 
-
 	//Assumes the neuron passed in has the correct layer
 	//This fucntion takes in a recently added neuron and then determines if the neurons that
 	//proceed that added neuron need to be pushed back to a new layer
-	public int pushNeurons(ArrayList<NeuronGene> neuronGenes, ArrayList<LinkGene> linkGenes, NeuronGene addedNeuron, int numLayers) 
+	public static void pushNeurons(ArrayList<NeuronGene> neuronGenes, ArrayList<LinkGene> linkGenes, NeuronGene addedNeuron) 
 	{
-
-		//Represents the fill neural network seperated by layers
-		ArrayList<ArrayList<NeuronGene>> geneSet = new ArrayList<ArrayList<NeuronGene>>();
-
 		//Represents the neuron that a link points to
-		NeuronGene toNeuron = new NeuronGene();
-
-		//Represents whether the output layer was affect as special things need to happen if this happens
-		boolean outputLayerPushed = false;
+		NeuronGene 	toNeuron 	= new NeuronGene();
 
 		//Recursivly find the next neuron to push back
 		//Loop through each link on a neuron and push back that neurons neurons from that neurons links.
-		for (int i= 0; i < linkGenes.size(); i++)
+		for (int i = 0; i < linkGenes.size(); i++)
 		{
 			//If we have found a link that is enabled and not looped and comes from our neuron then check that links
 			//To neuron and see if it needs to be pushed back. Then recursivly call push neurons on that
 			//Neuron
-			if ((linkGenes.get(i).getFromNeuron() == addedNeuron.getID()) && (linkGenes.get(i).getEnabled()) && !(linkGenes.get(i).getRecurrency()))
+			if ((linkGenes.get(i).getFromNeuron() == addedNeuron.getID()))
 			{
 				//Find the neuron gene that the link points to
 				for (int j = 0; j < neuronGenes.size(); j++)
@@ -135,27 +119,34 @@ public class GenomeHelper
                 }
 
 				//Check the neuron and see if it needs to be pushed back
-				if(toNeuron.getNeuronLayer() == addedNeuron.getNeuronLayer())
+				if (toNeuron.getNeuronLayer() == addedNeuron.getNeuronLayer())
 				{
-					if (toNeuron.getNeuronLayer() == numLayers)
+					if (toNeuron.getLayerType() == "Output")
 					{
-						outputLayerPushed = true;
+						for (int k = 0; k < neuronGenes.size(); k++)
+						{
+							if (neuronGenes.get(k).getLayerType() == "Output")
+							{
+								neuronGenes.get(k).pushLayer();
+							}
+						}
+						pushNeurons(neuronGenes, linkGenes, toNeuron);
 					}
-
-					toNeuron.pushLayer();
-					this.pushNeurons(neuronGenes, linkGenes, toNeuron, numLayers);
+					else
+					{
+						toNeuron.pushLayer();
+						pushNeurons(neuronGenes, linkGenes, toNeuron);
+					}
 				}
 				//else is one of the base cases(the neuron doesn't need to be pushed back)
 			}
 		}
-		
-		return (numLayers + 1);
 	}
 
 	//This function requires the incoming neuron genes to be sorted in order to properly sort the links
 	//The function also requires that the push back function was called if a neuron was recently added
 	//This function sorts the array of links by the layer they first appear.
-	public void sortLinkArray(ArrayList<NeuronGene> neuronGenes, ArrayList<LinkGene> linkGenes)
+	public static void sortLinkArray(ArrayList<NeuronGene> neuronGenes, ArrayList<LinkGene> linkGenes)
 	{
 		//Represents the sorted links
 		ArrayList<LinkGene> sortedLinkArray = new ArrayList<LinkGene>();
@@ -189,7 +180,7 @@ public class GenomeHelper
 		}
 	}
 
-	public ArrayList<LinkGene> removeDisabledLinks(ArrayList<LinkGene> linkGenes)
+	public static ArrayList<LinkGene> removeDisabledLinks(ArrayList<LinkGene> linkGenes)
 	{
 
 		//Represents the link array of only active links
@@ -209,4 +200,3 @@ public class GenomeHelper
 		return activeLinkGenes;
 	}
 }
-

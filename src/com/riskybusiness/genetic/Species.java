@@ -43,6 +43,11 @@ public class Species implements Serializable
 
 	public Species(ArrayList<Genome> population)
 	{
+
+		myPopulation.clear();
+
+		// ArrayList<Genome> species = new ArrayList<Genome>();
+
 		//Get compatitbility of the population
 		for (int i = 0; i < population.size(); i++)
 		{
@@ -87,15 +92,21 @@ public class Species implements Serializable
 		//For now adjusted fitness is simply fitness
 
 		//speciesPop.add(population);
+		// for (int i = 0; i < population.size(); i++)
+		// {
+		// 	species.add(population.get(i));
+		// }
+
 		//Until I can find a way to actually speciate the people the species is
 		//essentially going to be the population
+
 		myPopulation.add(population);
 
 		//Determine the adjusted fitness
 		//For now adjusted fitness is simply fitness
 		for (int i = 0; i < this.myPopulation.size(); i++)
 		{
-			for (int j = 0; j < this.myPopulation.get(j).size(); i++)
+			for (int j = 0; j < this.myPopulation.get(i).size(); j++)
 			{
 				myPopulation.get(i).get(j).setAdjustedFitness(myPopulation.get(i).get(j).getFitness());
 			}
@@ -122,8 +133,8 @@ public class Species implements Serializable
 		}
 
 		//Return
-		//return numToSpawn;
-		return 5.0;
+		return numToSpawn;
+		//return 5.0;
 	}
 
 	//Returns the size of the given species
@@ -141,14 +152,16 @@ public class Species implements Serializable
 
 		//Loop through the genomes and compare the current genome to the fittest and 
 		//determine the fittest individual
-		for (int genomeIndex = 1; genomeIndex < myPopulation.get(speciesID).size() + 1; genomeIndex++)
+		for (int genomeIndex = 1; genomeIndex < myPopulation.get(speciesID).size(); genomeIndex++)
 		{
-			if (myPopulation.get(speciesID).get(fittestGenomeIndex).getFitness() < 
-				   myPopulation.get(speciesID).get(genomeIndex).getFitness())
+			if (myPopulation.get(speciesID).get(fittestGenomeIndex).determineFitness() < 
+				   myPopulation.get(speciesID).get(genomeIndex).determineFitness())
 			{
 				fittestGenomeIndex = genomeIndex;
 			}
 		}
+
+		System.out.println(myPopulation.get(speciesID).get(fittestGenomeIndex).determineFitness());
 
 		//Return
 		return myPopulation.get(speciesID).get(fittestGenomeIndex);
@@ -158,34 +171,59 @@ public class Species implements Serializable
 	//Returns a random member from the population
 	public Genome getMember(int speciesID)
 	{
-		// ArrayList<Double> 	fitnessArray 	= new ArrayList<Double>();
+		ArrayList<Integer> 	speciesToCompete 	= new ArrayList<Integer>();
 
-		// double 				myRandom 		= 0.0;
+		int 				bestFitnessID;
 
-		// int  				genomeIndex 	= 1;
+		//This uses a tournament selection which accomplishes our goal of choosing genomes
+		//with higher fitness at a higher rate and choosing those with lower fitness at a 
+		//lower rate
+  
+		//May need to lower value to 5 or some computer value such as 10% of the species.
 
-		// for (genomeIndex = 1; genomeIndex < myPopulation.get(speciesID).size() + 1; genomeIndex++)
-		// {
-		// 	fitnessArray += myPopulation.get(speciesID).get(genomeIndex).getFitness();
-		// }
+		//System.out.println(myPopulation.get(speciesID).size() - 1);
 
-		// myRandom = random.nextDouble(/*Get the last value from the fitnessarray*/);
+		//Grab 10 random competitors
+		for (int i = 0; i < 3; i++)
+		{
+			speciesToCompete.add(new Integer(random.nextInt((myPopulation.get(speciesID).size() - 1))));
+		}
 
-		// for (int genomeIndex = 0; genomeIndex < myPopulation.get(speciesID).size(); genomeIndex++)
-		// {
-		// 	if (myRandom < myPopulation.get(speciesID).get(genomeIndex))
-		// 	{
-		// 		break;
-		// 	}
-		// }
+		bestFitnessID = speciesToCompete.get(0);
 
+		for (int i = 1; i < 3; i++)
+		{
+			if (myPopulation.get(speciesID).get(speciesToCompete.get(i)).getFitness() > myPopulation.get(speciesID).get(bestFitnessID).getFitness())
+			{
+				bestFitnessID = speciesToCompete.get(i);
+			}
+		}
 
-		// return myPopulation.get(speciesID).get(genomeIndex);
-		return myPopulation.get(speciesID).get(random.nextInt((myPopulation.get(speciesID).size() - 1)));
+		return myPopulation.get(speciesID).get(bestFitnessID);
+		//return myPopulation.get(speciesID).get(random.nextInt((myPopulation.get(speciesID).size() - 1)));
 	}
 
 	public int getNumMembers(int speciesID)
 	{
 		return myPopulation.get(speciesID).size();
+	}
+
+	@Override
+	public String toString()
+	{
+		//The string to return
+        String toReturn = "";
+
+        for (int i = 0; i < myPopulation.size(); i++)
+        {
+        	toReturn += "Species ID: " + (i + 1) + "\n";
+        	for (int j = 0; j < myPopulation.get(i).size(); j++)
+        	{
+        		toReturn += myPopulation.get(i).get(j).toString();
+        	}
+        	toReturn += "\n";
+        }
+
+        return toReturn;
 	}
 }

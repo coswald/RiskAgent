@@ -45,6 +45,11 @@ public class Innovation extends Object
 		return (this.type == innovation.type && this.fromNeuron == innovation.fromNeuron && this.toNeuron == innovation.toNeuron && this.neuronID == innovation.neuronID);
 	}
 
+	public boolean isEqual(InnovationType type, int fromNeuron, int toNeuron, int nueronID)
+	{
+		return (this.type == type && this.fromNeuron == fromNeuron && this.toNeuron == toNeuron && this.neuronID == neuronID);
+	}
+
 	//Get whether the innovation is a neuron or a link
 	public InnovationType getType() 
 	{

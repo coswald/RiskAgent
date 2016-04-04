@@ -59,6 +59,8 @@ public class Tester
 		boolean testFitnessFunction = false;
 		//Tester variable
 		boolean testMutators = false;
+		//Tester variable
+		boolean testCrossover = false;
 
 
 		/*User Params */
@@ -81,9 +83,9 @@ public class Tester
 		/* Parameters */
 
 		//Represents the size of the population
-		int 	populationSize 			= 10;
+		int 	populationSize 			= 2;
 		//Represents the number of input neurons
-		int 	numInputNeurons			= 5;
+		int 	numInputNeurons			= 2;
 		//Represents the number of output neurons
 		int 	numOutputNeurons		= 1;
 		//Represents the number of initial hidden layers
@@ -148,6 +150,7 @@ public class Tester
    			//Initialize number of neurons
    			summationNeuronsInLayer[0] = 0;
    			summationNeuronsInLayer[1] = numInputNeurons;
+
    			for (int i = 0; i < numHiddenLayers; i++)
    			{
    				summationNeuronsInLayer[i + 2] = summationNeuronsInLayer[i + 1] + hiddenLayers[i];
@@ -161,6 +164,8 @@ public class Tester
 				//Reset the genes for the new population
 				neuronGenes.clear();
 				linkGenes.clear();
+				curNeuronID = 0;
+				curLinkID = 0;
 
 				if (debug)
 				{
@@ -172,25 +177,25 @@ public class Tester
 				for (int i = 0; i < numInputNeurons; i++)
 				{
 					double dweight = random.nextDouble();
-					neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", false, dweight, 1)); 
+					neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", "Input", false, dweight, 1)); 
 				}
 				for (int i = 0; i < numHiddenLayers; i++)
 				{
 					for (int j = summationNeuronsInLayer[i + 1]; j < summationNeuronsInLayer[i + 2]; j++)
 					{
 						double dweight = random.nextDouble();
-						neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", false, dweight, (i + 2)));
+						neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", "Hidden", false, dweight, (i + 2)));
 					}
 				}
 				for (int i = 0; i < numOutputNeurons; i++)
 				{
 					double dweight = random.nextDouble();
-					neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", false, dweight, (numHiddenLayers + 2)));
+					neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", "Output", false, dweight, (numHiddenLayers + 2)));
 				}
 				
 				if (testPush)
 				{
-					neuronGenes.add(new NeuronGene(21, "Sigmoid", false, 1.0, 2));
+					neuronGenes.add(new NeuronGene(21, "Sigmoid", "Hidden", false, 1.0, 2));
     			}
 
 				if (debug)
@@ -276,18 +281,18 @@ public class Tester
 
 		if (testAddNeuron)
 		{
-			for (int i = 0; i <  population.size(); i++)
+			for (int i = 0; i < population.size(); i++)
 			{
 				for(float x = 0; x < 2; x++)
 				{
 					for(float y = 0; y < 2; y++)
 					{
-						System.out.println("Output 1: " + population.get(0).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
+						System.out.println("Output 1: " + population.get(i).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
 					}
 				}
 			}
 
-			for (int i = 0; i <  population.size(); i++)
+			for (int i = 0; i < population.size(); i++)
 			{
 				for (int j = 0; j < 10; j++)
 				{
@@ -302,7 +307,7 @@ public class Tester
 				{
 					for(float y = 0; y < 2; y++)
 					{
-						System.out.println("Output 2: " + population.get(0).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
+						System.out.println("Output 2: " + population.get(i).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
 					}
 				}
 			}
@@ -310,44 +315,44 @@ public class Tester
 
 		if (testAddLink)
 		{
-    		System.out.println(population.get(0));
+    		//System.out.println(population.get(0));
 			for (int i = 0; i < 10; i++)
 			{
 				population.get(0).addLink(1.0, 0.0, innovations, 10, 20);
 			}			
-    		System.out.println(population.get(0));
+    		//System.out.println(population.get(0));
 			for (int i = 0; i <  population.size(); i++)
 			{
 				for(float x = 0; x < 2; x++)
 				{
 					for(float y = 0; y < 2; y++)
 					{
-						System.out.println("Output 2: " + population.get(i).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
+						//System.out.println("Output 2: " + population.get(i).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
 					}
 				}
+			}
+			for (int i = 0; i < 10; i++)
+			{
+				population.get(1).addLink(1.0, 0.0, innovations, 10, 20);
 			}
 		}
 
 		if (testPush)
 		{
-
-			//Represents the package that rpovide the genome with helper functions
-    		GenomeHelper genomeHelper = new GenomeHelper();
-
     		//Represents the neuron to be added
-    		NeuronGene neuronToAdd = new NeuronGene(21, "Sigmoid", false, 0.0, 2);
+    		NeuronGene neuronToAdd = new NeuronGene(21, "Sigmoid", "Hidden", false, 0.0, 2);
 
 
 
     		System.out.println(population.get(0));
-			genomeHelper.pushNeurons(population.get(0).getNeurons(), population.get(0).getLinks(), neuronToAdd, 7);
+			GenomeHelper.pushNeurons(population.get(0).getNeurons(), population.get(0).getLinks(), neuronToAdd);
     		System.out.println(population.get(0));
 
 			if (testSortNeurons)
 			{
 			
     			System.out.println(population.get(0));
-				genomeHelper.sortNeuronArray(population.get(0).getNeurons(), 8);
+				GenomeHelper.sortNeuronArray(population.get(0).getNeurons(), 8);
     			System.out.println(population.get(0));
 			}
 		}
@@ -396,6 +401,11 @@ public class Tester
 					}
 				}
 			}
+		}
+
+		if (testCrossover)
+		{
+			population.get(0).crossover(population.get(1), innovations);
 		}
 
 		//System.out.println("Population size: " + population.size());

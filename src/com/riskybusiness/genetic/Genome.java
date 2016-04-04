@@ -24,11 +24,17 @@ import com.riskybusiness.neural.NeuralNet;
 import java.io.Serializable;
 import java.util.Random;
 import java.util.ArrayList;
+import java.util.*;
 
 
 public class Genome implements Serializable
 {
     
+    //Represents the users input
+    String  userInput;
+    //Represents the scanner to get user input
+    Scanner input   = new Scanner(System.in);
+
     private static final long serialVersionUID = 1L;
 
     //Represents the ID of the genome
@@ -44,7 +50,7 @@ public class Genome implements Serializable
     //Represents the fitness of the genome adjusted for the species of the genome
     private double                  genomeAdjFitness;
     //Represents the amount of children to spawn
-    private double                  amountToSpawn;
+    private double                  amountToSpawn = 1;
     //Represents the number of input Neurons
     private int                     numInputNeurons;
     //Represents the number of output Neurons
@@ -57,8 +63,8 @@ public class Genome implements Serializable
     private int                     numLinkGenes;
     //Represents the score given to speciate the genome
     private int                     compatibilityScore;
-    //Represents the package that rpovide the genome with helper functions
-    private GenomeHelper            genomeHelper = new GenomeHelper();
+    //Represents if the output layer is pushed
+    private boolean                 outputLayerPushed;
     //Represents the package to create psuedorandom numbers
     private Random                  random = new Random();
 
@@ -102,6 +108,11 @@ public class Genome implements Serializable
         }
     }
 
+    public Genome()
+    {
+        genomeID = -1;
+    }
+
     public ArrayList<NeuronGene> getNeurons()
     {
         return this.neuronGeneSet;
@@ -110,6 +121,16 @@ public class Genome implements Serializable
     public ArrayList<LinkGene> getLinks()
     {
         return this.linkGeneSet;
+    }
+
+    public int getNumInputs()
+    {
+        return this.numInputNeurons;
+    }
+
+    public int getNumOutputs()
+    {
+        return this.numOutputNeurons;
     }
 
     //Get the number of neurons in the genome
@@ -142,10 +163,11 @@ public class Genome implements Serializable
     /**
     Fix this
     **/
+    //Links theoretically know there innovation ID's, theoretically
 
-    public int getInnovationNum(LinkGene link)
+    public int getInnovationNum(LinkGene link, InnovationDB innovation)
     {
-        return link.getFromNeuron();
+        return innovation.getInnovationID(link.getFromNeuron(), link.getToNeuron());
     }
 
     public int getNumLinkGenes()
@@ -472,7 +494,7 @@ public class Genome implements Serializable
         {
             //Push the new gene into the array
             linkGeneSet.add(new LinkGene(fromNeuronID, toNeuronID, (linkGeneSet.size() + 1), random.nextDouble(), false));
-            genomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
+            GenomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
             numLinkGenes++;
         }
     }
@@ -515,6 +537,10 @@ public class Genome implements Serializable
 
                 //int fromNeuron =  linkGeneSet.get(chosenLink).getFromNeuron(); //?
 
+                /**
+                Fix this(finds the linkid not a potisition)
+                **/
+
                 if ((linkGeneSet.get(chosenLink).getEnabled())) //&&
                     //(!linkGeneSet.get(chosenLink).getRecurrent()))
                     //(neuronGeneSet.get(fromNeuron).getNeuronType != bias)) can't be a bias gene
@@ -529,23 +555,7 @@ public class Genome implements Serializable
                 {
                     return;
                 }
-                //I'm not entirely sure why this else statement is here
-                // else
-                // {
-                //     while(!linkFound)
-                //     {
-                //         chosenLink = random.nextInt(numLinkGenes - 1); //needs to be a number between 0 and the number of genes - 1
-
-                //         //Check that the link is enabled and not recurrent
-                //         //If the link is enabled and not recurrent then we have found a candidate
-                //         if ((linkGeneSet.get(chosenLink).getEnabled())) //&&
-                //             //(linkGeneSet.get(chosenLink).getRecurrent()))
-                //         {
-                //             linkFound = true;
-                //         }
-                //     }
-                // }
-
+                
                 //Disable the original link gene
                 linkGeneSet.get(chosenLink).setLink(false);
 
@@ -587,18 +597,28 @@ public class Genome implements Serializable
                     int newNeuronLayer = fromNeuron.getNeuronLayer() + 1;
 
                     //Add the new neuron to the gene set
-                    neuronGeneSet.add(new NeuronGene((neuronGeneSet.size() + 1), "Sigmoid", false, random.nextDouble(), newNeuronLayer));
+                    neuronGeneSet.add(new NeuronGene((neuronGeneSet.size() + 1), "Sigmoid", "Hidden", false, random.nextDouble(), newNeuronLayer));
                     linkGeneSet.add(new LinkGene(fromNeuronID, neuronGeneSet.size(), (linkGeneSet.size() + 1 ), 1.0, false));
                     linkGeneSet.add(new LinkGene(neuronGeneSet.size(), toNeuronID, (linkGeneSet.size() + 1), originalWeight, false));
 
                     //Push back any neurons that were affected by the addition
-                    numLayers = genomeHelper.pushNeurons(neuronGeneSet, linkGeneSet, neuronGeneSet.get((neuronGeneSet.size() - 1)), numLayers);
+                    GenomeHelper.pushNeurons(neuronGeneSet, linkGeneSet, neuronGeneSet.get((neuronGeneSet.size() - 1)));
+
+                    for (int j = 0; j < neuronGeneSet.size(); j++)
+                    {
+                        if(neuronGeneSet.get(j).getNeuronLayer() > numLayers)
+                        {
+                            numLayers++;
+                        }
+                    }
+
+                    //System.out.println(this);
 
                     //Sort the neuron array
-                    genomeHelper.sortNeuronArray(neuronGeneSet, numLayers);
+                    GenomeHelper.sortNeuronArray(neuronGeneSet, numLayers);
 
                     //Sort the link genes
-                    genomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
+                    GenomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
 
                     //Add to the innovation database
                     innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, fromNeuronID, neuronGeneSet.size(), -1);
@@ -633,6 +653,10 @@ public class Genome implements Serializable
 
         float[][]   inputs  = new float[][]{{0},{0}};
 
+        float[]     output  = new float[4];
+
+        int         i       = 0;
+
         //Need to create inputs for situations
 
         //Turn the genome into a neural net and compare the output to Wes's heuristic
@@ -642,19 +666,41 @@ public class Genome implements Serializable
         //For practice the fitness will essentially be how close the output is to 10.
         //Because of the strict and definite nature of the fitness function we should
         //see results and the genome conforming to 1.
-        result = myNetwork.fire(inputs);
-        genomeFitness = 2 - result[0];
+        // result = myNetwork.fire(inputs);
+        // genomeFitness = 2 - result[0];
+        // return genomeFitness;
+
+        this.createPhenotype();
+
+        for(float x = 0; x < 2; x++)
+        {
+            for(float y = 0; y < 2; y++)
+            {
+                output[i] = myNetwork.fire(new float[][] {new float[] {x}, new float[] {y}})[0];
+                i++;
+            }
+        }
+
+        genomeFitness = 0;
+        genomeFitness += 1 - output[0];
+        genomeFitness += 0 + output[1];
+        genomeFitness += 1 - output[2];
+        genomeFitness += 0 + output[3];
+
+        //System.out.println(genomeFitness);
         return genomeFitness;
 
         //Compare the results to the expected output, in our case we plug the 
         //results into wes' heuristic.
     }
 
-    public Genome makeBabies(Genome dad)
+    public Genome crossover(Genome dad, InnovationDB innovation)
     {
        int best; //0 = Mom, 1 = Dad;
        int dadIndex = 0;
        int momIndex = 0;
+
+       boolean selected = false;
 
        ArrayList<NeuronGene> babyNeuronGenes = new ArrayList<NeuronGene>();
        ArrayList<LinkGene> babyLinkGenes = new ArrayList<LinkGene>();
@@ -662,21 +708,29 @@ public class Genome implements Serializable
 
        LinkGene selectedLink = new LinkGene();
 
+       this.determineFitness();
+       dad.determineFitness();
+
+       //System.out.println(this.getFitness());
+       //System.out.println(dad.getFitness());
 
         if (this.getFitness() == dad.getFitness())
         {
             if (this.getNumLinkGenes() == dad.getNumLinkGenes())
             {
-                best = random.nextInt(1);
+                best = random.nextInt(2);
+                //System.out.println(best);
             }
             else
             {
                 if (this.getNumLinkGenes() < dad.getNumLinkGenes())
                 {
+                    //System.out.println("MOM");
                     best = 0; //Mom
                 }
                 else
                 {
+                    //System.out.println("DAD");
                     best = 1; //Dad
                 }
             }
@@ -685,10 +739,12 @@ public class Genome implements Serializable
         {
             if (this.getFitness() > dad.getFitness())
             {
+                //System.out.println("Mom has the best fitness");
                 best = 0; //Mom
             }
             else
             {
+                //System.out.println("Dad has the best fitness");
                 best = 1; //Dad
             }
         }
@@ -699,7 +755,9 @@ public class Genome implements Serializable
             {
                 if (best == 1)
                 {
+                    //System.out.println("Selected Dad's genes");
                     selectedLink = dad.linkGeneSet.get(dadIndex);
+                    selected = true;
                 }
 
                 dadIndex++;
@@ -708,59 +766,81 @@ public class Genome implements Serializable
             {
                 if (best == 0)
                 {
+                    //System.out.println("Selected Mom's genes");
                     selectedLink = this.linkGeneSet.get(momIndex);
+                    selected = true;
                 }
 
                 momIndex++;
             }
-            else if (this.getInnovationNum(this.linkGeneSet.get(momIndex)) < dad.getInnovationNum(dad.linkGeneSet.get(dadIndex)))
+            else if (this.getInnovationNum(this.linkGeneSet.get(momIndex), innovation) < dad.getInnovationNum(dad.linkGeneSet.get(dadIndex), innovation))
             {
                 if (best == 0)
                 {
+                    //System.out.println("Selected Mom's genes");
                     selectedLink = this.linkGeneSet.get(momIndex);
+                    selected = true;
                 }
 
                 momIndex++;
             }
-            else if (this.getInnovationNum(this.linkGeneSet.get(momIndex)) > dad.getInnovationNum(dad.linkGeneSet.get(dadIndex)))
+            else if (this.getInnovationNum(this.linkGeneSet.get(momIndex), innovation) > dad.getInnovationNum(dad.linkGeneSet.get(dadIndex), innovation))
             {
                 if (best == 1)
                 {
+                    //System.out.println("Selected Dad's genes");
                     selectedLink = dad.linkGeneSet.get(dadIndex);
+                    selected = true;
                 }
 
                 dadIndex++;
             }
-            else if (this.getInnovationNum(this.linkGeneSet.get(momIndex)) == dad.getInnovationNum(dad.linkGeneSet.get(dadIndex)))
+            else if (this.getInnovationNum(this.linkGeneSet.get(momIndex), innovation) == dad.getInnovationNum(dad.linkGeneSet.get(dadIndex), innovation))
             {
                 if (random.nextDouble() < 0.5)
                 {
+                    //System.out.println("Selected Mom's genes");
                     selectedLink = this.linkGeneSet.get(momIndex);
+                    selected = true;
                 }
                 else
                 {
+                    //System.out.println("Selected Dad's genes");
                     selectedLink = dad.linkGeneSet.get(dadIndex);
+                    selected = true;
                 }
 
                 momIndex++;
                 dadIndex++;
             }
 
-            if (babyLinkGenes.size() == 0)
+            if (selected)
             {
-                babyLinkGenes.add(selectedLink);
-            }
-            else
-            {
-                //if (babyLinkGenes.get(babyLinkGenes.size() - 1) != selectedLink.getInnovationNum())
-                if(true)
+                selected = false;
+                if (babyLinkGenes.size() == 0)
                 {
+                    //System.out.println("Add link");
                     babyLinkGenes.add(selectedLink);
                 }
-            }
+                else
+                {
+                    //if (babyLinkGenes.get(babyLinkGenes.size() - 1) != selectedLink.getInnovationNum())
+                    if(true)
+                    {
+                        //System.out.println("Add link");
+                        babyLinkGenes.add(selectedLink);
+                    }
+                }
 
-            neuronIDS.add(selectedLink.getFromNeuron());
-            neuronIDS.add(selectedLink.getToNeuron());
+                //System.out.println("Adding neurons");
+                neuronIDS.add(selectedLink.getFromNeuron());
+                neuronIDS.add(selectedLink.getToNeuron());
+            }
+        }
+
+        for (int i = 0; i < babyLinkGenes.size(); i++)
+        {
+            //System.out.println(babyLinkGenes.get(i));
         }
 
         //sort neurons
@@ -772,7 +852,7 @@ public class Genome implements Serializable
     }
     
 
-    public void mutateNeuronWeighs(double mutationRate, double newMutationRate, double changeWeight)
+    public void mutateNeuronWeights(double mutationRate, double newMutationRate, double changeWeight)
     {
         for (int i = 0; i < neuronGeneSet.size(); i++)
         {
@@ -813,7 +893,7 @@ public class Genome implements Serializable
 
     public void mutateLinkWeights(double mutationRate, double newMutationRate, double changeWeight)
     {
-        for (int i = 0; i < neuronGeneSet.size(); i++)
+        for (int i = 0; i < linkGeneSet.size(); i++)
         {
             if (random.nextDouble() < mutationRate)
             {
@@ -833,7 +913,7 @@ public class Genome implements Serializable
 
     public void mutateLinkWeights()
     {
-        for (int i = 0; i < neuronGeneSet.size(); i++)
+        for (int i = 0; i < linkGeneSet.size(); i++)
         {
             if (random.nextDouble() < 0.33)
             {

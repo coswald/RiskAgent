@@ -127,4 +127,19 @@ public class LinkGene implements Serializable
     {
         this.toNeuron = neuron;
     }
+
+    @Override
+    public String toString()
+    {
+        //The string to return
+        String toReturn = "";
+
+        //Add all the information to the string
+        toReturn += "This link comes from neuron: " + fromNeuron + " and goes to neuron: " + toNeuron + "\n";
+
+        toReturn += "This link has a weight of " + linkWeight;
+
+        //Return the string
+        return toReturn;
+    }
 }
