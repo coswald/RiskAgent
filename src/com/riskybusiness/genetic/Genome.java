@@ -96,7 +96,7 @@ public class Genome implements Serializable
         numLayers        = neurons.get((neurons.size() - 1)).getNeuronLayer();
  
         //Add the neurons from the new genome to the innovation database
-        for (int i = 0;i < neuronGeneSet.size(); i++)
+        for (int i = 0; i < neuronGeneSet.size(); i++)
         {
             innovation.addInnovation(InnovationType.NEW_NEURON, -1, -1, (i + 1));
         }
@@ -240,23 +240,39 @@ public class Genome implements Serializable
                 weights[i] = 1.0f;
             }
 
-            return new com.riskybusiness.neural.SigmoidNeuron (weight, weights);
+            return new com.riskybusiness.neural.SigmoidNeuron(weight, weights);
         }
         else
         {
             //Create a neuron dependent on its type
             if (neuron.getNeuronType().equals("Sigmoid"))
             {
-                return new com.riskybusiness.neural.SigmoidNeuron (weight, numInputs);
+                float[] weights = new float[numInputs + 1];
+
+                for (int i = 0; i < numInputs; i++)
+                {
+                    weights[i] = 1.0f;
+                }
+
+                weights[numInputs] = 0.6f;
+                return new com.riskybusiness.neural.SigmoidNeuron(weight, weights);
             }
             else if (neuron.getNeuronType().equals("Step")) 
             {
-                return new com.riskybusiness.neural.StepNeuron (weight, numInputs);
+                float[] weights = new float[numInputs + 1];
+
+                for (int i = 0; i < numInputs; i++)
+                {
+                    weights[i] = 1.0f;
+                }
+
+                weights[numInputs] = 0.6f;
+                return new com.riskybusiness.neural.StepNeuron(weight, weights);
             }
             else
             {
                 //throw some error
-                return new com.riskybusiness.neural.StepNeuron (weight, numInputs);
+                return new com.riskybusiness.neural.StepNeuron(weight, numInputs);
             }
         }
     }
@@ -341,8 +357,6 @@ public class Genome implements Serializable
                 }
             }
             neuronSet[toNeuronID].setWeight(linkPos, (float)link.getWeight());
-            System.out.println("link " + link.getID() + "\n" + link.getWeight());
-
             return new com.riskybusiness.neural.Synapse (linkPos, neuronSet[fromNeuronID], neuronSet[toNeuronID]);
         }
         else
@@ -506,7 +520,7 @@ public class Genome implements Serializable
         Complete the code to determine if a link is recurrent
         **/
 
-        int innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, toNeuronID, fromNeuronID, -1); //Need to figure out what to do with the innovation id -1
+        int innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, fromNeuronID, toNeuronID, -1); //Need to figure out what to do with the innovation id -1
         if (innovationCheck == 0)
         {
             //Push the new gene into the array
@@ -687,7 +701,7 @@ public class Genome implements Serializable
         // genomeFitness = 2 - result[0];
         // return genomeFitness;
 
-        //this.createPhenotype();
+        this.createPhenotype();
 
         for(float x = 0; x < 2; x++)
         {
@@ -701,8 +715,8 @@ public class Genome implements Serializable
         genomeFitness = 0;
         genomeFitness += 1 - output[0];
         genomeFitness += 0 + output[1];
-        genomeFitness += 1 - output[2];
-        genomeFitness += 0 + output[3];
+        genomeFitness += 0 + output[2];
+        genomeFitness += 1 - output[3];
 
         //System.out.println(genomeFitness);
         return genomeFitness;
@@ -959,12 +973,12 @@ public class Genome implements Serializable
         toReturn += "The neurons inside this genome are: \n";
         for (int i = 0; i < neuronGeneSet.size(); i++)
         {
-            toReturn += "   Neuron ID: " + neuronGeneSet.get(i).getID() + " Neuron Layer: " + neuronGeneSet.get(i).getNeuronLayer() + "\n";
+            toReturn += "   Neuron ID: " + neuronGeneSet.get(i).getID() + " Neuron Layer: " + neuronGeneSet.get(i).getNeuronLayer() + " has an activation response of " + neuronGeneSet.get(i).getActivationResponse() + "\n";
         }
         toReturn += "The links inside this genome are: \n";
         for (int i = 0; i < linkGeneSet.size(); i++)
         {
-            toReturn += "   Link ID: " + linkGeneSet.get(i).getID() + " comes from Neuron: " + linkGeneSet.get(i).getFromNeuron() + " and goes to Neuron: " + linkGeneSet.get(i).getToNeuron() + " and is " + ((linkGeneSet.get(i).getEnabled()) ? "enabled!\n" : "disabled!\n");
+            toReturn += "   Link ID: " + linkGeneSet.get(i).getID() + " comes from Neuron: " + linkGeneSet.get(i).getFromNeuron() + " and goes to Neuron: " + linkGeneSet.get(i).getToNeuron() + " and is " + ((linkGeneSet.get(i).getEnabled()) ? "enabled"  : "disabled") + " and has a weight of " + linkGeneSet.get(i).getWeight() + "\n";
         }
         toReturn += "\n";
 

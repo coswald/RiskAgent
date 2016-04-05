@@ -56,6 +56,12 @@ public class StepNeuron extends Neuron
 		this.setThreshold(threshold);
 	}
 
+    public StepNeuron(float threshold, float... weights)
+    {
+        super(weights);
+        this.setThreshold(threshold);
+    }
+
     /**
      * <p>Constructs a copy of this {@code StepNeuron}.</p>
      * @param neuron {@inheritDoc}

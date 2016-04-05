@@ -150,8 +150,6 @@ public class Species implements Serializable
 		//Represents the ID of the fittest genome
 		int fittestGenomeIndex = 0;
 
-		myPopulation.get(speciesID).get(0).createPhenotype();
-
 		//Loop through the genomes and compare the current genome to the fittest and 
 		//determine the fittest individual
 		for (int genomeIndex = 1; genomeIndex < myPopulation.get(speciesID).size(); genomeIndex++)
@@ -165,31 +163,6 @@ public class Species implements Serializable
 				fittestGenomeIndex = genomeIndex;
 			}
 		}
-
-		myPopulation.get(speciesID).get(fittestGenomeIndex).createPhenotype();
-
-		Neuron[] neurons = new Neuron[myPopulation.get(speciesID).get(fittestGenomeIndex).getNetwork().getNeurons().length];
-
-		neurons = myPopulation.get(speciesID).get(fittestGenomeIndex).getNetwork().getNeurons();
-
-		for (int i = 0; i < neurons.length; i++)
-		{
-			System.out.println("Neuron " + i + " " + neurons[i].getWeights()[0]);
-			System.out.println("Neuron " + i + " " + neurons[i].getWeights()[1]);
-		}
-
-		System.out.println("Best Fitness: " + myPopulation.get(speciesID).get(fittestGenomeIndex).determineFitness());
-		System.out.println("Best Fitness: " + myPopulation.get(speciesID).get(fittestGenomeIndex).determineFitness());
-		myPopulation.get(speciesID).get(fittestGenomeIndex).createPhenotype();
-		neurons = myPopulation.get(speciesID).get(fittestGenomeIndex).getNetwork().getNeurons();
-
-		for (int i = 0; i < neurons.length; i++)
-		{
-			System.out.println("Neuron " + i + " " + neurons[i].getWeights()[0]);
-			System.out.println("Neuron " + i + " " + neurons[i].getWeights()[1]);
-		}
-		System.out.println("Best Fitness: " + myPopulation.get(speciesID).get(fittestGenomeIndex).determineFitness());
-		System.out.println("Best Fitness: " + myPopulation.get(speciesID).get(fittestGenomeIndex).determineFitness());
 
 		//Return
 		return myPopulation.get(speciesID).get(fittestGenomeIndex);

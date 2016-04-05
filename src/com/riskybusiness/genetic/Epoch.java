@@ -60,7 +60,7 @@ public class Epoch
 		/* Parameters */
 
 		//Represents the size of the population
-		int 	populationSize 			= 20;
+		int 	populationSize 			= 1;
 		//Represents the number of input neurons
 		int 	numInputNeurons			= 2;
 		//Represents the number of output neurons
@@ -98,6 +98,8 @@ public class Epoch
    		ArrayList<Genome>		population 	= new ArrayList<Genome>();
    		//Represents the ID of the genome
    		int 					genomeID 	= 0;
+   		//The chosen one
+   		Genome 					theOne 		= new Genome();
 
 
    		/* Historical Data */	
@@ -236,17 +238,25 @@ public class Epoch
 		//Represents the rate at which a genomes breed
 		double 				crossoverRate 		= 0.5;
 
+		boolean				skip				= false;
 
 		//Start epoch
 		/* Note:
 		 *   Need to add more when I implement speciation
 		 */
 
-		for (int generation = 1; generation < 10; generation++)
+		for (int generation = 1; generation < 2500; generation++)
 		{
 			//Represents the population, but classified into their corresponding species
 			Species 			species 			= new Species(population);
 			
+			if (generation > 2 && species.getBestMember(0).determineFitness() == 4.0)
+			{
+				theOne = new Genome(species.getBestMember(0).getID(), species.getBestMember(0).getNeurons(), species.getBestMember(0).getLinks(), species.getBestMember(0).getNumInputs(), species.getBestMember(0).getNumOutputs(), innovations);
+				skip = true;
+				break;
+			}
+
 			System.out.println("Generation: " + generation);
 
 			//Debug function
@@ -255,181 +265,201 @@ public class Epoch
 				System.out.println("Number of species: " + species.getNumSpecies());
 			}
 
-				//Loop through each species and spawn genomes from each species
-				for (int speciesID = 0; speciesID < species.getNumSpecies(); speciesID++)
-				{
-					//Check to see if we still need to spawn children
-					//if (numChildrenSpawned < numberToSpawn)
-					//{
+			//Loop through each species and spawn genomes from each species
+			for (int speciesID = 0; speciesID < species.getNumSpecies(); speciesID++)
+			{
+				//Check to see if we still need to spawn children
+				//if (numChildrenSpawned < numberToSpawn)
+				//{
+					//Debug function
+					if (debug)
+					{
+						System.out.println("Number of spawns: " + species.getNumSpawns(speciesID));
+					}
+					//Creates the number of children necassary for the species
+					for (double i = 0.0; i < species.getNumSpawns(speciesID); i++)
+					{	
 						//Debug function
 						if (debug)
 						{
-							System.out.println("Number of spawns: " + species.getNumSpawns(speciesID));
+							System.out.println ("Creating genome: " + (genomeID + 1));
 						}
-						//Creates the number of children necassary for the species
-						for (double i = 0.0; i < species.getNumSpawns(speciesID); i++)
-						{	
+						//If this is our first pass then the first thing we want to do
+						//is grab the best member of the species and pass them along
+						if (i == 0.0)
+						{
 							//Debug function
 							if (debug)
 							{
-								System.out.println ("Creating genome: " + (genomeID + 1));
+								System.out.println("Elitism Loop");
 							}
-							//If this is our first pass then the first thing we want to do
-							//is grab the best member of the species and pass them along
-							if (i == 0.0)
+
+							toCopy = species.getBestMember(speciesID);
+							for (int f = 0; f < 5;f++)
 							{
+								//System.out.println(toCopy.getNeurons().get(f).getActivationResponse());
+							}
+
+							System.out.println("fitness " + toCopy.determineFitness());
+
+							//Use elitism and always take the best member from the species
+							child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs(), innovations);
+							for (int f = 0; f < 5;f++)
+							{
+								//System.out.println(child.getNeurons().get(f).getActivationResponse());
+							}
+
+							//System.out.println("fitness " + child.determineFitness());
+						}
+						else
+						{
+							//If the size of the species is only 1 then we can't breed
+							if (species.getNumMembers(speciesID) == 1)
+							{
+								//Grab a member from the species
+								toCopy = species.getMember(speciesID);
+
+								child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs(), innovations);
+
 								//Debug function
 								if (debug)
 								{
-									System.out.println("Elitism Loop");
+									System.out.println("Grabbing the sole survivor!");
 								}
-
-								toCopy = species.getBestMember(speciesID);
-								for (int f = 0; f < 5;f++)
-								{
-									//System.out.println(toCopy.getNeurons().get(f).getActivationResponse());
-								}
-
-								//System.out.println("fitness " + toCopy.determineFitness());
-								//System.out.println("fitness " + toCopy.determineFitness());
-
-								//Use elitism and always take the best member from the species
-								child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs(), innovations);
-								for (int f = 0; f < 5;f++)
-								{
-									//System.out.println(child.getNeurons().get(f).getActivationResponse());
-								}
-
-								//System.out.println("fitness " + child.determineFitness());
-							}
+							} 
 							else
 							{
-								//If the size of the species is only 1 then we can't breed
-								if (species.getNumMembers(speciesID) == 1)
+								//Grab a random member to breed with or mutate
+								Genome mom = species.getMember(speciesID);
+
+								//Debug function
+								if (debug)
 								{
-									//Grab a member from the species
-									toCopy = species.getMember(speciesID);
+									System.out.println("Grabbing mom, ID: " + mom.getID());
+								}
 
-									child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs(), innovations);
-
+								//Decide whether to do crossover or not based on the crossover rate
+								if (random.nextDouble() < crossoverRate)
+								{
+									//Grab a random genome to breed with
+									Genome dad = species.getMember(speciesID);
+									
 									//Debug function
 									if (debug)
 									{
-										System.out.println("Grabbing the sole survivor!");
+										System.out.println("Grabbing dad, ID: " + dad.getID());
 									}
-								} 
-								else
-								{
-									//Grab a random member to breed with or mutate
-									Genome mom = species.getMember(speciesID);
+									
+									//Represents th loop control variable
+									int 	lcv = 10;
 
-									//Debug function
-									if (debug)
+									//If the dad is the same as the mom then loop and try to find a
+									//new dad. Only do this as many times the lcv is initialized to.
+									while (dad.getID() == mom.getID() && lcv > 0)
 									{
-										System.out.println("Grabbing mom, ID: " + mom.getID());
-									}
-
-									//Decide whether to do crossover or not based on the crossover rate
-									if (random.nextDouble() < crossoverRate)
-									{
-										//Grab a random genome to breed with
-										Genome dad = species.getMember(speciesID);
-										
 										//Debug function
 										if (debug)
 										{
-											System.out.println("Grabbing dad, ID: " + dad.getID());
+											System.out.println("Dad is the same as mom");
 										}
+
+										//Grab a random genome to breed with
+										dad = species.getMember(speciesID);
 										
-										//Represents th loop control variable
-										int 	lcv = 10;
-
-										//If the dad is the same as the mom then loop and try to find a
-										//new dad. Only do this as many times the lcv is initialized to.
-										while (dad.getID() == mom.getID() && lcv > 0)
-										{
-											//Debug function
-											if (debug)
-											{
-												System.out.println("Dad is the same as mom");
-											}
-
-											//Grab a random genome to breed with
-											dad = species.getMember(speciesID);
-											
-											//Decrement the lcv
-											lcv--;
-										}
-
-										//If the dad genome does not equal the mom genome the breed
-										if (dad.getID() != mom.getID())
-										{
-											//Debug function
-											if (debug)
-											{
-												System.out.println("Breeding...");
-											}
-											//Breed the mom with the dad
-											child = mom.crossover(dad, innovations);
-										}
-										else
-										{
-											//Debug function
-											if (debug)
-											{
-												System.out.println("Couldn't breed");
-											}
-											//If the dad does equal the mom then simply set the child
-											//equal to mom.
-											toCopy = mom;
-											child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs(), innovations);
-
-										}
+										//Decrement the lcv
+										lcv--;
 									}
-									toCopy = mom;
-									child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs(), innovations);
-									//Do we want to set a limit on the number of nuerons?
+
+									//If the dad genome does not equal the mom genome the breed
+									if (dad.getID() != mom.getID())
+									{
+										//Debug function
+										if (debug)
+										{
+											System.out.println("Breeding...");
+										}
+										//Breed the mom with the dad
+										child = mom.crossover(dad, innovations);
+									}
+									else
+									{
+										//Debug function
+										if (debug)
+										{
+											System.out.println("Couldn't breed");
+										}
+										//If the dad does equal the mom then simply set the child
+										//equal to mom.
+										toCopy = mom;
+										child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs(), innovations);
+
+									}
 								}
-
-								// for (int j = 0; j < 5; j++)
-								// {
-								// 	//child.addNeuron(0.5, innovations, 10);
-								// 	//child.addLink(0.8, 0.15, innovations, 10, 20);
-								// }
-
-								child.mutateNeuronWeights();
-								child.mutateLinkWeights();
-							}	
-							
-							//Set the id of the child to the next genome ID
-							child.setID(++genomeID);
-
-							//Debug function
-							if (debug)
-							{
-								System.out.println("Adding member to new population");
+								toCopy = mom;
+								child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs(), innovations);
+								//Do we want to set a limit on the number of nuerons?
 							}
-							
-							//Add the child to the new population
-							newPopulation.add(new Genome(child.getID(), child.getNeurons(), child.getLinks(), child.getNumInputs(), child.getNumOutputs(), innovations));
+
+							// for (int j = 0; j < 5; j++)
+							// {
+							// 	//child.addNeuron(0.5, innovations, 10);
+							// 	//child.addLink(0.8, 0.15, innovations, 10, 20);
+							// }
+
+							child.mutateNeuronWeights();
+							child.mutateLinkWeights();
+						}	
+						
+						//Set the id of the child to the next genome ID
+						child.setID(++genomeID);
+
+						//Debug function
+						if (debug)
+						{
+							System.out.println("Adding member to new population");
 						}
-					//}
-				}
-				//Fancy ass math to determine if we met the required amount of children
-				//??
-
-				//Transfer the next generation
-				population.clear();
-				for (int i = 0; i < newPopulation.size(); i++)
-				{
-					population.add(new Genome(newPopulation.get(i).getID(), newPopulation.get(i).getNeurons(), newPopulation.get(i).getLinks(), newPopulation.get(i).getNumInputs(), newPopulation.get(i).getNumOutputs(), innovations));
-				}
-				newPopulation.clear();
-
-				for (int i = 0; i < population.size(); i++)
-				{
-					//System.out.println(population.get(i));
-				}
+						
+						//Add the child to the new population
+						newPopulation.add(new Genome(child.getID(), child.getNeurons(), child.getLinks(), child.getNumInputs(), child.getNumOutputs(), innovations));
+					}
+				//}
 			}
+			//Fancy ass math to determine if we met the required amount of children
+			//??
+
+			//Transfer the next generation
+			population.clear();
+			for (int i = 0; i < newPopulation.size(); i++)
+			{
+				population.add(new Genome(newPopulation.get(i).getID(), newPopulation.get(i).getNeurons(), newPopulation.get(i).getLinks(), newPopulation.get(i).getNumInputs(), newPopulation.get(i).getNumOutputs(), innovations));
+			}
+			newPopulation.clear();
+
+			for (int i = 0; i < population.size(); i++)
+			{
+				//System.out.println(population.get(i));
+			}
+		}
+
+		if (skip)
+		{
+			float[] inputs = new float[] {0,0};
+
+			while(inputs[0] >= 0)
+			{
+
+				System.out.println("Congrats on being a genius enter the values you wish to fire!");
+				System.out.println("First: ");
+				inputs[0] = input.nextFloat();
+				System.out.println("Second: ");
+				inputs[1] = input.nextFloat();
+				theOne.createPhenotype();
+				System.out.println("The value fired was: " + theOne.getNetwork().fire(new float[][] {new float[] {inputs[0]}, new float[] {inputs[1]}})[0]);
+
+				// System.out.println("The network responds with: " + theOne.getNetwork().fire(new float[][] {new float[] {inputs[0]}, new float[] {inputs[1]}}));
+
+			}
+		}
+
 	}
 }

@@ -36,6 +36,11 @@ public class InnovationDB implements Serializable
 		innovationID = 0;
 	}
 
+	public int getSize()
+	{
+		return innovationDB.size();
+	}
+
 	public int getInnovationID(int fromNeuron, int toNeuron)
 	{
 		for (int i = 0; i < innovationDB.size(); i++)
@@ -52,33 +57,33 @@ public class InnovationDB implements Serializable
 	/**
 	Fix these two function
 	**///Also the id may not be necassary
-	public int innovationExists(InnovationType type, int to, int from, int id)
+	public boolean innovationExists(InnovationType type, int from, int to, int id)
 	{
-		//Instantiate the inputs into an innovation to be compared throughout the database
-		toFind = new Innovation(type, to, from, id);
+		boolean exists = false;
+
 		//See if the innovation datebase contains the toFind object
-		if (innovationDB.contains(toFind))
+		for (int i = 0; i < innovationDB.size(); i++)
 		{
-			return 1;
-		}
-		else
-		{
-			return -1;
+			if (innovationDB.get(i).isEqual(type, from, to, id))
+			{
+				exists = true;
+			}
 		}
 
+		return exists;
 	}
 
 	public int addInnovation(InnovationType type, int to, int from, int id)
 	{
 		//Check to see if innovation exists
-		if (innovationExists(type, to, from, id) != -1)
+		if (innovationExists(type, from, to, id))
 		{
 			return -1;
 		} 
 		else 
 		{
 			//Add innovation
-			innovationDB.add(innovationID, new Innovation(type, to, from, id));
+			innovationDB.add(innovationID, new Innovation(type, from, to, id));
 			//Increment innovationID
 			innovationID++; 
 			return 0;
@@ -90,13 +95,17 @@ public class InnovationDB implements Serializable
 		return innovationID;
 	}
 
-	public void printDatabase()
+	@Override
+	public String toString()
 	{
-		System.out.println("Printing Database...");
+		String toReturn = "";
+		toReturn = "Printing Database...\n";
 		for (int i = 0; i < innovationDB.size(); i++)
 		{
 			Innovation toPrint = innovationDB.get(i);
-			System.out.println("Type: " + toPrint.getType() + " From Neuron: " + toPrint.getFromNeuron() + " To Neuron: " + toPrint.getToNeuron() + " ID: " + toPrint.getNeuronID());
+			toReturn += "Type: " + toPrint.getType() + " From Neuron: " + toPrint.getFromNeuron() + " To Neuron: " + toPrint.getToNeuron() + " ID: " + toPrint.getNeuronID() + "\n";
 		}	
+
+		return toReturn;
 	}
 }
