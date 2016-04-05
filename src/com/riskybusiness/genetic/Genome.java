@@ -515,11 +515,6 @@ public class Genome implements Serializable
         
         //int id = innovation.innovationExists(InnovationType.NEW_LINK, fromNeuronID, toNeuronID, -1);
 
-        //The algortihm in the book uses the y values to determine if the link is recurrent so im gonna skip this part
-        /**
-        Complete the code to determine if a link is recurrent
-        **/
-
         int innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, fromNeuronID, toNeuronID, -1); //Need to figure out what to do with the innovation id -1
         if (innovationCheck == 0)
         {
@@ -537,25 +532,30 @@ public class Genome implements Serializable
      
     public void addNeuron(double mutationRate, InnovationDB innovation, int numTrysToFindOldLink) 
     {
-        //This variable describes a function to create random numbers
-        Random random = new Random();
         //If a valid link is found to add a neuron to then this will be set to true
         boolean linkFound = false;
-        //This is the index of the chosen link to test
+
+        //This is the ID of the chosen link to test
+        int chosenLinkID = -1;
+        
+        //Represent the index of the chosen link 
         int chosenLink = 0;
+        
         //Represents the weight of the original link
         double originalWeight;
+        
         //These two variables respresent the id's of the neurons the original link connects
         int toNeuronID;
         int fromNeuronID;
+        
+        //This represents the maximum amount of neurons allowed in the genome
+        int sizeThreshold = 30;
 
         //If the random value doesn't exceed the probability threshold then exit by returning
         if (random.nextDouble() > mutationRate)
         {
             return;
         }
-
-        int sizeThreshold = numInputNeurons + numOutputNeurons + 500;
 
         //Not quite sure what the size threshold is yet but it prevents the chaining effect so I will implement it
         if (linkGeneSet.size() < sizeThreshold)
@@ -564,20 +564,21 @@ public class Genome implements Serializable
             for (int i = numTrysToFindOldLink; i > 0; i--)
             {
                 //Prevents the chaining problem
-                chosenLink = random.nextInt(numLinkGenes - 1 - ((int)Math.sqrt(numLinkGenes)));
+                chosenLinkID = random.nextInt(numLinkGenes - 1 - ((int)Math.sqrt(numLinkGenes)));
 
-                //int fromNeuron =  linkGeneSet.get(chosenLink).getFromNeuron(); //?
+                for (int j = 0; j < linkGeneSet.size(); j++)
+                {
+                    if (linkGeneSet.get(j).getID() == chosenLinkID)
+                    {
+                        chosenLink = j;
+                        break;
+                    }
+                }
 
-                /**
-                Fix this(finds the linkid not a potisition)
-                **/
-
-                if ((linkGeneSet.get(chosenLink).getEnabled())) //&&
-                    //(!linkGeneSet.get(chosenLink).getRecurrent()))
-                    //(neuronGeneSet.get(fromNeuron).getNeuronType != bias)) can't be a bias gene
+                //If the link is enabled then we have found the link we are going to disable
+                if ((linkGeneSet.get(chosenLink).getEnabled()))
                 {
                     linkFound = true;
-
                     numTrysToFindOldLink = 0;
                 }
 
@@ -596,8 +597,6 @@ public class Genome implements Serializable
                 //Get the id's of the neurons the original link connected
                 fromNeuronID = linkGeneSet.get(chosenLink).getFromNeuron();
                 toNeuronID   = linkGeneSet.get(chosenLink).getToNeuron();
-
-                //If we want to add the x and y coords we could do so here// pg. 376
 
                 //Check to see if this innovation exists in another genome
                 //int id = innovation.innovationExists(NEW_LINK, toNeuronID, fromNeuronID)
@@ -717,6 +716,10 @@ public class Genome implements Serializable
         genomeFitness += 0 + output[1];
         genomeFitness += 0 + output[2];
         genomeFitness += 1 - output[3];
+        // genomeFitness += 0 + output[0];
+        // genomeFitness += 1 - output[1];
+        // genomeFitness += 0 + output[2];
+        // genomeFitness += 1 - output[3];
 
         //System.out.println(genomeFitness);
         return genomeFitness;

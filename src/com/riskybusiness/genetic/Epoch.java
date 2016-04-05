@@ -60,7 +60,7 @@ public class Epoch
 		/* Parameters */
 
 		//Represents the size of the population
-		int 	populationSize 			= 1;
+		int 	populationSize 			= 100;
 		//Represents the number of input neurons
 		int 	numInputNeurons			= 2;
 		//Represents the number of output neurons
@@ -166,7 +166,7 @@ public class Epoch
 					for (int j = summationNeuronsInLayer[i + 1]; j < summationNeuronsInLayer[i + 2]; j++)
 					{
 						double dweight = random.nextDouble();
-						neuronGenes.add(new NeuronGene(++curNeuronID, "Step", "Hidden", false, dweight, (i + 2)));
+						neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", "Hidden", false, dweight, (i + 2)));
 					}
 				}
 				for (int i = 0; i < numOutputNeurons; i++)
@@ -249,10 +249,11 @@ public class Epoch
 		{
 			//Represents the population, but classified into their corresponding species
 			Species 			species 			= new Species(population);
-			
-			if (generation > 2 && species.getBestMember(0).determineFitness() == 4.0)
+
+			theOne = new Genome(species.getBestMember(0).getID(), species.getBestMember(0).getNeurons(), species.getBestMember(0).getLinks(), species.getBestMember(0).getNumInputs(), species.getBestMember(0).getNumOutputs(), innovations);
+
+			if (species.getBestMember(0).determineFitness() == 4.0)
 			{
-				theOne = new Genome(species.getBestMember(0).getID(), species.getBestMember(0).getNeurons(), species.getBestMember(0).getLinks(), species.getBestMember(0).getNumInputs(), species.getBestMember(0).getNumOutputs(), innovations);
 				skip = true;
 				break;
 			}
@@ -295,21 +296,9 @@ public class Epoch
 							}
 
 							toCopy = species.getBestMember(speciesID);
-							for (int f = 0; f < 5;f++)
-							{
-								//System.out.println(toCopy.getNeurons().get(f).getActivationResponse());
-							}
-
-							System.out.println("fitness " + toCopy.determineFitness());
-
+							System.out.println("Best Member's Fitness " + toCopy.determineFitness() + "\n");
 							//Use elitism and always take the best member from the species
 							child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs(), innovations);
-							for (int f = 0; f < 5;f++)
-							{
-								//System.out.println(child.getNeurons().get(f).getActivationResponse());
-							}
-
-							//System.out.println("fitness " + child.determineFitness());
 						}
 						else
 						{
@@ -400,11 +389,11 @@ public class Epoch
 								//Do we want to set a limit on the number of nuerons?
 							}
 
-							// for (int j = 0; j < 5; j++)
-							// {
-							// 	//child.addNeuron(0.5, innovations, 10);
-							// 	//child.addLink(0.8, 0.15, innovations, 10, 20);
-							// }
+							for (int j = 0; j < 5; j++)
+							{
+								child.addNeuron(0.05, innovations, 10);
+								//child.addLink(0.8, 0.15, innovations, 10, 20);
+							}
 
 							child.mutateNeuronWeights();
 							child.mutateLinkWeights();
@@ -447,7 +436,7 @@ public class Epoch
 
 			while(inputs[0] >= 0)
 			{
-
+				System.out.println(theOne);
 				System.out.println("Congrats on being a genius enter the values you wish to fire!");
 				System.out.println("First: ");
 				inputs[0] = input.nextFloat();
@@ -459,6 +448,11 @@ public class Epoch
 				// System.out.println("The network responds with: " + theOne.getNetwork().fire(new float[][] {new float[] {inputs[0]}, new float[] {inputs[1]}}));
 
 			}
+		}
+		else
+		{
+			theOne.createPhenotype();
+			System.out.println(theOne);
 		}
 
 	}
