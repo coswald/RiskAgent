@@ -467,11 +467,11 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	 */
 	public void setWeight(int weightIndex, float weight) throws InvalidNeuronInputException
 	{
-		if(linkPos >= this.weights.length || index < 0)
+		if(weightIndex >= this.weights.length || weightIndex < 0)
 		{
 			throw new InvalidNeuronInputException("The amount of weights given is invalid! Make sure to include the bias weight!");
 		}
-		this.weights[linkPos] = weight;
+		this.weights[weightIndex] = weight;
 	}
 	
 	/**
