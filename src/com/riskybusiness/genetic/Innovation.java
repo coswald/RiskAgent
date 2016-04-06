@@ -16,8 +16,9 @@
  */
 
 package com.riskybusiness.genetic;
+import java.io.Serializable;
 
-public class Innovation extends Object
+public class Innovation implements Serializable
 {
 	//Represents the innovation type
 	private InnovationType type;
@@ -28,6 +29,8 @@ public class Innovation extends Object
 	//Represents the ID of the neuron if its a neuron else -1 for links
 	private int            neuronID;
 	//private int            innovationNum;
+
+	private static final long serialVersionUID = 7260173936646208532L;
 
 	public Innovation(InnovationType type, int from, int to, int id)
 	{

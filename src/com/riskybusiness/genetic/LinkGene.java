@@ -25,7 +25,7 @@ import java.io.Serializable;
 public class LinkGene implements Serializable
 {
     
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -6113158899915565377L;
     
     //Represents the ID of the neuron the link/synapse is coming from
     private int     fromNeuron;

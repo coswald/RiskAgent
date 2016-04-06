@@ -31,11 +31,11 @@ public class Genome implements Serializable
 {
     
     //Represents the users input
-    String  userInput;
+    private transient String userInput;
     //Represents the scanner to get user input
-    Scanner input   = new Scanner(System.in);
+    private transient Scanner input   = new Scanner(System.in);
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2649985816998697033L;
 
     //Represents the ID of the genome
     private int                     genomeID;
@@ -516,7 +516,8 @@ public class Genome implements Serializable
         //int id = innovation.innovationExists(InnovationType.NEW_LINK, fromNeuronID, toNeuronID, -1);
 
         int innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, fromNeuronID, toNeuronID, -1); //Need to figure out what to do with the innovation id -1
-        if (innovationCheck == 0)
+        
+        if (innovationCheck == 0 || innovationCheck == -1)
         {
             //Push the new gene into the array
             linkGeneSet.add(new LinkGene(fromNeuronID, toNeuronID, (linkGeneSet.size() + 1), random.nextDouble(), false));
@@ -609,7 +610,7 @@ public class Genome implements Serializable
                 **/
                 int innovationCheck = innovation.addInnovation(InnovationType.NEW_NEURON, fromNeuronID, toNeuronID, (neuronGeneSet.size() + 1));
 
-                if (innovationCheck == 0)
+                if (innovationCheck == 0 || innovationCheck == -1)
                 {
                     //Determine Nueron layer
                     NeuronGene fromNeuron = new NeuronGene();

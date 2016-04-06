@@ -30,6 +30,8 @@ public class InnovationDB implements Serializable
 	//Represetns the innovationID
 	private int 					innovationID;
 
+	private static final long serialVersionUID = 141838380522290195L;
+
 
 	public InnovationDB()
 	{

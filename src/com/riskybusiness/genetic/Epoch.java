@@ -252,6 +252,8 @@ public class Epoch
 
 			theOne = new Genome(species.getBestMember(0).getID(), species.getBestMember(0).getNeurons(), species.getBestMember(0).getLinks(), species.getBestMember(0).getNumInputs(), species.getBestMember(0).getNumOutputs(), innovations);
 
+			System.out.println(innovations.getSize());
+
 			if (species.getBestMember(0).determineFitness() == 4.0)
 			{
 				skip = true;
@@ -392,7 +394,7 @@ public class Epoch
 							for (int j = 0; j < 5; j++)
 							{
 								child.addNeuron(0.05, innovations, 10);
-								//child.addLink(0.8, 0.15, innovations, 10, 20);
+								child.addLink(0.05, 0.0, innovations, 10, 20);
 							}
 
 							child.mutateNeuronWeights();

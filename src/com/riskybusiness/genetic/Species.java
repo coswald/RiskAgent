@@ -40,6 +40,7 @@ public class Species implements Serializable
 
 	private ArrayList<ArrayList<Double>>	compatibilityTable	= new ArrayList<ArrayList<Double>>();
 
+	private static final long serialVersionUID = -4268206798591932773L;
 
 	public Species(ArrayList<Genome> population)
 	{

@@ -26,7 +26,7 @@ import java.io.Serializable;
 public class NeuronGene implements Serializable
 {
     
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -4444998043311781107L;
     
     //Represents the ID of the Neuron
     private int     neuronID;

@@ -16,8 +16,9 @@
  */
 
 package com.riskybusiness.genetic;
+import java.io.Serializable;
 
-public enum InnovationType 
+public enum InnovationType implements Serializable
 {
 	NEW_LINK, NEW_NEURON
 }

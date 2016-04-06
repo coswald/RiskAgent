@@ -48,7 +48,7 @@ public class Tester
 		//Tester variable
 		boolean printGenome = false;
 		//Tester variable
-		boolean testAddNeuron = false;
+		boolean testAddNeuron = true;
 		//Tester variable
 		boolean testPush 	= false;
 		//Tester variable
@@ -83,7 +83,7 @@ public class Tester
 		/* Parameters */
 
 		//Represents the size of the population
-		int 	populationSize 			= 2;
+		int 	populationSize 			= 20;
 		//Represents the number of input neurons
 		int 	numInputNeurons			= 2;
 		//Represents the number of output neurons
@@ -310,6 +310,8 @@ public class Tester
 						System.out.println("Output 2: " + population.get(i).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
 					}
 				}
+				userInput = input.nextLine();
+				System.out.println(population.get(i));
 			}
 		}
 
