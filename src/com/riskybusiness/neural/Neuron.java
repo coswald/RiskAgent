@@ -159,7 +159,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	
 	/**
 	 * <p>Makes a {@code Neuron} with the given number
-	 * of inputs and a learning rate of .1. Also
+	 * of inputs and a learning rate of 0.1. Also
 	 * randomizes weights; see link below.</p>
 	 * @param inputNum The amount of inputs this neuron
 	 *				will recieve.
@@ -187,7 +187,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	
 	/**
 	 * <p>Fills a list with values, either 1, or a
-	 * random float between 0 and 1.</p>
+	 * random float between -0.5 and 0.5.</p>
 	 * @param random Determines which values to fill
 	 *				the list with: either random
 	 *				values, or not.
@@ -198,7 +198,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 		for(int i = 0; i < list.length; i++)
 		{
 			if(random)
-				list[i] = (float)Math.random();
+				list[i] = (float)Math.random() - .5F;
 			else
 				list[i] = 1;
 		}
@@ -209,13 +209,15 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	 * {@code Neuron}. This is accomplished by
 	 * making all of the values in the
 	 * {@link com.riskybusiness.neural.Neuron#inputs}
-	 * list -1.</p>
+	 * list the lowest value that can be stored
+	 * in a {@code Float}. This is the negative
+	 * version of {@link java.lang.Float#MAX_VALUE}.</p>
 	 * @see com.riskybusiness.neural.Neuron#inputs
 	 */
 	public void clearInputs()
 	{
 		for(int i = 0; i < this.inputs.length; i++)
-			this.inputs[i] = -1;
+			this.inputs[i] = -Float.MAX_VALUE;
 		haveFired = false;
 	}
 	
@@ -233,7 +235,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	public boolean canFire()
 	{
 		for(float x : this.inputs)
-			if(x < 0)
+			if(x == -Float.MAX_VALUE)
 				return false;
 		return true;
 	}
@@ -256,7 +258,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 		if(this.canFire())
 			throw new ExceededNeuronInputException("The amount of given inputs is already at its maximum!");
 		
-		if(this.inputs[index] >= 0)
+		if(this.inputs[index] != -Float.MAX_VALUE)
 			throw new InvalidNeuronInputException("The input " + index + " on neuron " + this.toString() + " cannot be overriden!");
 		
 		this.inputs[index] = output;
@@ -288,12 +290,7 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 	 * while the inverse is true if the output is
 	 * lower. NOTE: this only compares their
 	 * outputs, nothing about the amount of inputs
-	 * or weight values are checked. Also, one
-	 * thing to remember is that the integer
-	 * returned is a rounded version of the
-	 * output difference: two {@code Neuron}s could
-	 * be "equal" but output two completely differnt
-	 * floats.</p>
+	 * or weight values are checked.</p>
 	 * @param other The other object to compare to.
 	 * @return A positive number if the output
 	 * 		of this {@code Neuron} was greater, 0
@@ -456,10 +453,21 @@ public abstract class Neuron extends Object implements Serializable, Comparable<
 		}
 		this.weights = weights;
 	}
-
-	public void setWeight(int linkPos, float weight) throws InvalidNeuronInputException
+	
+	/**
+	 * <p>Sets the weight given for the given index
+	 * supplied.</p>
+	 * @param weightIndex The position for the weight.
+	 * @param weight The new weight for that index.
+	 * @see com.riskybusiness.neural.Neuron#weights
+	 * @throws InvalidNeuronInputException If the index
+	 * 			is greater than or equal to
+	 * 			the length of the weight array.
+	 * @since COFED 1.3
+	 */
+	public void setWeight(int weightIndex, float weight) throws InvalidNeuronInputException
 	{
-		if(linkPos > this.weights.length)
+		if(linkPos >= this.weights.length || index < 0)
 		{
 			throw new InvalidNeuronInputException("The amount of weights given is invalid! Make sure to include the bias weight!");
 		}
