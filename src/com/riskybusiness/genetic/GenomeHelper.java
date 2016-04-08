@@ -107,7 +107,7 @@ public final class GenomeHelper extends Object
 			//If we have found a link that is enabled and not looped and comes from our neuron then check that links
 			//To neuron and see if it needs to be pushed back. Then recursivly call push neurons on that
 			//Neuron
-			if ((linkGenes.get(i).getFromNeuron() == addedNeuron.getID()))
+			if ((linkGenes.get(i).getFromNeuron() == addedNeuron.getID()) && !(linkGenes.get(i).getFromNeuron() == addedNeuron.getID()))
 			{
 				//Find the neuron gene that the link points to
 				for (int j = 0; j < neuronGenes.size(); j++)

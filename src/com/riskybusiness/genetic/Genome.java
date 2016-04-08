@@ -21,6 +21,8 @@ import com.riskybusiness.neural.Neuron;
 import com.riskybusiness.neural.Synapse;
 import com.riskybusiness.neural.NeuralNet;
 
+import static java.lang.Math.abs;
+
 import java.io.Serializable;
 import java.util.Random;
 import java.util.ArrayList;
@@ -183,7 +185,99 @@ public class Genome implements Serializable
     //Calculates the compatibility score between this genome and another genome
     public double getCompatibilityScore(Genome toCompare)
     {
-        return 1.0;
+        //Represents the number of disjoint, excess, and common genes the two
+        //genomes share
+        double  numDisjoint = 0;
+        double  numExcess   = 0;
+        double  numCommon   = 0;
+
+        //Represents the summed difference in weights between link genes in common
+        double  diffWeights = 0;
+
+        //Represents the indexes for each genome being searched
+        int     index1      = 0;
+        int     index2      = 0;
+
+        //Represents the innovation ID's of the current links
+        int     innovID1    = 0;
+        int     innovID2    = 0;
+
+        //As long as we have not reached the end of both linkGeneSets then continue to loop
+        while((index1 < this.linkGeneSet.size() - 1) || (index2 < toCompare.getLinks().size() - 1))
+        {
+            //Represents whether or not we should skip some conditional statements
+            boolean skip = false;
+
+            //If we have reached the end of the first genome then increment the index
+            //of the second genome and excess genes.
+            if (index1 == this.linkGeneSet.size() - 1)
+            {
+                index2++;
+                numExcess++;
+                skip = true;
+            }
+
+            if (index2 == toCompare.getLinks().size() && !skip)
+            {
+                index1++;
+                numExcess++;
+                skip = true;
+            }
+
+            //If we don't need to skip then continue with the if statement
+            if (!skip)
+            {
+                //Grab the innovation ID's of the current links
+                innovID1 = this.linkGeneSet.get(index1).getID();
+                innovID2 = toCompare.getLinks().get(index2).getID();
+
+                //If the innovation ID's are the same then increment both indices
+                //and number in common and add the value to the difference in weights
+                if (innovID1 == innovID1)
+                {
+                    index1++;
+                    index2++;
+                    numCommon++;
+
+                    diffWeights += abs(this.linkGeneSet.get(index1).getWeight() - toCompare.getLinks().get(index2).getWeight());
+                }
+                //Else if the first link is younger than the second link then increment
+                //the second link and number of disjoint links
+                else if (innovID1 < innovID2)
+                {
+                    numDisjoint++;
+                    index1++;
+                }
+                //Else if the second link is younger than the first link then increment
+                //the first link and number of disjoint links
+                else if (innovID1 > innovID2)
+                {
+                    numDisjoint++;
+                    index2++;
+                }
+            }
+        }
+
+        //Determine which genome is longer
+        int numGenes = toCompare.getNumLinkGenes();
+
+        if (this.numLinkGenes > numGenes)
+        {
+            numGenes = this.numLinkGenes;
+        }
+
+        //Initialize multipliers
+        double disjointMultiplier = 1;
+        double excessMultiplier = 1;
+        double commonMultiplier = 0.4;
+
+        //Figure out the compatibility score
+        double score = (excessMultiplier * numExcess/(double)numGenes) + 
+                       (disjointMultiplier * numDisjoint/(double)numGenes) + 
+                       (commonMultiplier * diffWeights / numCommon);
+
+        //Return the compatibility score
+        return score;
     }
 
     public void setID(int id)

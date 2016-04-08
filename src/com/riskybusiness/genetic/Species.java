@@ -40,6 +40,8 @@ public class Species implements Serializable
 
 	private ArrayList<ArrayList<Double>>	compatibilityTable	= new ArrayList<ArrayList<Double>>();
 
+	private double 							speciesThreshold	= 1.0;
+
 	private static final long serialVersionUID = -4268206798591932773L;
 
 	public Species(ArrayList<Genome> population)
@@ -110,6 +112,42 @@ public class Species implements Serializable
 			for (int j = 0; j < this.myPopulation.get(i).size(); j++)
 			{
 				myPopulation.get(i).get(j).setAdjustedFitness(myPopulation.get(i).get(j).getFitness());
+			}
+		}
+	}
+
+	public void Speciate(ArrayList<Genome> toSpeciate)
+	{
+		boolean speciated = false;
+
+		//Loop through the arraylist of genomes and find their compatibility with
+		//other species and if they are compatible, add them to that species
+		for (int genomeID = 0; genomeID < toSpeciate.size(); genomeID++)
+		{
+			//New genome, so reset the speciated variable
+			speciated = false;
+
+			//Loop through all the species and determine if the genome would fit
+			//well in that species. If so add the genome to the species
+			for (int speciesID = 0; speciesID < myPopulation.size(); speciesID++)
+			{
+				double compatibility = toSpeciate.get(genomeID).getCompatibilityScore(getBestMember(speciesID));
+				
+				if (compatibility <= speciesThreshold)
+				{
+					addGenome(speciesID, toSpeciate.get(genomeID));
+					//Tell genome it's species ID?
+
+					speciated = true;
+
+				}
+			}
+
+			if (!speciated)
+			{
+				ArrayList<Genome> toAdd = new ArrayList<Genome>();
+				toAdd.add(toSpeciate.get(genomeID));
+				myPopulation.add(toAdd);
 			}
 		}
 	}
@@ -203,6 +241,11 @@ public class Species implements Serializable
 
 		return myPopulation.get(speciesID).get(bestFitnessID);
 		//return myPopulation.get(speciesID).get(random.nextInt((myPopulation.get(speciesID).size() - 1)));
+	}
+
+	public void addGenome(int speciesID, Genome genome)
+	{
+		myPopulation.get(speciesID).add(genome);
 	}
 
 	public int getNumMembers(int speciesID)
