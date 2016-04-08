@@ -112,7 +112,7 @@ public abstract class LuxAgentAdapter implements LuxAgent
     {
       return this.version;
     }
-
+	
     /**
      * <p>A short description of this class as it relates to
      * LuxDelux.</p>

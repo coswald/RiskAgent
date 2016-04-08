@@ -49,7 +49,7 @@ public class MMTest extends Object
 		while(true)
 		{
 			fired = test.fire(inputs);
-			if(round >= 1 || fired[0] == desired[0] && fired[1] == desired[1])
+			if(round >= 100 || fired[0] == desired[0] && fired[1] == desired[1])
 				break;
 			Debug.println("Round " + ++round);
 			Debug.println("Guess: " + fired[0] + ", " + fired[1], 1);

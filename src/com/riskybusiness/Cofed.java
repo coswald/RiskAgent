@@ -20,10 +20,11 @@ package com.riskybusiness;
 import com.riskybusiness.LuxAgentAdapter;
 import com.riskybusiness.neural.NeuralNet;
 import com.sillysoft.lux.Board;
+import com.sillysoft.lux.Card;
 import com.sillysoft.lux.Country;
 import com.sillysoft.lux.agent.EvilPixie;
+import com.sillysoft.lux.util.BoardHelper;
 import java.util.ArrayList;
-import java.util.Random;
 
 /**
  * <p>&nbsp&nbsp&nbsp&nbspThe {@code Cofed} agent uses ANNs to play
@@ -346,7 +347,7 @@ public class Cofed extends LuxAgentAdapter
         // Attack or don't attack
         int countryCounter = 0;
         int playerCounter = 0;
-        float[][] inputs = new int[inputNeurons][1];
+        float[][] inputs = new float[inputNeurons][1];
         for(int i = 0; i < inputs.length; i++)
         {
             if(i <= this.countries.length)
@@ -355,22 +356,24 @@ public class Cofed extends LuxAgentAdapter
                 inputs[++i][0] = this.countries[countryCounter].getContinent();
                 inputs[++i][0] = this.countries[countryCounter].getOwner();
                 inputs[++i][0] = this.countries[countryCounter].getArmies();
-                inputs[++i][0] = (this.countries[countryCounter++].getNumberPlayerNeighbors(this.ID) == 0 || inputs[i - 2] == this.ID) ? 0 : 1;
+                inputs[++i][0] = (this.countries[countryCounter++].getNumberPlayerNeighbors(this.ID) == 0 || (int)inputs[i - 2][0] == this.ID) ? 0 : 1;
             }
             else
             {
                 inputs[i][0] = playerCounter; //does it start at zero or 1?
                 inputs[++i][0] = this.board.getPlayerCards(playerCounter);
-                input[++i][0] = this.board.getPlayerIncome(playerCounter++);
+                inputs[++i][0] = this.board.getPlayerIncome(playerCounter++);
             }
         }
         float[] outputs = nn.fire(inputs);
+		
+		//Determines how to transfer Network output to attack
         char[] countryToAttack = new char[outputs.length / 2];
         char[] countryToAttackFrom = new char[outputs.length / 2];
         for(int i = 1; i < outputs.length / 2 + 1; i++)
-            countryToAttack[i - 1] = outputs[i] + '0';
+            countryToAttack[i - 1] = (outputs[i] >= .5F) ? '1' : '0';
         for(int i = outputs.length / 2 + 1; i < outputs.length; i++)
-            countryToAttackFrom[i - 1] = outputs[i] + '0';
+            countryToAttackFrom[i - 1] = (outputs[i] >= .5F) ? '1' : '0';
         int countryToAttackCode = Integer.parseInt(new String(countryToAttack), 2);
         int countryToAttackFromCode = Integer.parseInt(new String(countryToAttackFrom), 2);
         boolean attack = (outputs[0] == 0) ? false : true;
@@ -381,19 +384,19 @@ public class Cofed extends LuxAgentAdapter
     @Override
     public void cardsPhase(Card[] cards)
     {
-        return this.agent.cardsPhase(cards);
+        this.agent.cardsPhase(cards);
     }
 
     @Override
     public void fortifyPhase()
     {
-        return this.agent.fortifyPhase();
+        this.agent.fortifyPhase();
     }
 
     @Override
-    public int message(String note, Object data)
+    public String message(String message, Object data)
     {
-        return this.agent.message(note, data);
+        return this.agent.message(message, data);
     }
 
     @Override
@@ -409,15 +412,15 @@ public class Cofed extends LuxAgentAdapter
     }
 
     @Override
-    public void placeArmies()
+    public void placeArmies(int numberOfArmies)
     {
-        return this.agent.placeArmies();
+        this.agent.placeArmies(numberOfArmies);
     }
 
     @Override
     public void placeInitialArmies(int numberOfArmies)
     {
-        return this.agent.placeInitialArmies(numberOfArmies);
+        this.agent.placeInitialArmies(numberOfArmies);
     }
 
     @Override
@@ -434,11 +437,10 @@ public class Cofed extends LuxAgentAdapter
   		    "Join me, and I will spare you!\n \n Oh wait, you're already dead",
   		    "Even the Doctor can't save you now!",
   		    "Next I shall conquer the seas and become King of the Pirates!",
-  		    "Now, I just need to make sure Goku stays out \n
-            of my way and I will be unstoppable!",
+  		    "Now, I just need to make sure Goku stays out \nof my way and I will be unstoppable!",
           "I am the drill that will pierce the heavens!"
         };
 
-  	    return answers[ Random.nextInt(answers.length) ];
+  	    return answers[(int)(Math.random() * answers.length)];
     }
 }

@@ -47,7 +47,7 @@ public class XORTest extends Object
 		
 		int round = 0;
 		boolean trained = false;
-		while(!trained)
+		while(round < 1000 && !trained)
 		{
 			Debug.println("\rRound: " + ++round);
 			//System.out.println(xor);

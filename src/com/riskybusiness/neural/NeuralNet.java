@@ -373,8 +373,8 @@ public class NeuralNet extends Object implements Serializable
 			{
 				//this.neurons[i].adjustWeight(j, -1 * this.neurons[i].getLastTotalError() * this.neurons[i].getInputAt(j));
 				errorValues[errorIndex] = this.neurons[i].getLastTotalError();
-				errorValues[errorIndex++] *= -1 * this.neurons[i].getInputAt(j);
-				Debug.println("outh:\t" + this.neurons[i].getInputAt(j), 2);
+				errorValues[errorIndex++] *= -1 * this.neurons[i].getInputAt(j) * this.neurons[i].getWeights()[j];
+				Debug.println("outh:\t" + (this.neurons[i].getInputAt(j) * this.neurons[i].getWeights()[j]), 2);
 			}
 		}
 		
@@ -400,7 +400,7 @@ public class NeuralNet extends Object implements Serializable
 			{
 				//this.neurons[i].adjustWeight(j, -1 * this.neurons[i].getLastTotalError() * this.neurons[i].getInputAt(j));
 				errorValues[errorIndex] = this.neurons[i].getLastTotalError();
-				errorValues[errorIndex++] *= -1 * this.neurons[i].getInputAt(j);
+				errorValues[errorIndex++] *= -1 * this.neurons[i].getInputAt(j) * this.neurons[i].getWeights()[j];
 			}
 		}
 		
