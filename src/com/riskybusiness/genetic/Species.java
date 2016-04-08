@@ -47,62 +47,8 @@ public class Species implements Serializable
 	public Species(ArrayList<Genome> population)
 	{
 
+		//Clear the old species and add the new population
 		myPopulation.clear();
-
-		// ArrayList<Genome> species = new ArrayList<Genome>();
-
-		//Get compatitbility of the population
-		for (int i = 0; i < population.size(); i++)
-		{
-			for (int j = 0; j < population.size(); j++)
-			{
-				if (i != j)
-				{
-					compatibilityRow.add(j, new Double(population.get(i).getCompatibilityScore(population.get(j))));
-				}
-				else
-				{
-					compatibilityRow.add(j, new Double(1.0));
-				}
-			}
-			compatibilityTable.add(compatibilityRow);
-		}
-
-		// for (int i = 0; i < population.size(); i++)
-		// {
-		// 	System.out.print("Row " + i + ":");
-		// 	for (int j = 0; j < population.size(); j++)
-		// 	{
-		// 		if (i != j)
-		// 		{
-		// 			System.out.print(compatibilityTable.get(i).get(j) + " ");
-		// 		}
-		// 	}
-		// 	System.out.println();
-		// }
-
-
-		//Using the compatibilty table determine the species
-		// for (int i = 0; population.size(); i++)
-		// {
-		// 	for (int j = 0; j < population.size(); j++)
-		// 	{
-				
-		// 	}
-		// }
-
-		//Determine the adjusted fitness
-		//For now adjusted fitness is simply fitness
-
-		//speciesPop.add(population);
-		// for (int i = 0; i < population.size(); i++)
-		// {
-		// 	species.add(population.get(i));
-		// }
-
-		//Until I can find a way to actually speciate the people the species is
-		//essentially going to be the population
-
 		myPopulation.add(population);
 
 		//Determine the adjusted fitness
@@ -173,7 +119,6 @@ public class Species implements Serializable
 
 		//Return
 		return numToSpawn;
-		//return 5.0;
 	}
 
 	//Returns the size of the given species
@@ -221,9 +166,6 @@ public class Species implements Serializable
   
 		//May need to lower value to 5 or some computer value such as 10% of the species.
 
-		//System.out.println(myPopulation.get(speciesID).size() - 1);
-
-		//Grab 10 random competitors
 		for (int i = 0; i < 3; i++)
 		{
 			speciesToCompete.add(new Integer(random.nextInt((myPopulation.get(speciesID).size() - 1))));

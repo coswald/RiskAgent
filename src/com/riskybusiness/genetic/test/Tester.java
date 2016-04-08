@@ -177,25 +177,25 @@ public class Tester
 				for (int i = 0; i < numInputNeurons; i++)
 				{
 					double dweight = random.nextDouble();
-					neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", "Input", false, dweight, 1)); 
+					neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", "Input", dweight, 1)); 
 				}
 				for (int i = 0; i < numHiddenLayers; i++)
 				{
 					for (int j = summationNeuronsInLayer[i + 1]; j < summationNeuronsInLayer[i + 2]; j++)
 					{
 						double dweight = random.nextDouble();
-						neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", "Hidden", false, dweight, (i + 2)));
+						neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", "Hidden", dweight, (i + 2)));
 					}
 				}
 				for (int i = 0; i < numOutputNeurons; i++)
 				{
 					double dweight = random.nextDouble();
-					neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", "Output", false, dweight, (numHiddenLayers + 2)));
+					neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", "Output", dweight, (numHiddenLayers + 2)));
 				}
 				
 				if (testPush)
 				{
-					neuronGenes.add(new NeuronGene(21, "Sigmoid", "Hidden", false, 1.0, 2));
+					neuronGenes.add(new NeuronGene(21, "Sigmoid", "Hidden", 1.0, 2));
     			}
 
 				if (debug)
@@ -221,7 +221,7 @@ public class Tester
 								//Create random weight
 								double dweight = random.nextDouble();
 								//Add the link to the link gene array
-				 				linkGenes.add(new LinkGene(neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), ++curLinkID, dweight, false));
+				 				linkGenes.add(new LinkGene(neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), ++curLinkID, dweight));
 							}
 						}
 						//Still have to deal with the fact that this way results in some neurons not getting links
@@ -238,8 +238,8 @@ public class Tester
 				if (testPush)
 				{
 					//Represents the added links
-    				linkGenes.add(new LinkGene(1, 21, 56, 1.0, false));
-    				linkGenes.add(new LinkGene(21, 4, 57, 1.0, false));
+    				linkGenes.add(new LinkGene(1, 21, 56, 1.0));
+    				linkGenes.add(new LinkGene(21, 4, 57, 1.0));
     			}
 
 				if (debug)
@@ -247,7 +247,7 @@ public class Tester
 					System.out.println("Adding genome to population");
 				}
 
-				population.add(new Genome(++curGenomeID, neuronGenes, linkGenes, numInputNeurons, numOutputNeurons, innovations));
+				population.add(new Genome(++curGenomeID, neuronGenes, linkGenes, numInputNeurons, numOutputNeurons));
 
 			}
 		}
@@ -342,7 +342,7 @@ public class Tester
 		if (testPush)
 		{
     		//Represents the neuron to be added
-    		NeuronGene neuronToAdd = new NeuronGene(21, "Sigmoid", "Hidden", false, 0.0, 2);
+    		NeuronGene neuronToAdd = new NeuronGene(21, "Sigmoid", "Hidden", 0.0, 2);
 
 
 

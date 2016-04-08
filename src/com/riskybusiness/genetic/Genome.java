@@ -72,21 +72,21 @@ public class Genome implements Serializable
 
     //This constructor creates a genome from an ArrayList of links, an ArrayList of neurons, an ID number, an innovation database,
     //and the number of input and output neurons
-    public Genome(int id, ArrayList<NeuronGene> neurons, ArrayList<LinkGene> links, int inputs, int outputs, InnovationDB innovation)
+    public Genome(int id, ArrayList<NeuronGene> neurons, ArrayList<LinkGene> links, int inputs, int outputs)
     {
         //Represents the ID of the genome
-        genomeID         = id;
+        genomeID = id;
 
         //Create a deep copy of the passed in ArrayList of neurons
         for (int i = 0; i < neurons.size(); i++)
         {
-            neuronGeneSet.add(new NeuronGene(neurons.get(i).getID(), neurons.get(i).getNeuronType(), neurons.get(i).getLayerType(), false, neurons.get(i).getActivationResponse(), neurons.get(i).getNeuronLayer()));
+            neuronGeneSet.add(new NeuronGene(neurons.get(i).getID(), neurons.get(i).getNeuronType(), neurons.get(i).getLayerType(), neurons.get(i).getActivationResponse(), neurons.get(i).getNeuronLayer()));
         }
 
         //Create a deep copy of the passed in ArrayList of links
         for (int i = 0; i < links.size(); i++)
         {
-            linkGeneSet.add(new LinkGene(links.get(i).getFromNeuron(), links.get(i).getToNeuron(), links.get(i).getID(), links.get(i).getWeight(), false));
+            linkGeneSet.add(new LinkGene(links.get(i).getFromNeuron(), links.get(i).getToNeuron(), links.get(i).getID(), links.get(i).getWeight()));
         }
 
         //Set the genome parameters with information passed in
@@ -96,18 +96,6 @@ public class Genome implements Serializable
         //Set some parameters using some of the metadata provided by the inputs
         numLinkGenes     = links.size();
         numLayers        = neurons.get((neurons.size() - 1)).getNeuronLayer();
- 
-        //Add the neurons from the new genome to the innovation database
-        for (int i = 0; i < neuronGeneSet.size(); i++)
-        {
-            innovation.addInnovation(InnovationType.NEW_NEURON, -1, -1, (i + 1));
-        }
-        
-        //Add the links from the new genome to the innovation database
-        for (int i = 0;i < linkGeneSet.size(); i++)
-        {
-            innovation.addInnovation(InnovationType.NEW_LINK, linkGeneSet.get(i).getFromNeuron(), linkGeneSet.get(i).getToNeuron(), -1);
-        }
     }
 
     public Genome()
@@ -503,6 +491,19 @@ public class Genome implements Serializable
         this.myNetwork = new com.riskybusiness.neural.NeuralNet(neuronSet, linkSet);
     }
 
+    public boolean neuronIDExists(int id)
+    {
+        for (int i = 0; i < neuronGeneSet.size(); i++)
+        {
+            if (neuronGeneSet.get(i).getID() == id)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public NeuralNet getNetwork()
     {
         return this.myNetwork;
@@ -552,7 +553,6 @@ public class Genome implements Serializable
                 {
                     toNeuronID   = neuronGeneSet.get(neuronIndex).getID();
                     fromNeuronID = neuronGeneSet.get(neuronIndex).getID();
-                    //recurrent    = true;
                     //If we find a good neuron that satisfies our conditions then we don't need to loop anymore
                     numTrysToFindLoop = 0;
                 }
@@ -597,24 +597,25 @@ public class Genome implements Serializable
                 numTrysToAddLink--;
             }
         }
-        //If either neuronid is less than 0 then we can't create a link so exit by returning
+        //If either neuronID is less than 0 then we can't create a link so exit by returning
         if (toNeuronID < 0 || fromNeuronID < 0)
         {
             return;
         }
 
-
+        //Check the database for this innovation, if it exists it returns the ID of the link else returns 0 if new
+        int innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, fromNeuronID, toNeuronID, -1);
         
-        //Why can't I just add the innovation and have my add innovation check to see if it already exists? Seems silly to seperate the two
-        
-        //int id = innovation.innovationExists(InnovationType.NEW_LINK, fromNeuronID, toNeuronID, -1);
-
-        int innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, fromNeuronID, toNeuronID, -1); //Need to figure out what to do with the innovation id -1
-        
-        if (innovationCheck == 0 || innovationCheck == -1)
+        if (innovationCheck == 0)
         {
             //Push the new gene into the array
-            linkGeneSet.add(new LinkGene(fromNeuronID, toNeuronID, (linkGeneSet.size() + 1), random.nextDouble(), false));
+            linkGeneSet.add(new LinkGene(fromNeuronID, toNeuronID, innovation.curID(), random.nextDouble()));
+            GenomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
+            numLinkGenes++;
+        }
+        else
+        {
+            linkGeneSet.add(new LinkGene(fromNeuronID, toNeuronID, innovationCheck, random.nextDouble()));
             GenomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
             numLinkGenes++;
         }
@@ -624,7 +625,6 @@ public class Genome implements Serializable
 
     //Add a neuron to the genome dependent upon the mutation rate
     //I need to find a way to create a pointer to the innovation db
-     
     public void addNeuron(double mutationRate, InnovationDB innovation, int numTrysToFindOldLink) 
     {
         //If a valid link is found to add a neuron to then this will be set to true
@@ -693,38 +693,39 @@ public class Genome implements Serializable
                 fromNeuronID = linkGeneSet.get(chosenLink).getFromNeuron();
                 toNeuronID   = linkGeneSet.get(chosenLink).getToNeuron();
 
-                //Check to see if this innovation exists in another genome
-                //int id = innovation.innovationExists(NEW_LINK, toNeuronID, fromNeuronID)
-
-
-                //pg. 377 provides info about a problem that may need to be implemented.
-
-                /**
-                Add link
-                **/
                 int innovationCheck = innovation.addInnovation(InnovationType.NEW_NEURON, fromNeuronID, toNeuronID, (neuronGeneSet.size() + 1));
 
-                if (innovationCheck == 0 || innovationCheck == -1)
+                if (!neuronIDExists(innovationCheck)) 
+                {
+                    innovationCheck = 0;
+                }
+
+                if (innovationCheck == 0)
                 {
                     //Determine Nueron layer
                     NeuronGene fromNeuron = new NeuronGene();
 
-                    //Find the   
+                    //Find the from neuron
                     for (int j = 0; j < neuronGeneSet.size(); j++)
                     {
                         if (neuronGeneSet.get(j).getID() == fromNeuronID)
                         {
                            fromNeuron = neuronGeneSet.get(j);
+                           break;
                         }
                     }
 
-                    //Determine the layey of the fromNeuron and add 1 to get the neuron to be added layer
+                    //Determine the layer of the fromNeuron and add 1 to get the neuron to be added layer
                     int newNeuronLayer = fromNeuron.getNeuronLayer() + 1;
 
                     //Add the new neuron to the gene set
-                    neuronGeneSet.add(new NeuronGene((neuronGeneSet.size() + 1), "Sigmoid", "Hidden", false, random.nextDouble(), newNeuronLayer));
-                    linkGeneSet.add(new LinkGene(fromNeuronID, neuronGeneSet.size(), (linkGeneSet.size() + 1 ), 1.0, false));
-                    linkGeneSet.add(new LinkGene(neuronGeneSet.size(), toNeuronID, (linkGeneSet.size() + 1), originalWeight, false));
+                    neuronGeneSet.add(new NeuronGene((neuronGeneSet.size() + 1), "Sigmoid", "Hidden", random.nextDouble(), newNeuronLayer));
+                    innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, fromNeuronID, neuronGeneSet.size(), -1);
+                    linkGeneSet.add(new LinkGene(fromNeuronID, neuronGeneSet.size(), innovation.curID(), 1.0));
+                    numLinkGenes++;
+                    innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, neuronGeneSet.size(), toNeuronID, -1);
+                    linkGeneSet.add(new LinkGene(neuronGeneSet.size(), toNeuronID, innovation.curID(), originalWeight));
+                    numLinkGenes++;
 
                     //Push back any neurons that were affected by the addition
                     GenomeHelper.pushNeurons(neuronGeneSet, linkGeneSet, neuronGeneSet.get((neuronGeneSet.size() - 1)));
@@ -737,24 +738,61 @@ public class Genome implements Serializable
                         }
                     }
 
-                    //System.out.println(this);
+                    //Sort the neuron array
+                    GenomeHelper.sortNeuronArray(neuronGeneSet, numLayers);
+
+                    //Sort the link genes
+                    GenomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
+                    
+                    return;
+                }
+                else //the innovation already exists
+                {
+                    System.out.println("special");
+                    int newNeuronID = innovation.getNeuronID(innovationCheck);
+
+                    int linkID1 = innovation.getInnovationID(fromNeuronID, newNeuronID);
+                    int linkID2 = innovation.getInnovationID(newNeuronID, toNeuronID);
+
+                    //Determine Nueron layer
+                    NeuronGene fromNeuron = new NeuronGene();
+
+                    //Find the from neuron
+                    for (int j = 0; j < neuronGeneSet.size(); j++)
+                    {
+                        if (neuronGeneSet.get(j).getID() == fromNeuronID)
+                        {
+                           fromNeuron = neuronGeneSet.get(j);
+                           break;
+                        }
+                    }
+
+                    //Determine the layer of the fromNeuron and add 1 to get the neuron to be added layer
+                    int newNeuronLayer = fromNeuron.getNeuronLayer() + 1;
+
+                    //Add the genes but don't update the innovation database
+                    neuronGeneSet.add(new NeuronGene(newNeuronID, "Sigmoid", "Hidden", random.nextDouble(), newNeuronLayer));
+                    linkGeneSet.add(new LinkGene(fromNeuronID, newNeuronID, linkID1, 1.0));
+                    numLinkGenes++;
+                    linkGeneSet.add(new LinkGene(newNeuronID, toNeuronID, linkID2, originalWeight));
+                    numLinkGenes++;
+
+                    //Push back any neurons that were affected by the addition
+                    GenomeHelper.pushNeurons(neuronGeneSet, linkGeneSet, neuronGeneSet.get((neuronGeneSet.size() - 1)));
+
+                    for (int j = 0; j < neuronGeneSet.size(); j++)
+                    {
+                        if(neuronGeneSet.get(j).getNeuronLayer() > numLayers)
+                        {
+                            numLayers++;
+                        }
+                    }
 
                     //Sort the neuron array
                     GenomeHelper.sortNeuronArray(neuronGeneSet, numLayers);
 
                     //Sort the link genes
                     GenomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
-
-                    //Add to the innovation database
-                    innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, fromNeuronID, neuronGeneSet.size(), -1);
-                    innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, neuronGeneSet.size(), toNeuronID, -1);
-                    numLinkGenes++;numLinkGenes++;
-                    return;
-                }
-                else //the innovation already exists
-                {
-                    //Complicated innovation stuff exists here?
-                    int z = 0;
                 }
             }
         }

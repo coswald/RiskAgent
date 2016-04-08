@@ -35,32 +35,27 @@ public class LinkGene implements Serializable
     private double  linkWeight; //Not necassary at the moment?
     //Represents if the link is enabled
     private boolean linkEnabled;
-    //Represents if the link is recurrent
-    private boolean linkRecurrent; //Not necassary right now but would be very useful
     //Represents the innovation ID
-    private int     innovationID; //Still not sure what this does?
+    private int     innovationID;
     
     public LinkGene()
     {
+        fromNeuron = -1;
+        toNeuron = -1;
+        linkWeight = 0.0;
+        linkEnabled = false;
         innovationID = 0;
     }
 
     //Create a LinkGene
-    public LinkGene(int fNeuron, int tNeuron, int id, double weight, boolean recur)
+    public LinkGene(int fNeuron, int tNeuron, int id, double weight)
     {
         fromNeuron    = fNeuron;
         toNeuron      = tNeuron;
         linkWeight    = weight;
         linkEnabled   = true;
-        linkRecurrent = recur;
         innovationID  = id;
     }
-
-    //Create a LinkGene
-    //public LinkGene(int fNeuron, int tNeuron, int id)
-    //{
-    //    this.LinkGene(fNeuron, tNeuron, id, .1, false);
-    //}
     
     //Get the ID of the link
     public int getID()
@@ -92,22 +87,10 @@ public class LinkGene implements Serializable
         return fromNeuron;
     }
 
-    //
-    public boolean getRecurrency()
-    {
-        return linkRecurrent;
-    }
-
     //Set the link to be enabled or disabled
     public void setLink(boolean enabled)
     {
         this.linkEnabled = enabled;
-    }
-    
-    //Set the link to be either recurrent or not
-    public void setRecurrency(boolean recur)
-    {
-        this.linkRecurrent = recur;
     }
     
     //Set the weight of the link

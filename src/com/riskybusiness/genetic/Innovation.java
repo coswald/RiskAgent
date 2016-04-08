@@ -53,6 +53,11 @@ public class Innovation implements Serializable
 		return (this.type == type && this.fromNeuron == fromNeuron && this.toNeuron == toNeuron && this.neuronID == neuronID);
 	}
 
+	public boolean isEqual(InnovationType type, int fromNeuron, int toNeuron)
+	{
+		return (this.type == type && this.fromNeuron == fromNeuron && this.toNeuron == toNeuron);
+	}
+
 	//Get whether the innovation is a neuron or a link
 	public InnovationType getType() 
 	{

@@ -32,43 +32,42 @@ public class NeuronGene implements Serializable
     private int     neuronID;
     //Represents the type of the Neuron, sigmoid or step
     private String  neuronType;
-    //Represents whether the neuron is recurrent
-    private boolean neuronRecurrent;
-    //Represents the weight of the neuron
-    private double   neuronActivationResponse;
-    //Represents the layer of the neuron(used in the genome class)
-    //private String  neuronLayer;
-    //private int     innovationNum;
-    //Represents the layer the neuron exists in
-    private int     neuronLayer;
     //Represents whether the neuron is a hidden neuron, input, or output
     private String  neuronLayerType;
+    //Represents the layer the neuron exists in
+    private int     neuronLayer;
+    //Represents the weight of the neuron
+    private double   neuronActivationResponse;
 
     //Create a blank neuron gene
     public NeuronGene()
     {
         neuronID = -1;
         neuronType = "SIGMOID";
-        neuronRecurrent = false;
-        neuronActivationResponse = 0.0;
+        neuronLayerType ="Hidden";
         neuronLayer = 1;
+        neuronActivationResponse = 0.0;
     }
 
     //Create a neuron gene
-    public NeuronGene(int id, String type, String layerType, boolean recur, double activate, int layer)
+    public NeuronGene(int id, String type, String layerType, double activate, int layer)
     {
         neuronID = id;
         neuronType = type;
         neuronLayerType = layerType;
-        neuronRecurrent = recur;
-        neuronActivationResponse = activate;
         neuronLayer = layer;
+        neuronActivationResponse = activate;
     }
 
     //Get the id of the neuron
     public int getID()
     {
         return this.neuronID;
+    }
+
+    public void setID(int id)
+    {
+        neuronID = id;
     }
 
     //Get the neuron type
@@ -81,19 +80,7 @@ public class NeuronGene implements Serializable
     public void setNeuronType(String type)
     {
         this.neuronType = type;
-    }
-
-    //Return whether the link is recurrent
-    public boolean isRecurrent()
-    {
-        return this.neuronRecurrent;
-    }
-    
-    //Set the recurrency of the neuron
-    public void setRecurrency(boolean recur)
-    {
-        this.neuronRecurrent = recur;
-    }
+    }    
     
     //Get the activation response of the neuron
     public double getActivationResponse()
@@ -125,8 +112,30 @@ public class NeuronGene implements Serializable
         this.neuronLayer += 1;
     }
 
+    //Gets the type of layer this neuron is (Input, Hidden, or Output)
     public String getLayerType()
     {
         return this.neuronLayerType;
+    }
+
+    //Sets the layer type of the neuron
+    public void setLayerType(String layerType)
+    {
+        neuronLayerType = layerType;
+    }
+
+    @Override
+    public String toString()
+    {
+        //The string to return
+        String toReturn = "";
+
+        //Add all the information to the string
+        toReturn += "This neuron is a " + neuronType + " neuron. The neuron exists in the " + neuronLayerType + " layer.\n";
+
+        toReturn += "The neuron has an activation response of " + neuronActivationResponse + " and is in layer " + neuronLayer + "\n";
+
+        //Return the string
+        return toReturn;
     }
 }

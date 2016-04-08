@@ -43,6 +43,90 @@ public class InnovationDB implements Serializable
 		return innovationDB.size();
 	}
 
+	public int innovationExists(InnovationType type, int from, int to, int id)
+	{
+		//See if the innovation datebase contains the toFind object
+		for (int i = 0; i < innovationDB.size(); i++)
+		{
+			if (innovationDB.get(i).isEqual(type, from, to, id))
+			{
+				/**
+				Test
+				**/
+				 return i + 1;
+			}
+		}
+
+		return 0;
+	}
+
+	public int innovationExists(InnovationType type, int from, int to)
+	{
+		//See if the innovation datebase contains the toFind object
+		for (int i = 0; i < innovationDB.size(); i++)
+		{
+			if (innovationDB.get(i).isEqual(type, from, to))
+			{
+				/**
+				Test
+				**/
+				 return i + 1;
+			}
+		}
+
+		return 0;
+	}
+
+	public int addInnovation(InnovationType type, int from, int to, int id)
+	{
+		if (type == InnovationType.NEW_LINK)
+		{
+			int innovationCheck = innovationExists(type, from, to, id);
+
+			//Check to see if innovation exists
+			if (innovationCheck != 0)
+			{
+				return innovationCheck;
+			} 
+			else 
+			{
+				//Add innovation
+				innovationDB.add(innovationID, new Innovation(type, from, to, id));
+				//Increment innovationID
+				innovationID++; 
+				return 0;
+			}
+		}
+		else
+		{
+			int innovationCheck = innovationExists(type, from, to);
+
+			//Check to see if innovation exists
+			if (innovationCheck != 0)
+			{
+				return innovationCheck;
+			} 
+			else 
+			{
+				//Add innovation
+				innovationDB.add(innovationID, new Innovation(type, from, to, id));
+				//Increment innovationID
+				innovationID++; 
+				return 0;
+			}
+		}
+	}
+
+	public int curID()
+	{
+		return innovationID;
+	}
+
+	public int getNeuronID(int index)
+	{
+		return innovationDB.get(index).getNeuronID();
+	}
+
 	public int getInnovationID(int fromNeuron, int toNeuron)
 	{
 		for (int i = 0; i < innovationDB.size(); i++)
@@ -54,47 +138,6 @@ public class InnovationDB implements Serializable
 		}
 
 		return -1;
-	}
-
-	/**
-	Fix these two function
-	**///Also the id may not be necassary
-	public boolean innovationExists(InnovationType type, int from, int to, int id)
-	{
-		boolean exists = false;
-
-		//See if the innovation datebase contains the toFind object
-		for (int i = 0; i < innovationDB.size(); i++)
-		{
-			if (innovationDB.get(i).isEqual(type, from, to, id))
-			{
-				exists = true;
-			}
-		}
-
-		return exists;
-	}
-
-	public int addInnovation(InnovationType type, int to, int from, int id)
-	{
-		//Check to see if innovation exists
-		if (innovationExists(type, from, to, id))
-		{
-			return -1;
-		} 
-		else 
-		{
-			//Add innovation
-			innovationDB.add(innovationID, new Innovation(type, from, to, id));
-			//Increment innovationID
-			innovationID++; 
-			return 0;
-		}
-	}
-
-	public int curID()
-	{
-		return innovationID;
 	}
 
 	@Override

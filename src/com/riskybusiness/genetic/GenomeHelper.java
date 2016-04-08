@@ -49,9 +49,6 @@ public final class GenomeHelper extends Object
 
 					//Add the neuron to the layer array
 					layer.add(genes.get(j));
-					/**
-					Should I do something about deactivated neurons??
-					**/
 				}
 			}
 
