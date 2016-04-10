@@ -60,7 +60,7 @@ public class Epoch
 		/* Parameters */
 
 		//Represents the size of the population
-		int 	populationSize 			= 10;
+		int 	populationSize 			= 100;
 		//Represents the number of input neurons
 		int 	numInputNeurons			= 2;
 		//Represents the number of output neurons
@@ -105,7 +105,7 @@ public class Epoch
    		/* Historical Data */	
 
    		//Represents the historical changes of all the previous populations
-   		InnovationDB 			innovations	= new InnovationDB();
+   		InnovationDB 			innovations	= new InnovationDB(5);
    		//Represents the current generation
    		//int 					generation 	= 1;		
 
@@ -178,8 +178,6 @@ public class Epoch
 					neuronGenes.add(new NeuronGene(curNeuronID, "Sigmoid", "Output", dweight, (numHiddenLayers + 2)));
 				}
 
-				System.out.println(innovations);
-
 				if (debug)
 				{
 					System.out.println("Creating Links...");
@@ -206,11 +204,11 @@ public class Epoch
 								int innovationCheck = innovations.addInnovation(InnovationType.NEW_LINK, neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), -1);
 								if (innovationCheck == 0)
 							    {
-							        linkGenes.add(new LinkGene(neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), innovations.curID(), random.nextDouble()));
+							        linkGenes.add(new LinkGene(linkGenes.size() + 1, neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), innovations.curID(), random.nextDouble(), true));
 							    }
 							    else
 							    {
-							        linkGenes.add(new LinkGene(neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), innovationCheck, random.nextDouble()));
+							        linkGenes.add(new LinkGene(linkGenes.size() + 1, neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), innovationCheck, random.nextDouble(), true));
 							    }
 							}
 						}
@@ -233,23 +231,23 @@ public class Epoch
 
 		System.out.println("Population size: " + population.size());
 
-		for (int i = 0; i < population.size(); i++)
-		{
-			System.out.println(population.get(i));
-		}
+		// for (int i = 0; i < population.size(); i++)
+		// {
+		// 	System.out.println(population.get(i));
+		// }
 
 		//Represents the newPopulation created from the old one
 		ArrayList<Genome> 	newPopulation 		= new ArrayList<Genome>();
 		//Represents the number of children spawned so far
 		int 				numChildrenSpawned 	= 0;
 		//Represents the number of children to spawn
-		int 				numberToSpawn 		= 20;
+		int 				numberToSpawn 		= 100;
 		//Represents the genome used to make deep copies
 		Genome 				toCopy 				= new Genome();
 		//Represents the child of a crossover
 		Genome 				child 				= new Genome();
 		//Represents the rate at which a genomes breed
-		double 				crossoverRate 		= 0.5;
+		double 				crossoverRate 		= 0.3;
 
 		boolean				skip				= false;
 
@@ -263,19 +261,23 @@ public class Epoch
 			//Represents the population, but classified into their corresponding species
 			Species 			species 			= new Species(population);
 
-			System.out.println(species);
+			// theOne = new Genome(species.getBestMember(0).getID(), species.getBestMember(0).getNeurons(), species.getBestMember(0).getLinks(), species.getBestMember(0).getNumInputs(), species.getBestMember(0).getNumOutputs());
 
-			theOne = new Genome(species.getBestMember(0).getID(), species.getBestMember(0).getNeurons(), species.getBestMember(0).getLinks(), species.getBestMember(0).getNumInputs(), species.getBestMember(0).getNumOutputs());
+			// for (int i = 0; i < population.size(); i++)
+			// {
+			// 	System.out.println("Loop " + i + ": " + theOne.getCompatibilityScore(population.get(i)));
+			// }
 
-			System.out.println(innovations.getSize());
+			//userInput = input.nextLine();
 
-			if (species.getBestMember(0).determineFitness() == 4.0)
-			{
-				skip = true;
-				break;
-			}
+			// if (species.getBestMember(0).determineFitness() == 4.0)
+			// {
+			// 	skip = true;
+			// 	break;
+			// }
 
 			System.out.println("Generation: " + generation);
+			System.out.println("Innovation Size: " + innovations.getSize());
 
 			//Debug function
 			if (debug)
@@ -313,7 +315,7 @@ public class Epoch
 							}
 
 							toCopy = species.getBestMember(speciesID);
-							System.out.println("Best Member's Fitness " + toCopy.determineFitness() + "\n");
+							//System.out.println("Best Member's Fitness " + toCopy.determineFitness() + "\n");
 							//Use elitism and always take the best member from the species
 							child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
 						}
@@ -406,10 +408,10 @@ public class Epoch
 								//Do we want to set a limit on the number of nuerons?
 							}
 
-							for (int j = 0; j < 5; j++)
+							for (int j = 0; j < 1; j++)
 							{
-								child.addNeuron(0.05, innovations, 10);
-								//child.addLink(0.05, 0.0, innovations, 10, 20);
+								child.addNeuron(0.05, innovations, 20);
+								child.addLink(0.05, 0.0, innovations, 10, 20);
 							}
 
 							child.mutateNeuronWeights();

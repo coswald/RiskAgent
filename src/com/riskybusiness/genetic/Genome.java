@@ -86,7 +86,7 @@ public class Genome implements Serializable
         //Create a deep copy of the passed in ArrayList of links
         for (int i = 0; i < links.size(); i++)
         {
-            linkGeneSet.add(new LinkGene(links.get(i).getFromNeuron(), links.get(i).getToNeuron(), links.get(i).getID(), links.get(i).getWeight()));
+            linkGeneSet.add(new LinkGene(links.get(i).getID(), links.get(i).getFromNeuron(), links.get(i).getToNeuron(), links.get(i).getInnovationID(), links.get(i).getWeight(), links.get(i).getEnabled()));
         }
 
         //Set the genome parameters with information passed in
@@ -204,8 +204,7 @@ public class Genome implements Serializable
                 numExcess++;
                 skip = true;
             }
-
-            if (index2 == toCompare.getLinks().size() && !skip)
+            else if (index2 == toCompare.getLinks().size() - 1)
             {
                 index1++;
                 numExcess++;
@@ -216,8 +215,8 @@ public class Genome implements Serializable
             if (!skip)
             {
                 //Grab the innovation ID's of the current links
-                innovID1 = this.linkGeneSet.get(index1).getID();
-                innovID2 = toCompare.getLinks().get(index2).getID();
+                innovID1 = this.linkGeneSet.get(index1).getInnovationID();
+                innovID2 = toCompare.getLinks().get(index2).getInnovationID();
 
                 //If the innovation ID's are the same then increment both indices
                 //and number in common and add the value to the difference in weights
@@ -443,9 +442,8 @@ public class Genome implements Serializable
         }
         else
         {
-            neuronSet[toNeuronID].setWeight(linkPos, (float)link.getWeight());
             //throw some error
-            return new com.riskybusiness.neural.Synapse (link.getID(), neuronSet[fromNeuronID], neuronSet[toNeuronID]);
+            throw new RuntimeException("Link genes were not set properly");
         }
         
     }
@@ -609,13 +607,13 @@ public class Genome implements Serializable
         if (innovationCheck == 0)
         {
             //Push the new gene into the array
-            linkGeneSet.add(new LinkGene(fromNeuronID, toNeuronID, innovation.curID(), random.nextDouble()));
+            linkGeneSet.add(new LinkGene(linkGeneSet.size() + 1, fromNeuronID, toNeuronID, innovation.curID(), random.nextDouble(), true));
             GenomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
             numLinkGenes++;
         }
         else
         {
-            linkGeneSet.add(new LinkGene(fromNeuronID, toNeuronID, innovationCheck, random.nextDouble()));
+            linkGeneSet.add(new LinkGene(linkGeneSet.size() + 1, fromNeuronID, toNeuronID, innovationCheck, random.nextDouble(), true));
             GenomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
             numLinkGenes++;
         }
@@ -634,7 +632,7 @@ public class Genome implements Serializable
         int chosenLinkID = -1;
         
         //Represent the index of the chosen link 
-        int chosenLink = 0;
+        LinkGene chosenLink = new LinkGene();
         
         //Represents the weight of the original link
         double originalWeight;
@@ -665,13 +663,13 @@ public class Genome implements Serializable
                 {
                     if (linkGeneSet.get(j).getID() == chosenLinkID)
                     {
-                        chosenLink = j;
+                        chosenLink = linkGeneSet.get(j);
                         break;
                     }
                 }
 
                 //If the link is enabled then we have found the link we are going to disable
-                if ((linkGeneSet.get(chosenLink).getEnabled()))
+                if ((chosenLink.getEnabled()))
                 {
                     linkFound = true;
                     numTrysToFindOldLink = 0;
@@ -684,23 +682,23 @@ public class Genome implements Serializable
                 }
                 
                 //Disable the original link gene
-                linkGeneSet.get(chosenLink).setLink(false);
+                chosenLink.setLink(false);
 
                 //Grab the weight of the original link
-                originalWeight = linkGeneSet.get(chosenLink).getWeight();
+                originalWeight = chosenLink.getWeight();
 
                 //Get the id's of the neurons the original link connected
-                fromNeuronID = linkGeneSet.get(chosenLink).getFromNeuron();
-                toNeuronID   = linkGeneSet.get(chosenLink).getToNeuron();
+                fromNeuronID = chosenLink.getFromNeuron();
+                toNeuronID   = chosenLink.getToNeuron();
 
                 int innovationCheck = innovation.addInnovation(InnovationType.NEW_NEURON, fromNeuronID, toNeuronID, (neuronGeneSet.size() + 1));
 
-                if (!neuronIDExists(innovationCheck)) 
-                {
-                    innovationCheck = 0;
-                }
+                // if (!neuronIDExists(innovationCheck)) 
+                // {
+                //     innovationCheck = 0;
+                // }
 
-                if (innovationCheck == 0)
+                if (innovationCheck != -1)
                 {
                     //Determine Nueron layer
                     NeuronGene fromNeuron = new NeuronGene();
@@ -721,10 +719,24 @@ public class Genome implements Serializable
                     //Add the new neuron to the gene set
                     neuronGeneSet.add(new NeuronGene((neuronGeneSet.size() + 1), "Sigmoid", "Hidden", random.nextDouble(), newNeuronLayer));
                     innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, fromNeuronID, neuronGeneSet.size(), -1);
-                    linkGeneSet.add(new LinkGene(fromNeuronID, neuronGeneSet.size(), innovation.curID(), 1.0));
+                    if (innovationCheck == 0)
+                    {
+                        linkGeneSet.add(new LinkGene(linkGeneSet.size() + 1, fromNeuronID, neuronGeneSet.size(), innovation.curID(), 1.0, true));
+                    }
+                    else
+                    {
+                        linkGeneSet.add(new LinkGene(linkGeneSet.size() + 1, fromNeuronID, neuronGeneSet.size(), innovationCheck, 1.0, true));
+                    }
                     numLinkGenes++;
                     innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, neuronGeneSet.size(), toNeuronID, -1);
-                    linkGeneSet.add(new LinkGene(neuronGeneSet.size(), toNeuronID, innovation.curID(), originalWeight));
+                    if (innovationCheck == 0)
+                    {
+                        linkGeneSet.add(new LinkGene(linkGeneSet.size() + 1, neuronGeneSet.size(), toNeuronID, innovation.curID(), originalWeight, true));
+                    }
+                    else
+                    {
+                        linkGeneSet.add(new LinkGene(linkGeneSet.size() + 1, neuronGeneSet.size(), toNeuronID, innovationCheck, originalWeight, true));
+                    }
                     numLinkGenes++;
 
                     //Push back any neurons that were affected by the addition
@@ -749,10 +761,13 @@ public class Genome implements Serializable
                 else //the innovation already exists
                 {
                     System.out.println("special");
+                    //System.out.println(innovation);
                     int newNeuronID = innovation.getNeuronID(innovationCheck);
 
-                    int linkID1 = innovation.getInnovationID(fromNeuronID, newNeuronID);
-                    int linkID2 = innovation.getInnovationID(newNeuronID, toNeuronID);
+                    System.out.println("New neuron ID: " + newNeuronID);
+
+                    int linkID1 = innovation.getInnovationID(fromNeuronID, neuronGeneSet.size() + 1);
+                    int linkID2 = innovation.getInnovationID(neuronGeneSet.size() + 1, toNeuronID);
 
                     //Determine Nueron layer
                     NeuronGene fromNeuron = new NeuronGene();
@@ -771,10 +786,10 @@ public class Genome implements Serializable
                     int newNeuronLayer = fromNeuron.getNeuronLayer() + 1;
 
                     //Add the genes but don't update the innovation database
-                    neuronGeneSet.add(new NeuronGene(newNeuronID, "Sigmoid", "Hidden", random.nextDouble(), newNeuronLayer));
-                    linkGeneSet.add(new LinkGene(fromNeuronID, newNeuronID, linkID1, 1.0));
+                    neuronGeneSet.add(new NeuronGene(neuronGeneSet.size() + 1, "Sigmoid", "Hidden", random.nextDouble(), newNeuronLayer));
+                    linkGeneSet.add(new LinkGene(linkGeneSet.size() + 1, fromNeuronID, newNeuronID, linkID1, 1.0, true));
                     numLinkGenes++;
-                    linkGeneSet.add(new LinkGene(newNeuronID, toNeuronID, linkID2, originalWeight));
+                    linkGeneSet.add(new LinkGene(linkGeneSet.size() + 1, newNeuronID, toNeuronID, linkID2, originalWeight, true));
                     numLinkGenes++;
 
                     //Push back any neurons that were affected by the addition
@@ -1114,7 +1129,7 @@ public class Genome implements Serializable
         toReturn += "The links inside this genome are: \n";
         for (int i = 0; i < linkGeneSet.size(); i++)
         {
-            toReturn += "   Link ID: " + linkGeneSet.get(i).getID() + " comes from Neuron: " + linkGeneSet.get(i).getFromNeuron() + " and goes to Neuron: " + linkGeneSet.get(i).getToNeuron() + " and is " + ((linkGeneSet.get(i).getEnabled()) ? "enabled"  : "disabled") + " and has a weight of " + linkGeneSet.get(i).getWeight() + "\n";
+            toReturn += "   Link ID & InnovID: " + linkGeneSet.get(i).getID() + " & " + linkGeneSet.get(i).getInnovationID() + " comes from Neuron: " + linkGeneSet.get(i).getFromNeuron() + " and goes to Neuron: " + linkGeneSet.get(i).getToNeuron() + " and is " + ((linkGeneSet.get(i).getEnabled()) ? "enabled"  : "disabled") + " and has a weight of " + linkGeneSet.get(i).getWeight() + "\n";
         }
         toReturn += "\n";
 

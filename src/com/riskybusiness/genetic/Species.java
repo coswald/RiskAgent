@@ -40,60 +40,76 @@ public class Species implements Serializable
 
 	private ArrayList<ArrayList<Double>>	compatibilityTable	= new ArrayList<ArrayList<Double>>();
 
-	private double 							speciesThreshold	= 1.0;
+	private double 							speciesThreshold	= 0.2;
 
 	private static final long serialVersionUID = -4268206798591932773L;
 
-	public Species(ArrayList<Genome> population)
-	{
+	// public Species(ArrayList<Genome> population)
+	// {
 
-		//Clear the old species and add the new population
+	// 	//Clear the old species and add the new population
+	// 	myPopulation.clear();
+	// 	myPopulation.add(population);
+
+	// 	//Determine the adjusted fitness
+	// 	//For now adjusted fitness is simply fitness
+	// 	for (int i = 0; i < this.myPopulation.size(); i++)
+	// 	{
+	// 		for (int j = 0; j < this.myPopulation.get(i).size(); j++)
+	// 		{
+	// 			myPopulation.get(i).get(j).setAdjustedFitness(myPopulation.get(i).get(j).getFitness());
+	// 		}
+	// 	}
+	// }
+
+	public Species(ArrayList<Genome> toSpeciate)
+	{
 		myPopulation.clear();
-		myPopulation.add(population);
 
-		//Determine the adjusted fitness
-		//For now adjusted fitness is simply fitness
-		for (int i = 0; i < this.myPopulation.size(); i++)
+		//Represents how many genomes are left to be speciated
+		int numLeft = toSpeciate.size();
+
+		//Represents the index of the first genome to be added to the next species
+		int nextIndex = 0;
+
+		//Represents whether the next index has been set as it should only be set once per species
+		boolean nextIndexSet = true;
+
+		//
+		boolean[] speciated;
+
+		speciated = new boolean[toSpeciate.size()];
+
+		for (int i = 0; i < toSpeciate.size(); i++)
 		{
-			for (int j = 0; j < this.myPopulation.get(i).size(); j++)
-			{
-				myPopulation.get(i).get(j).setAdjustedFitness(myPopulation.get(i).get(j).getFitness());
-			}
+			speciated[i] = false;
 		}
-	}
 
-	public void Speciate(ArrayList<Genome> toSpeciate)
-	{
-		boolean speciated = false;
-
-		//Loop through the arraylist of genomes and find their compatibility with
-		//other species and if they are compatible, add them to that species
-		for (int genomeID = 0; genomeID < toSpeciate.size(); genomeID++)
+		for (int speciesID = 0; numLeft > 0; speciesID++)
 		{
-			//New genome, so reset the speciated variable
-			speciated = false;
+			//System.out.println(numLeft);
+			//System.out.println("Making a new species!");
+			myPopulation.add(new ArrayList<Genome>());
+			myPopulation.get(speciesID).add(toSpeciate.get(nextIndex));
+			speciated[nextIndex] = true;
+			numLeft--;
+			nextIndexSet = false;
 
-			//Loop through all the species and determine if the genome would fit
-			//well in that species. If so add the genome to the species
-			for (int speciesID = 0; speciesID < myPopulation.size(); speciesID++)
+			for(int genomeIndex = 0; genomeIndex < toSpeciate.size() - 1; genomeIndex++)
 			{
-				double compatibility = toSpeciate.get(genomeID).getCompatibilityScore(getBestMember(speciesID));
-				
-				if (compatibility <= speciesThreshold)
+				double compatibility = toSpeciate.get(genomeIndex).getCompatibilityScore(getBestMember(speciesID));
+
+				if (compatibility <= speciesThreshold && !speciated[genomeIndex])
 				{
-					addGenome(speciesID, toSpeciate.get(genomeID));
-					//Tell genome it's species ID?
-
-					speciated = true;
-
+					myPopulation.get(speciesID).add(toSpeciate.get(genomeIndex));
+					numLeft--;
+					speciated[genomeIndex] = true;
 				}
-			}
-
-			if (!speciated)
-			{
-				ArrayList<Genome> toAdd = new ArrayList<Genome>();
-				toAdd.add(toSpeciate.get(genomeID));
-				myPopulation.add(toAdd);
+				else if(!nextIndexSet && !speciated[genomeIndex])
+				{
+					nextIndexSet = true;
+					nextIndex = genomeIndex;
+				}
 			}
 		}
 	}
@@ -183,11 +199,6 @@ public class Species implements Serializable
 
 		return myPopulation.get(speciesID).get(bestFitnessID);
 		//return myPopulation.get(speciesID).get(random.nextInt((myPopulation.get(speciesID).size() - 1)));
-	}
-
-	public void addGenome(int speciesID, Genome genome)
-	{
-		myPopulation.get(speciesID).add(genome);
 	}
 
 	public int getNumMembers(int speciesID)

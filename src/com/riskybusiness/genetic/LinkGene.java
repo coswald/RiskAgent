@@ -27,6 +27,8 @@ public class LinkGene implements Serializable
     
     private static final long serialVersionUID = -6113158899915565377L;
     
+    //Represents the ID of the link
+    private int     linkID;
     //Represents the ID of the neuron the link/synapse is coming from
     private int     fromNeuron;
     //Represents the ID of the neuron the link/synapse is going to
@@ -47,18 +49,36 @@ public class LinkGene implements Serializable
         innovationID = 0;
     }
 
+    // //Create a LinkGene
+    // public LinkGene(int myID, int fNeuron, int tNeuron, int id, double weight)
+    // {
+    //     linkID        = myID;
+    //     fromNeuron    = fNeuron;
+    //     toNeuron      = tNeuron;
+    //     linkWeight    = weight;
+    //     linkEnabled   = true;
+    //     innovationID  = id;
+    // }
+    
     //Create a LinkGene
-    public LinkGene(int fNeuron, int tNeuron, int id, double weight)
+    public LinkGene(int myID, int fNeuron, int tNeuron, int id, double weight, boolean enabled)
     {
+        linkID        = myID;
         fromNeuron    = fNeuron;
         toNeuron      = tNeuron;
         linkWeight    = weight;
-        linkEnabled   = true;
         innovationID  = id;
+        linkEnabled   = enabled;
     }
-    
+
     //Get the ID of the link
     public int getID()
+    {
+        return linkID;
+    }
+
+    //Get the ID of the link
+    public int getInnovationID()
     {
         return innovationID;
     }
@@ -120,7 +140,7 @@ public class LinkGene implements Serializable
         //Add all the information to the string
         toReturn += "This link comes from neuron: " + fromNeuron + " and goes to neuron: " + toNeuron + "\n";
 
-        toReturn += "This link has a weight of " + linkWeight;
+        toReturn += "This link has a weight of " + linkWeight + " and is " + linkEnabled;
 
         //Return the string
         return toReturn;

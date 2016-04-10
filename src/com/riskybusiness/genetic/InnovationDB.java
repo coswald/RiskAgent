@@ -29,13 +29,16 @@ public class InnovationDB implements Serializable
 	private Innovation 				toFind;
 	//Represetns the innovationID
 	private int 					innovationID;
+	//Represents the neuronID to add
+	private int 					neuronID;
 
 	private static final long serialVersionUID = 141838380522290195L;
 
 
-	public InnovationDB()
+	public InnovationDB(int start)
 	{
 		innovationID = 0;
+		neuronID = start;
 	}
 
 	public int getSize()
@@ -109,8 +112,8 @@ public class InnovationDB implements Serializable
 			else 
 			{
 				//Add innovation
-				innovationDB.add(innovationID, new Innovation(type, from, to, id));
-				//Increment innovationID
+				innovationDB.add(innovationID, new Innovation(type, from, to, ++neuronID));
+				//Increment innovationID and neuronID
 				innovationID++; 
 				return 0;
 			}
@@ -122,9 +125,14 @@ public class InnovationDB implements Serializable
 		return innovationID;
 	}
 
+	public int getNext()
+	{
+		return neuronID + 1;
+	}
+
 	public int getNeuronID(int index)
 	{
-		return innovationDB.get(index).getNeuronID();
+		return innovationDB.get(index - 1).getNeuronID();
 	}
 
 	public int getInnovationID(int fromNeuron, int toNeuron)

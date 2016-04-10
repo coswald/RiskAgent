@@ -125,7 +125,7 @@ public class Tester
    		/* Historical Data */	
 
    		//Represents the historical changes of all the previous populations
-   		InnovationDB 			innovations	= new InnovationDB();
+   		InnovationDB 			innovations	= new InnovationDB(5);
    		//Represents the current generation
    		int 					generation 	= 1;		
 
@@ -221,7 +221,7 @@ public class Tester
 								//Create random weight
 								double dweight = random.nextDouble();
 								//Add the link to the link gene array
-				 				linkGenes.add(new LinkGene(neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), ++curLinkID, dweight));
+				 				linkGenes.add(new LinkGene(linkGenes.size() + 1, neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), ++curLinkID, dweight, true));
 							}
 						}
 						//Still have to deal with the fact that this way results in some neurons not getting links
@@ -238,8 +238,8 @@ public class Tester
 				if (testPush)
 				{
 					//Represents the added links
-    				linkGenes.add(new LinkGene(1, 21, 56, 1.0));
-    				linkGenes.add(new LinkGene(21, 4, 57, 1.0));
+    				linkGenes.add(new LinkGene(1, 1, 21, 56, 1.0, true));
+    				linkGenes.add(new LinkGene(1, 21, 4, 57, 1.0,true));
     			}
 
 				if (debug)
