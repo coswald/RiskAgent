@@ -37,7 +37,9 @@ public class NeuronGene implements Serializable
     //Represents the layer the neuron exists in
     private int     neuronLayer;
     //Represents the weight of the neuron
-    private double   neuronActivationResponse;
+    private double  neuronActivationResponse;
+    //Represents the bias weight for the neuron
+    private double  biasWeight;
 
     //Create a blank neuron gene
     public NeuronGene()
@@ -122,6 +124,16 @@ public class NeuronGene implements Serializable
     public void setLayerType(String layerType)
     {
         neuronLayerType = layerType;
+    }
+
+    public double getBiasWeight()
+    {
+        return this.biasWeight;
+    }
+
+    public void setBiasWeight(double weight)
+    {
+        this.biasWeight = weight;
     }
 
     @Override

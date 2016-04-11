@@ -27,7 +27,6 @@ import com.riskybusiness.genetic.InnovationDB;
 import com.riskybusiness.genetic.InnovationType;
 import com.riskybusiness.genetic.LinkGene;
 import com.riskybusiness.genetic.NeuronGene;
-import com.riskybusiness.genetic.UniqueID;
 import com.riskybusiness.genetic.Species;
 
 import java.util.Random;
@@ -60,7 +59,7 @@ public class Epoch
 		/* Parameters */
 
 		//Represents the size of the population
-		int 	populationSize 			= 100;
+		int 	populationSize 			= 300;
 		//Represents the number of input neurons
 		int 	numInputNeurons			= 2;
 		//Represents the number of output neurons
@@ -84,8 +83,6 @@ public class Epoch
 		Random 	random 	= new Random();
 		//Represents the scanner to get user input
 		Scanner input 	= new Scanner(System.in);
-		//Represents the package used to create unique ID's
-		UniqueID unique = new UniqueID();
 
 
 		/* Population Items */
@@ -168,7 +165,7 @@ public class Epoch
 					{
 						double dweight = random.nextDouble();
 						innovations.addInnovation(InnovationType.NEW_NEURON, -1, -1, ++curNeuronID);
-						neuronGenes.add(new NeuronGene(curNeuronID, "Sigmoid", "Hidden", dweight, (i + 2)));
+						neuronGenes.add(new NeuronGene(curNeuronID, "Step", "Hidden", dweight, (i + 2)));
 					}
 				}
 				for (int i = 0; i < numOutputNeurons; i++)
@@ -249,7 +246,7 @@ public class Epoch
 		//Represents the rate at which a genomes breed
 		double 				crossoverRate 		= 0.3;
 
-		boolean				skip				= false;
+		boolean				skip				= true;
 
 		//Start epoch
 		/* Note:
@@ -261,7 +258,7 @@ public class Epoch
 			//Represents the population, but classified into their corresponding species
 			Species 			species 			= new Species(population);
 
-			// theOne = new Genome(species.getBestMember(0).getID(), species.getBestMember(0).getNeurons(), species.getBestMember(0).getLinks(), species.getBestMember(0).getNumInputs(), species.getBestMember(0).getNumOutputs());
+			theOne = new Genome(species.getBestMember(0).getID(), species.getBestMember(0).getNeurons(), species.getBestMember(0).getLinks(), species.getBestMember(0).getNumInputs(), species.getBestMember(0).getNumOutputs());
 
 			// for (int i = 0; i < population.size(); i++)
 			// {
@@ -275,6 +272,25 @@ public class Epoch
 			// 	skip = true;
 			// 	break;
 			// }
+
+			if (generation%100 == 0)
+			{
+
+				boolean done = false;
+
+				for (int i = 0; i < species.getNumSpecies(); i++)
+				{
+					if (species.getBestMember(i).determineFitness() == 4.0)
+					{
+						theOne = new Genome(species.getBestMember(i).getID(), species.getBestMember(i).getNeurons(), species.getBestMember(i).getLinks(), species.getBestMember(i).getNumInputs(), species.getBestMember(i).getNumOutputs());
+						done = true;
+					}
+				}
+				if (done)
+				{
+					break;
+				}
+			}
 
 			System.out.println("Generation: " + generation);
 			System.out.println("Innovation Size: " + innovations.getSize());
@@ -296,8 +312,11 @@ public class Epoch
 					{
 						System.out.println("Number of spawns: " + species.getNumSpawns(speciesID));
 					}
+
+					double numSpawns = species.getNumSpawns(speciesID);
+
 					//Creates the number of children necassary for the species
-					for (double i = 0.0; i < species.getNumSpawns(speciesID); i++)
+					for (double i = 0.0; i < numSpawns; i++)
 					{	
 						//Debug function
 						if (debug)
@@ -315,9 +334,22 @@ public class Epoch
 							}
 
 							toCopy = species.getBestMember(speciesID);
-							//System.out.println("Best Member's Fitness " + toCopy.determineFitness() + "\n");
+							System.out.println("Best Member's Fitness " + toCopy.determineFitness() + "Population Size: " + species.getSize(speciesID) + "\n");
 							//Use elitism and always take the best member from the species
 							child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
+						}
+						else if (i==1.0)
+						{
+							//Use elitism and always take the best member from the species and mutate it
+							child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
+							
+							child.addNeuron(0.05, innovations, 20);
+							child.addLink(0.05, 0.0, innovations, 10, 20);
+							child.changeNeuronType(0.1, 0.5);
+							child.changeBiasWeight(0.2);
+
+							child.mutateNeuronWeights();
+							child.mutateLinkWeights();
 						}
 						else
 						{
@@ -412,6 +444,8 @@ public class Epoch
 							{
 								child.addNeuron(0.05, innovations, 20);
 								child.addLink(0.05, 0.0, innovations, 10, 20);
+								child.changeNeuronType(0.1, 0.7);
+								child.changeBiasWeight(0.2);
 							}
 
 							child.mutateNeuronWeights();
@@ -456,7 +490,7 @@ public class Epoch
 			while(inputs[0] >= 0)
 			{
 				System.out.println(theOne);
-				System.out.println("Congrats on being a genius enter the values you wish to fire!");
+				System.out.println("Congrats on being a fucking genius enter the values you wish to fire!");
 				System.out.println("First: ");
 				inputs[0] = input.nextFloat();
 				System.out.println("Second: ");
@@ -464,7 +498,7 @@ public class Epoch
 				theOne.createPhenotype();
 				System.out.println("The value fired was: " + theOne.getNetwork().fire(new float[][] {new float[] {inputs[0]}, new float[] {inputs[1]}})[0]);
 
-				// System.out.println("The network responds with: " + theOne.getNetwork().fire(new float[][] {new float[] {inputs[0]}, new float[] {inputs[1]}}));
+				System.out.println("The network responds with: " + theOne.getNetwork().fire(new float[][] {new float[] {inputs[0]}, new float[] {inputs[1]}}));
 
 			}
 		}

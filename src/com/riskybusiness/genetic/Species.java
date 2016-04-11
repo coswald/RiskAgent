@@ -40,7 +40,7 @@ public class Species implements Serializable
 
 	private ArrayList<ArrayList<Double>>	compatibilityTable	= new ArrayList<ArrayList<Double>>();
 
-	private double 							speciesThreshold	= 0.2;
+	private double 							speciesThreshold	= 0.10;
 
 	private static final long serialVersionUID = -4268206798591932773L;
 
