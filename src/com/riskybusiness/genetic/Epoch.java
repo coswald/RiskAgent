@@ -59,15 +59,15 @@ public class Epoch
 		/* Parameters */
 
 		//Represents the size of the population
-		int 	populationSize 			= 300;
+		int 	populationSize 			= 30;
 		//Represents the number of input neurons
-		int 	numInputNeurons			= 2;
+		int 	numInputNeurons			= 30;
 		//Represents the number of output neurons
 		int 	numOutputNeurons		= 1;
 		//Represents the number of initial hidden layers
-		int 	numHiddenLayers			= 1;
+		int 	numHiddenLayers			= 3;
 		//Represents the number of initial neurons in each hidden layer
-		int[]	hiddenLayers 			= {2};
+		int[]	hiddenLayers 			= {30,30,30};
 		//Represents the number of neurons in the genome up to the given index
 		int[] 	summationNeuronsInLayer	= new int[numHiddenLayers + 3];
 		//Represents the current neuron ID 
