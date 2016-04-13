@@ -202,10 +202,14 @@ public class Epoch
 								if (innovationCheck == 0)
 							    {
 							        linkGenes.add(new LinkGene(linkGenes.size() + 1, neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), innovations.curID(), random.nextDouble(), true));
+							        neuronGenes.get(j).addOutgoingLink(linkGenes.size());
+							        neuronGenes.get(k).addIncomingLink(linkGenes.size());
 							    }
 							    else
 							    {
 							        linkGenes.add(new LinkGene(linkGenes.size() + 1, neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), innovationCheck, random.nextDouble(), true));
+							        neuronGenes.get(j).addOutgoingLink(linkGenes.size());
+							        neuronGenes.get(k).addIncomingLink(linkGenes.size());
 							    }
 							}
 						}

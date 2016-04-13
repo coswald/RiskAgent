@@ -65,6 +65,24 @@ public class NeuronGene implements Serializable
         neuronActivationResponse = activate;
     }
 
+        //Create a neuron gene
+    public NeuronGene(int id, String type, String layerType, double activate, int layer, ArrayList<Integer> incoming, ArrayList<Integer> outgoing)
+    {
+        neuronID = id;
+        neuronType = type;
+        neuronLayerType = layerType;
+        neuronLayer = layer;
+        neuronActivationResponse = activate;
+        for (int i = 0; i < incoming.size(); i++)
+        {
+            incomingLinks.add(new Integer(incoming.get(i)));
+        }
+        for (int i = 0; i < outgoing.size(); i++)
+        {
+            outgoingLinks.add(new Integer(outgoing.get(i)));
+        }
+    }
+
     //Get the id of the neuron
     public int getID()
     {

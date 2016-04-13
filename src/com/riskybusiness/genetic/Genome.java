@@ -45,6 +45,10 @@ public class Genome implements Serializable
     private ArrayList<NeuronGene>   neuronGeneSet = new ArrayList<NeuronGene>();
     //Represents the list of links
     private ArrayList<LinkGene>     linkGeneSet   = new ArrayList<LinkGene>();
+    //Represents the sorted list of neurons
+    private ArrayList<NeuronGene>   sortedNeuronGeneSet = new ArrayList<NeuronGene>();
+    //Represents the sorted list of links
+    private ArrayList<LinkGene>     sortedLinkGeneSet   = new ArrayList<LinkGene>();
     //Represents the nueral net of the genome
     private NeuralNet               myNetwork;
     //Represents the fitness of the genome
@@ -80,14 +84,16 @@ public class Genome implements Serializable
         //Create a deep copy of the passed in ArrayList of neurons
         for (int i = 0; i < neurons.size(); i++)
         {
-            neuronGeneSet.add(new NeuronGene(neurons.get(i).getID(), neurons.get(i).getNeuronType(), neurons.get(i).getLayerType(), neurons.get(i).getActivationResponse(), neurons.get(i).getNeuronLayer()));
+            neuronGeneSet.add(new NeuronGene(neurons.get(i).getID(), neurons.get(i).getNeuronType(), neurons.get(i).getLayerType(), neurons.get(i).getActivationResponse(), neurons.get(i).getNeuronLayer(), neurons.getIncomingLinks(), neurons.getOutgoingLinks()));
         }
+        sortedNeuronGeneSet = neuronGeneSet;
 
         //Create a deep copy of the passed in ArrayList of links
         for (int i = 0; i < links.size(); i++)
         {
             linkGeneSet.add(new LinkGene(links.get(i).getID(), links.get(i).getFromNeuron(), links.get(i).getToNeuron(), links.get(i).getInnovationID(), links.get(i).getWeight(), links.get(i).getEnabled()));
         }
+        sortedLinkGeneSet = linkGeneSet;
 
         //Set the genome parameters with information passed in
         numInputNeurons  = inputs;
@@ -608,6 +614,8 @@ public class Genome implements Serializable
         {
             //Push the new gene into the array
             linkGeneSet.add(new LinkGene(linkGeneSet.size() + 1, fromNeuronID, toNeuronID, innovation.curID(), random.nextDouble(), true));
+            neuronGenes.get(j).addOutgoingLink(linkGenes.size());
+            neuronGenes.get(j).addOutgoingLink(linkGenes.size());
             GenomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
             numLinkGenes++;
         }
