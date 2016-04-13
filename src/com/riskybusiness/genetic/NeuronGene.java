@@ -38,6 +38,7 @@ public class NeuronGene implements Serializable
     private int     neuronLayer;
     //Represents the weight of the neuron
 <<<<<<< HEAD
+<<<<<<< HEAD
     private double  neuronActivationResponse;
     //Represents the bias weight for the neuron
     private double  biasWeight;
@@ -45,6 +46,9 @@ public class NeuronGene implements Serializable
     private ArrayList<Integer> incomingLinks = new ArrayList<Integer>();
     //Represents the list of links that leave this neuron
     private ArrayList<Integer> outgoingLinks   = new ArrayList<Integer>();
+=======
+    private double   neuronActivationResponse;
+>>>>>>> parent of a9da4e3... Genome v8.1
 =======
     private double   neuronActivationResponse;
 >>>>>>> parent of a9da4e3... Genome v8.1
@@ -147,6 +151,7 @@ public class NeuronGene implements Serializable
     }
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     public double getBiasWeight()
     {
         return this.biasWeight;
@@ -201,6 +206,8 @@ public class NeuronGene implements Serializable
         this.neuronLayer += 1;
     }
 
+=======
+>>>>>>> parent of a9da4e3... Genome v8.1
 =======
 >>>>>>> parent of a9da4e3... Genome v8.1
     @Override

@@ -61,7 +61,11 @@ public class Epoch
 
 		//Represents the size of the population
 <<<<<<< HEAD
+<<<<<<< HEAD
 		int 	populationSize 			= 30;
+=======
+		int 	populationSize 			= 100;
+>>>>>>> parent of a9da4e3... Genome v8.1
 =======
 		int 	populationSize 			= 100;
 >>>>>>> parent of a9da4e3... Genome v8.1
