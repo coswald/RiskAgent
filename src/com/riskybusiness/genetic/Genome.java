@@ -341,7 +341,7 @@ public class Genome implements Serializable
                     weights[i] = 1.0f;
                 }
 
-                weights[numInputs] = (float)neuron.getBiasWeight();
+                weights[numInputs] = 0.6f;
                 return new com.riskybusiness.neural.SigmoidNeuron(weight, weights);
             }
             else if (neuron.getNeuronType().equals("Step")) 
@@ -353,7 +353,7 @@ public class Genome implements Serializable
                     weights[i] = 1.0f;
                 }
 
-                weights[numInputs] = (float)neuron.getBiasWeight();
+                weights[numInputs] = 0.6f;
                 return new com.riskybusiness.neural.StepNeuron(weight, weights);
             }
             else
@@ -1117,36 +1117,6 @@ public class Genome implements Serializable
                     double newWeight = curWeight + (random.nextDouble() * 2.0 - 1.0) * 0.1;
                     linkGeneSet.get(i).setWeight(newWeight);
                 }
-            }
-        }
-    }
-
-    public void changeNeuronType(double mutationRate, double sigmoidRate)
-    {
-        for (int i = 0; i < neuronGeneSet.size(); i++)
-        {
-            if (random.nextDouble() < mutationRate)
-            {
-                if (random.nextDouble() < sigmoidRate)
-                {
-                    neuronGeneSet.get(i).setNeuronType("Sigmoid");
-                }
-                else
-                {
-                    neuronGeneSet.get(i).setNeuronType("Step");
-                }
-            }
-        }
-    }
-
-    public void changeBiasWeight(double mutationRate)
-    {
-        for (int i = 0; i < neuronGeneSet.size(); i++)
-        {
-            int links = 0;
-            if (random.nextDouble() < mutationRate)
-            {
-                neuronGeneSet.get(i).setBiasWeight(random.nextDouble());
             }
         }
     }

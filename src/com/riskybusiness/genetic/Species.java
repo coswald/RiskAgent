@@ -40,7 +40,11 @@ public class Species implements Serializable
 
 	private ArrayList<ArrayList<Double>>	compatibilityTable	= new ArrayList<ArrayList<Double>>();
 
+<<<<<<< HEAD
 	private double 							speciesThreshold	= 0.35;
+=======
+	private double 							speciesThreshold	= 0.2;
+>>>>>>> parent of a9da4e3... Genome v8.1
 
 	private static final long serialVersionUID = -4268206798591932773L;
 
