@@ -27,7 +27,6 @@ import com.riskybusiness.genetic.InnovationDB;
 import com.riskybusiness.genetic.InnovationType;
 import com.riskybusiness.genetic.LinkGene;
 import com.riskybusiness.genetic.NeuronGene;
-import com.riskybusiness.genetic.UniqueID;
 import com.riskybusiness.genetic.Species;
 import com.riskybusiness.genetic.GenomeHelper;
 
@@ -109,8 +108,6 @@ public class Tester
 		Random 	random 	= new Random();
 		//Represents the scanner to get user input
 		Scanner input 	= new Scanner(System.in);
-		//Represents the package used to create unique ID's
-		UniqueID unique = new UniqueID();
 
 
 		/* Population Items */

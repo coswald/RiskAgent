@@ -45,10 +45,6 @@ public class Genome implements Serializable
     private ArrayList<NeuronGene>   neuronGeneSet = new ArrayList<NeuronGene>();
     //Represents the list of links
     private ArrayList<LinkGene>     linkGeneSet   = new ArrayList<LinkGene>();
-    //Represents the sorted list of neurons
-    private ArrayList<NeuronGene>   sortedNeuronGeneSet = new ArrayList<NeuronGene>();
-    //Represents the sorted list of links
-    private ArrayList<LinkGene>     sortedLinkGeneSet   = new ArrayList<LinkGene>();
     //Represents the nueral net of the genome
     private NeuralNet               myNetwork;
     //Represents the fitness of the genome
@@ -84,16 +80,14 @@ public class Genome implements Serializable
         //Create a deep copy of the passed in ArrayList of neurons
         for (int i = 0; i < neurons.size(); i++)
         {
-            neuronGeneSet.add(new NeuronGene(neurons.get(i).getID(), neurons.get(i).getNeuronType(), neurons.get(i).getLayerType(), neurons.get(i).getActivationResponse(), neurons.get(i).getNeuronLayer(), neurons.getIncomingLinks(), neurons.getOutgoingLinks()));
+            neuronGeneSet.add(new NeuronGene(neurons.get(i).getID(), neurons.get(i).getNeuronType(), neurons.get(i).getLayerType(), neurons.get(i).getActivationResponse(), neurons.get(i).getNeuronLayer()));
         }
-        sortedNeuronGeneSet = neuronGeneSet;
 
         //Create a deep copy of the passed in ArrayList of links
         for (int i = 0; i < links.size(); i++)
         {
             linkGeneSet.add(new LinkGene(links.get(i).getID(), links.get(i).getFromNeuron(), links.get(i).getToNeuron(), links.get(i).getInnovationID(), links.get(i).getWeight(), links.get(i).getEnabled()));
         }
-        sortedLinkGeneSet = linkGeneSet;
 
         //Set the genome parameters with information passed in
         numInputNeurons  = inputs;
@@ -341,7 +335,7 @@ public class Genome implements Serializable
                     weights[i] = 1.0f;
                 }
 
-                weights[numInputs] = 0.6f;
+                weights[numInputs] = (float)neuron.getBiasWeight();
                 return new com.riskybusiness.neural.SigmoidNeuron(weight, weights);
             }
             else if (neuron.getNeuronType().equals("Step")) 
@@ -353,7 +347,7 @@ public class Genome implements Serializable
                     weights[i] = 1.0f;
                 }
 
-                weights[numInputs] = 0.6f;
+                weights[numInputs] = (float)neuron.getBiasWeight();
                 return new com.riskybusiness.neural.StepNeuron(weight, weights);
             }
             else
@@ -614,8 +608,6 @@ public class Genome implements Serializable
         {
             //Push the new gene into the array
             linkGeneSet.add(new LinkGene(linkGeneSet.size() + 1, fromNeuronID, toNeuronID, innovation.curID(), random.nextDouble(), true));
-            neuronGenes.get(j).addOutgoingLink(linkGenes.size());
-            neuronGenes.get(j).addOutgoingLink(linkGenes.size());
             GenomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
             numLinkGenes++;
         }
@@ -1120,6 +1112,37 @@ public class Genome implements Serializable
             }
         }
     }
+
+    public void changeNeuronType(double mutationRate, double sigmoidRate)
+    {
+        for (int i = 0; i < neuronGeneSet.size(); i++)
+        {
+            if (random.nextDouble() < mutationRate)
+            {
+                if (random.nextDouble() < sigmoidRate)
+                {
+                    neuronGeneSet.get(i).setNeuronType("Sigmoid");
+                }
+                else
+                {
+                    neuronGeneSet.get(i).setNeuronType("Step");
+                }
+            }
+        }
+    }
+
+    public void changeBiasWeight(double mutationRate)
+    {
+        for (int i = 0; i < neuronGeneSet.size(); i++)
+        {
+            int links = 0;
+            if (random.nextDouble() < mutationRate)
+            {
+                neuronGeneSet.get(i).setBiasWeight(random.nextDouble());
+            }
+        }
+    }
+
 
     @Override
     public String toString()

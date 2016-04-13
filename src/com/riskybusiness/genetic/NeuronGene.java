@@ -38,6 +38,8 @@ public class NeuronGene implements Serializable
     private int     neuronLayer;
     //Represents the weight of the neuron
     private double   neuronActivationResponse;
+    //Represents the bias weight for the neuron
+    private double  biasWeight;
 
     //Create a blank neuron gene
     public NeuronGene()
@@ -57,24 +59,6 @@ public class NeuronGene implements Serializable
         neuronLayerType = layerType;
         neuronLayer = layer;
         neuronActivationResponse = activate;
-    }
-
-        //Create a neuron gene
-    public NeuronGene(int id, String type, String layerType, double activate, int layer, ArrayList<Integer> incoming, ArrayList<Integer> outgoing)
-    {
-        neuronID = id;
-        neuronType = type;
-        neuronLayerType = layerType;
-        neuronLayer = layer;
-        neuronActivationResponse = activate;
-        for (int i = 0; i < incoming.size(); i++)
-        {
-            incomingLinks.add(new Integer(incoming.get(i)));
-        }
-        for (int i = 0; i < outgoing.size(); i++)
-        {
-            outgoingLinks.add(new Integer(outgoing.get(i)));
-        }
     }
 
     //Get the id of the neuron
@@ -124,6 +108,16 @@ public class NeuronGene implements Serializable
         this.neuronLayer = layer;
     }
 
+    public double getBiasWeight()
+    {
+        return this.biasWeight;
+    }
+
+    public void setBiasWeight(double weight)
+    {
+        this.biasWeight = weight;
+    }
+
     //Gets the type of layer this neuron is (Input, Hidden, or Output)
     public String getLayerType()
     {
@@ -134,6 +128,12 @@ public class NeuronGene implements Serializable
     public void setLayerType(String layerType)
     {
         neuronLayerType = layerType;
+    }
+    
+    //Increment the layer by one
+    public void pushLayer()
+    {
+        this.neuronLayer += 1;
     }
 
     @Override

@@ -27,7 +27,6 @@ import com.riskybusiness.genetic.InnovationDB;
 import com.riskybusiness.genetic.InnovationType;
 import com.riskybusiness.genetic.LinkGene;
 import com.riskybusiness.genetic.NeuronGene;
-import com.riskybusiness.genetic.UniqueID;
 import com.riskybusiness.genetic.Species;
 
 import java.util.Random;
@@ -62,13 +61,13 @@ public class Epoch
 		//Represents the size of the population
 		int 	populationSize 			= 100;
 		//Represents the number of input neurons
-		int 	numInputNeurons			= 30;
+		int 	numInputNeurons			= 10;
 		//Represents the number of output neurons
 		int 	numOutputNeurons		= 1;
 		//Represents the number of initial hidden layers
-		int 	numHiddenLayers			= 3;
+		int 	numHiddenLayers			= 2;
 		//Represents the number of initial neurons in each hidden layer
-		int[]	hiddenLayers 			= {30,30,30};
+		int[]	hiddenLayers 			= {10,10};
 		//Represents the number of neurons in the genome up to the given index
 		int[] 	summationNeuronsInLayer	= new int[numHiddenLayers + 3];
 		//Represents the current neuron ID 
@@ -84,8 +83,6 @@ public class Epoch
 		Random 	random 	= new Random();
 		//Represents the scanner to get user input
 		Scanner input 	= new Scanner(System.in);
-		//Represents the package used to create unique ID's
-		UniqueID unique = new UniqueID();
 
 
 		/* Population Items */
@@ -205,14 +202,10 @@ public class Epoch
 								if (innovationCheck == 0)
 							    {
 							        linkGenes.add(new LinkGene(linkGenes.size() + 1, neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), innovations.curID(), random.nextDouble(), true));
-							        neuronGenes.get(j).addOutgoingLink(linkGenes.size());
-							        neuronGenes.get(k).addIncomingLink(linkGenes.size());
 							    }
 							    else
 							    {
 							        linkGenes.add(new LinkGene(linkGenes.size() + 1, neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), innovationCheck, random.nextDouble(), true));
-							        neuronGenes.get(j).addOutgoingLink(linkGenes.size());
-							        neuronGenes.get(k).addIncomingLink(linkGenes.size());
 							    }
 							}
 						}
@@ -323,6 +316,19 @@ public class Epoch
 							//Use elitism and always take the best member from the species
 							child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
 						}
+						else if (i==1.0)
+						{
+							//Use elitism and always take the best member from the species and mutate it
+							child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
+							
+							child.addNeuron(0.05, innovations, 20);
+							child.addLink(0.05, 0.0, innovations, 10, 20);
+							child.changeNeuronType(0.1, 0.5);
+							child.changeBiasWeight(0.2);
+
+							child.mutateNeuronWeights();
+							child.mutateLinkWeights();
+						}
 						else
 						{
 							//If the size of the species is only 1 then we can't breed
@@ -416,6 +422,8 @@ public class Epoch
 							{
 								child.addNeuron(0.05, innovations, 20);
 								child.addLink(0.05, 0.0, innovations, 10, 20);
+								child.changeNeuronType(0.1, 0.7);
+								child.changeBiasWeight(0.2);
 							}
 
 							child.mutateNeuronWeights();
