@@ -37,12 +37,6 @@ public class NeuronGene implements Serializable
     //Represents the layer the neuron exists in
     private int     neuronLayer;
     //Represents the weight of the neuron
-    //Represents the bias weight for the neuron
-    private double  biasWeight;
-    //Represents the list of links that connect to the neuron
-    private ArrayList<Integer> incomingLinks = new ArrayList<Integer>();
-    //Represents the list of links that leave this neuron
-    private ArrayList<Integer> outgoingLinks   = new ArrayList<Integer>();
     private double   neuronActivationResponse;
 
     //Create a blank neuron gene
@@ -140,60 +134,6 @@ public class NeuronGene implements Serializable
     public void setLayerType(String layerType)
     {
         neuronLayerType = layerType;
-    }
-
-    public double getBiasWeight()
-    {
-        return this.biasWeight;
-    }
-
-    public void setBiasWeight(double weight)
-    {
-        this.biasWeight = weight;
-    }
-
-    public ArrayList<Integer> getIncomingLinks()
-    {
-        return this.incomingLinks;
-    }
-
-    public ArrayList<Integer> getOutgoingLinks()
-    {
-        return this.outgoingLinks;
-    }
-
-    public void setIncomingLinks(ArrayList<Integer> incoming)
-    {
-        this.incomingLinks.clear();
-        for(int i = 0; i < incoming.size(); i++)
-        {
-            this.incomingLinks.add(new Integer(incoming.get(i)));
-        }
-    }
-
-    public void setOutgoingLinks(ArrayList<Integer> outgoing)
-    {
-        this.outgoingLinks.clear();
-        for(int i = 0; i < outgoing.size(); i++)
-        {
-            this.outgoingLinks.add(new Integer(outgoing.get(i)));
-        }
-    }
-
-    public void addIncomingLink(int incomingLink)
-    {
-        this.incomingLinks.add(new Integer(incomingLink));
-    }
-
-    public void addOutgoingLink(int outgoingLink)
-    {
-        this.outgoingLinks.add(new Integer(outgoingLink));
-    }
-
-    //Increment the layer by one
-    public void pushLayer()
-    {
-        this.neuronLayer += 1;
     }
 
     @Override
