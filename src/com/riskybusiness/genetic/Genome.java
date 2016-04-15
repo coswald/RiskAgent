@@ -582,17 +582,26 @@ public class Genome implements Serializable
                     toNeuronID   = neuronGeneSet.get(neuronIndexFrom).getID();
                 }
 
-                //Check to see if a link exists and if it doesn't then break from the loop else continue looping
-                if((!(duplicateLink(fromNeuronID,toNeuronID)) || (fromNeuronID == toNeuronID)) && 
-                    !(neuronGeneSet.get(neuronIndexFrom).getNeuronLayer() == numLayers || neuronGeneSet.get(neuronIndexTo).getNeuronLayer() == numLayers) &&
-                    !(neuronGeneSet.get(neuronIndexFrom).getNeuronLayer() == neuronGeneSet.get(neuronIndexTo).getNeuronLayer()))
-                {
-                    numTrysToAddLink = 0;
-                }
-                else
+                //Hardcoded the input layer(don't add links to the input layer)
+                if(fromNeuronID <= 13)
                 {
                     toNeuronID   = -1;
                     fromNeuronID = -1;
+                }
+                else
+                {
+                    //Check to see if a link exists and if it doesn't then break from the loop else continue looping
+                    if((!(duplicateLink(fromNeuronID,toNeuronID)) || (fromNeuronID == toNeuronID)) && 
+                        !(neuronGeneSet.get(neuronIndexFrom).getNeuronLayer() == numLayers || neuronGeneSet.get(neuronIndexTo).getNeuronLayer() == numLayers) &&
+                        !(neuronGeneSet.get(neuronIndexFrom).getNeuronLayer() == neuronGeneSet.get(neuronIndexTo).getNeuronLayer()))
+                    {
+                        numTrysToAddLink = 0;
+                    }
+                    else
+                    {
+                        toNeuronID   = -1;
+                        fromNeuronID = -1;
+                    }
                 }
                 numTrysToAddLink--;
             }
@@ -630,6 +639,8 @@ public class Genome implements Serializable
         //If a valid link is found to add a neuron to then this will be set to true
         boolean linkFound = false;
 
+        boolean skip = true;
+
         //This is the ID of the chosen link to test
         int chosenLinkID = -1;
         
@@ -644,7 +655,7 @@ public class Genome implements Serializable
         int fromNeuronID;
         
         //This represents the maximum amount of neurons allowed in the genome
-        int sizeThreshold = 30;
+        int sizeThreshold = 300;
 
         //If the random value doesn't exceed the probability threshold then exit by returning
         if (random.nextDouble() > mutationRate)
@@ -659,7 +670,7 @@ public class Genome implements Serializable
             for (int i = numTrysToFindOldLink; i > 0; i--)
             {
                 //Prevents the chaining problem
-                chosenLinkID = random.nextInt(numLinkGenes - 1 - ((int)Math.sqrt(numLinkGenes)));
+                chosenLinkID = random.nextInt(numLinkGenes - 1 - ((int)Math.sqrt(numLinkGenes)) + 169);
 
                 for (int j = 0; j < linkGeneSet.size(); j++)
                 {
@@ -674,6 +685,7 @@ public class Genome implements Serializable
                 if ((chosenLink.getEnabled()))
                 {
                     linkFound = true;
+                    skip = false;
                     numTrysToFindOldLink = 0;
                 }
 
@@ -887,7 +899,7 @@ public class Genome implements Serializable
         // //Plug output into wes' heuristic function
 
         // The name of the file to open.
-        String fileName = "Inputs.txt";
+        String fileName = "shorter.txt";
 
         // This will reference one line at a time
         String line = null;
@@ -896,6 +908,8 @@ public class Genome implements Serializable
 
         float[][] inputs = new float[13][1];
         float expectedOutput = 0.0f;
+
+        genomeFitness = 0;
 
         try {
             // FileReader reads text files in the default encoding.
@@ -917,9 +931,10 @@ public class Genome implements Serializable
                     {
                         inputs[x] = new float[]{(float)Integer.parseInt(inputss[x])};
                     }
-                //System.out.println(this.myNetwork.fire(inputs)[0]);
-                this.myNetwork.fire(inputs);
+                genomeFitness += Math.pow((this.myNetwork.fire(inputs)[0] * 365) - expectedOutput, 2);
             }   
+
+            genomeFitness = 133225000 / genomeFitness;
 
 
             // int i = 0;
@@ -952,7 +967,141 @@ public class Genome implements Serializable
             // Or we could just do this: 
             // ex.printStackTrace();
         }
-        return 0;
+        return genomeFitness;
+    }
+
+    public void printFitness()
+    {
+        // //For this we will have to create the scenarios we talked about ealier in
+        // //the year and use those scenarios as inputs. We will then input these 
+        // //scenarios into the network and see how the network responds
+        // //We wil use wes' heuristic to give the neural network a fitness score 
+        // //based on the result of its actions
+
+
+        // float[]     result  = new float[]{0};
+
+        // float[][]   inputs  = new float[][]{{0},{0}};
+
+        // float[]     output  = new float[4];
+
+        // int         i       = 0;
+
+        // //Need to create inputs for situations
+
+        // //Turn the genome into a neural net and compare the output to Wes's heuristic
+        // //I think we are to take the output and simulate the output and feed the results
+        // //into the heuristic. Need more info. 
+
+        // //For practice the fitness will essentially be how close the output is to 10.
+        // //Because of the strict and definite nature of the fitness function we should
+        // //see results and the genome conforming to 1.
+        // // result = myNetwork.fire(inputs);
+        // // genomeFitness = 2 - result[0];
+        // // return genomeFitness;
+
+        this.createPhenotype();
+
+        // for(float x = 0; x < 2; x++)
+        // {
+        //     for(float y = 0; y < 2; y++)
+        //     {
+        //         output[i] = myNetwork.fire(new float[][] {new float[] {x}, new float[] {y}})[0];
+        //         i++;
+        //     }
+        // }
+
+        // genomeFitness = 0;
+        // genomeFitness += 1 - output[0];
+        // genomeFitness += 0 + output[1];
+        // genomeFitness += 0 + output[2];
+        // genomeFitness += 1 - output[3];
+        // // genomeFitness += 0 + output[0];
+        // // genomeFitness += 1 - output[1];
+        // // genomeFitness += 0 + output[2];
+        // // genomeFitness += 1 - output[3];
+
+        // //System.out.println(genomeFitness);
+        // return genomeFitness;
+
+        // //Compare the results to the expected output, in our case we plug the 
+        // //results into wes' heuristic.
+
+
+
+        // //Board States
+        // //10 - 30  static arrays of inputs(will definetly need to be generated by a program)
+
+        // //Input board states into network and get output
+
+        // //Plug output into wes' heuristic function
+
+        // The name of the file to open.
+        String fileName = "shorter.txt";
+
+        // This will reference one line at a time
+        String line = null;
+
+        String[] inputss = new String[14];
+
+        float[][] inputs = new float[13][1];
+        float expectedOutput = 0.0f;
+
+        genomeFitness = 0;
+
+        try {
+            // FileReader reads text files in the default encoding.
+            FileReader fileReader = 
+                new FileReader(fileName);
+
+            // Always wrap FileReader in BufferedReader.
+            BufferedReader bufferedReader = 
+                new BufferedReader(fileReader);
+
+            while((line = bufferedReader.readLine()) != null) {
+                inputss = line.split("\\t");
+                for (int x = 0; x < inputss.length; x++)
+                    if (x == 13)
+                    {
+                        expectedOutput = (float)Integer.parseInt(inputss[x]);
+                    }
+                    else
+                    {
+                        inputs[x] = new float[]{(float)Integer.parseInt(inputss[x])};
+                    }
+                System.out.println(this.myNetwork.fire(inputs)[0]);
+            }   
+
+            // int i = 0;
+            // while (tokenizer.hasMoreTokens()){
+            //     if (i == 13)
+            //     {
+            //         System.out.println("1");
+            //         expectedOutput = Integer.parseInt(tokenizer.nextToken());
+            //     }
+            //     else
+            //     {
+            //         System.out.println("1");
+            //         inputs[i] = Integer.parseInt(tokenizer.nextToken());
+            //         i++;
+            //     }
+            // }
+
+            // Always close files.
+            bufferedReader.close();         
+        }
+        catch(FileNotFoundException ex) {
+            System.out.println(
+                "Unable to open file '" + 
+                fileName + "'");                
+        }
+        catch(IOException ex) {
+            System.out.println(
+                "Error reading file '" 
+                + fileName + "'");                  
+            // Or we could just do this: 
+            // ex.printStackTrace();
+        }
     }
 
     public Genome crossover(Genome dad, InnovationDB innovation)

@@ -40,79 +40,79 @@ public class Species implements Serializable
 
 	private ArrayList<ArrayList<Double>>	compatibilityTable	= new ArrayList<ArrayList<Double>>();
 
-	private double 							speciesThreshold	= 0.2;
+	private double 							speciesThreshold	= 0.13;
 
 	private static final long serialVersionUID = -4268206798591932773L;
 
-	public Species(ArrayList<Genome> population)
-	{
-
-		//Clear the old species and add the new population
-		myPopulation.clear();
-		myPopulation.add(population);
-
-		//Determine the adjusted fitness
-		//For now adjusted fitness is simply fitness
-		for (int i = 0; i < this.myPopulation.size(); i++)
-		{
-			for (int j = 0; j < this.myPopulation.get(i).size(); j++)
-			{
-				myPopulation.get(i).get(j).setAdjustedFitness(myPopulation.get(i).get(j).getFitness());
-			}
-		}
-	}
-
-	// public Species(ArrayList<Genome> toSpeciate)
+	// public Species(ArrayList<Genome> population)
 	// {
+
+	// 	//Clear the old species and add the new population
 	// 	myPopulation.clear();
+	// 	myPopulation.add(population);
 
-	// 	//Represents how many genomes are left to be speciated
-	// 	int numLeft = toSpeciate.size();
-
-	// 	//Represents the index of the first genome to be added to the next species
-	// 	int nextIndex = 0;
-
-	// 	//Represents whether the next index has been set as it should only be set once per species
-	// 	boolean nextIndexSet = true;
-
-	// 	//
-	// 	boolean[] speciated;
-
-	// 	speciated = new boolean[toSpeciate.size()];
-
-	// 	for (int i = 0; i < toSpeciate.size(); i++)
+	// 	//Determine the adjusted fitness
+	// 	//For now adjusted fitness is simply fitness
+	// 	for (int i = 0; i < this.myPopulation.size(); i++)
 	// 	{
-	// 		speciated[i] = false;
-	// 	}
-
-	// 	for (int speciesID = 0; numLeft > 0; speciesID++)
-	// 	{
-	// 		//System.out.println(numLeft);
-	// 		//System.out.println("Making a new species!");
-	// 		myPopulation.add(new ArrayList<Genome>());
-	// 		myPopulation.get(speciesID).add(toSpeciate.get(nextIndex));
-	// 		speciated[nextIndex] = true;
-	// 		numLeft--;
-	// 		nextIndexSet = false;
-
-	// 		for(int genomeIndex = 0; genomeIndex < toSpeciate.size() - 1; genomeIndex++)
+	// 		for (int j = 0; j < this.myPopulation.get(i).size(); j++)
 	// 		{
-	// 			double compatibility = toSpeciate.get(genomeIndex).getCompatibilityScore(getBestMember(speciesID));
-
-	// 			if (compatibility <= speciesThreshold && !speciated[genomeIndex])
-	// 			{
-	// 				myPopulation.get(speciesID).add(toSpeciate.get(genomeIndex));
-	// 				numLeft--;
-	// 				speciated[genomeIndex] = true;
-	// 			}
-	// 			else if(!nextIndexSet && !speciated[genomeIndex])
-	// 			{
-	// 				nextIndexSet = true;
-	// 				nextIndex = genomeIndex;
-	// 			}
+	// 			myPopulation.get(i).get(j).setAdjustedFitness(myPopulation.get(i).get(j).getFitness());
 	// 		}
 	// 	}
 	// }
+
+	public Species(ArrayList<Genome> toSpeciate)
+	{
+		myPopulation.clear();
+
+		//Represents how many genomes are left to be speciated
+		int numLeft = toSpeciate.size();
+
+		//Represents the index of the first genome to be added to the next species
+		int nextIndex = 0;
+
+		//Represents whether the next index has been set as it should only be set once per species
+		boolean nextIndexSet = true;
+
+		//
+		boolean[] speciated;
+
+		speciated = new boolean[toSpeciate.size()];
+
+		for (int i = 0; i < toSpeciate.size(); i++)
+		{
+			speciated[i] = false;
+		}
+
+		for (int speciesID = 0; numLeft > 0; speciesID++)
+		{
+			//System.out.println(numLeft);
+			//System.out.println("Making a new species!");
+			myPopulation.add(new ArrayList<Genome>());
+			myPopulation.get(speciesID).add(toSpeciate.get(nextIndex));
+			speciated[nextIndex] = true;
+			numLeft--;
+			nextIndexSet = false;
+
+			for(int genomeIndex = 0; genomeIndex < toSpeciate.size() - 1; genomeIndex++)
+			{
+				double compatibility = toSpeciate.get(genomeIndex).getCompatibilityScore(getBestMember(speciesID));
+
+				if (compatibility <= speciesThreshold && !speciated[genomeIndex])
+				{
+					myPopulation.get(speciesID).add(toSpeciate.get(genomeIndex));
+					numLeft--;
+					speciated[genomeIndex] = true;
+				}
+				else if(!nextIndexSet && !speciated[genomeIndex])
+				{
+					nextIndexSet = true;
+					nextIndex = genomeIndex;
+				}
+			}
+		}
+	}
 
 	//Returns the number of species
 	public int getNumSpecies()

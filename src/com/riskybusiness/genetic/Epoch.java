@@ -59,15 +59,15 @@ public class Epoch
 		/* Parameters */
 
 		//Represents the size of the population
-		int 	populationSize 			= 100;
+		int 	populationSize 			= 50;
 		//Represents the number of input neurons
-		int 	numInputNeurons			= 10;
+		int 	numInputNeurons			= 13;
 		//Represents the number of output neurons
 		int 	numOutputNeurons		= 1;
 		//Represents the number of initial hidden layers
-		int 	numHiddenLayers			= 2;
+		int 	numHiddenLayers			= 3;
 		//Represents the number of initial neurons in each hidden layer
-		int[]	hiddenLayers 			= {10,10};
+		int[]	hiddenLayers 			= {13,10,10};
 		//Represents the number of neurons in the genome up to the given index
 		int[] 	summationNeuronsInLayer	= new int[numHiddenLayers + 3];
 		//Represents the current neuron ID 
@@ -312,7 +312,8 @@ public class Epoch
 							}
 
 							toCopy = species.getBestMember(speciesID);
-							//System.out.println("Best Member's Fitness " + toCopy.determineFitness() + "\n");
+							//toCopy.printFitness();
+							System.out.println("Species ID: " + speciesID + species.getSize(speciesID) + " Best Member's Fitness " + toCopy.determineFitness() + "\n");
 							//Use elitism and always take the best member from the species
 							child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
 						}
@@ -323,7 +324,7 @@ public class Epoch
 							
 							child.addNeuron(0.05, innovations, 20);
 							child.addLink(0.05, 0.0, innovations, 10, 20);
-							child.changeNeuronType(0.1, 0.5);
+							//child.changeNeuronType(0.1, 0.5);
 							child.changeBiasWeight(0.2);
 
 							child.mutateNeuronWeights();
@@ -422,7 +423,7 @@ public class Epoch
 							{
 								child.addNeuron(0.05, innovations, 20);
 								child.addLink(0.05, 0.0, innovations, 10, 20);
-								child.changeNeuronType(0.1, 0.7);
+								//child.changeNeuronType(0.1, 0.7);
 								child.changeBiasWeight(0.2);
 							}
 
