@@ -65,9 +65,9 @@ public class Epoch
 		//Represents the number of output neurons
 		int 	numOutputNeurons		= 1;
 		//Represents the number of initial hidden layers
-		int 	numHiddenLayers			= 3;
+		int 	numHiddenLayers			= 2;
 		//Represents the number of initial neurons in each hidden layer
-		int[]	hiddenLayers 			= {13,10,10};
+		int[]	hiddenLayers 			= {13,1};
 		//Represents the number of neurons in the genome up to the given index
 		int[] 	summationNeuronsInLayer	= new int[numHiddenLayers + 3];
 		//Represents the current neuron ID 
@@ -108,18 +108,7 @@ public class Epoch
 
    		System.out.println("Would you like to load[L] a file or start fresh[S]?");
    		userInput = input.nextLine();
-   		/*
-   		while (!(userInput == "S" || userInput == "L"))
-   		{
-   			System.out.println("You need to enter either 'L' or 'S' to begin!");
-   			System.out.println("Would you like to load[L] a file or start fresh[S]?");
-   			userInput = input.nextLine();
-   		}
-   		
-   		if (userInput == "L") loadFile = true;
 
-
-		*/
    		if (loadFile)
    		{
    			int temp = 0;
@@ -198,15 +187,26 @@ public class Epoch
 								//Create random weight
 								double dweight = random.nextDouble();
 								//Add the innovation
-								int innovationCheck = innovations.addInnovation(InnovationType.NEW_LINK, neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), -1);
-								if (innovationCheck == 0)
-							    {
-							        linkGenes.add(new LinkGene(linkGenes.size() + 1, neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), innovations.curID(), random.nextDouble(), true));
-							    }
-							    else
-							    {
-							        linkGenes.add(new LinkGene(linkGenes.size() + 1, neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), innovationCheck, random.nextDouble(), true));
-							    }
+								if (neuronGenes.get(j).getID() <= numInputNeurons)
+								{
+									if (neuronGenes.get(j).getID() == (neuronGenes.get(k).getID() - numInputNeurons))
+									{
+										linkGenes.add(new LinkGene(linkGenes.size() + 1, neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), innovations.curID(), 1, true));
+									}
+								}
+
+								else 
+								{
+									int innovationCheck = innovations.addInnovation(InnovationType.NEW_LINK, neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), -1);
+									if (innovationCheck == 0)
+								    {
+								        linkGenes.add(new LinkGene(linkGenes.size() + 1, neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), innovations.curID(), random.nextDouble(), true));
+								    }
+								    else
+								    {
+								        linkGenes.add(new LinkGene(linkGenes.size() + 1, neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), innovationCheck, random.nextDouble(), true));
+								    }
+								}
 							}
 						}
 						//Still have to deal with the fact that this way results in some neurons not getting links
@@ -253,7 +253,7 @@ public class Epoch
 		 *   Need to add more when I implement speciation
 		 */
 
-		for (int generation = 1; generation < 2500; generation++)
+		for (int generation = 1; generation < 5000; generation++)
 		{
 			//Represents the population, but classified into their corresponding species
 			Species 			species 			= new Species(population);
@@ -312,19 +312,31 @@ public class Epoch
 							}
 
 							toCopy = species.getBestMember(speciesID);
+
+							if (generation % 500 == 0)
+							{
+								toCopy.printFitness();
+								System.out.println("Best Member's Fitness " + toCopy.determineFitness() + "\n");
+								System.out.println(species.getBestMember(speciesID));
+								userInput = input.nextLine();
+							}
+
 							//toCopy.printFitness();
-							System.out.println("Species ID: " + speciesID + species.getSize(speciesID) + " Best Member's Fitness " + toCopy.determineFitness() + "\n");
+							System.out.println("Best Member's Fitness " + toCopy.determineFitness() + "\n");
+							//System.out.println(species.getBestMember(speciesID));
+
 							//Use elitism and always take the best member from the species
 							child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
 						}
 						else if (i==1.0)
 						{
+							toCopy = species.getBestMember(speciesID);
+
 							//Use elitism and always take the best member from the species and mutate it
 							child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
 							
 							child.addNeuron(0.05, innovations, 20);
 							child.addLink(0.05, 0.0, innovations, 10, 20);
-							//child.changeNeuronType(0.1, 0.5);
 							child.changeBiasWeight(0.2);
 
 							child.mutateNeuronWeights();
@@ -397,6 +409,10 @@ public class Epoch
 										{
 											System.out.println("Breeding...");
 										}
+										/**
+										FIX
+										*/
+
 										//Breed the mom with the dad
 										child = mom.crossover(dad, innovations);
 									}
@@ -419,13 +435,12 @@ public class Epoch
 								//Do we want to set a limit on the number of nuerons?
 							}
 
-							for (int j = 0; j < 1; j++)
-							{
-								child.addNeuron(0.05, innovations, 20);
-								child.addLink(0.05, 0.0, innovations, 10, 20);
-								//child.changeNeuronType(0.1, 0.7);
-								child.changeBiasWeight(0.2);
-							}
+							child.addNeuron(0.05, innovations, 20);
+							child.addLink(0.05, 0.0, innovations, 10, 20);
+							//child.changeNeuronType(0.1, 0.7);
+							child.changeBiasWeight(0.2);
+							child.mutateInputLink(0.8);
+							//child.mutateinputNeuron(0.8, numInputNeurons);
 
 							child.mutateNeuronWeights();
 							child.mutateLinkWeights();

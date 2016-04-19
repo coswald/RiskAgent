@@ -1069,7 +1069,7 @@ public class Genome implements Serializable
                     {
                         inputs[x] = new float[]{(float)Integer.parseInt(inputss[x])};
                     }
-                System.out.println(this.myNetwork.fire(inputs)[0]);
+                System.out.println(this.myNetwork.fire(inputs)[0] * 365);
             }   
 
             // int i = 0;
@@ -1368,6 +1368,24 @@ public class Genome implements Serializable
             {
                 neuronGeneSet.get(i).setBiasWeight(random.nextDouble());
             }
+        }
+    }
+
+    public void mutateInputLink(double mutationRate)
+    {
+        int linkToMutate = random.nextInt(numInputNeurons);
+        if(random.nextDouble() < mutationRate)
+        {
+            if (random.nextDouble() < 0.1)
+                {
+                    linkGeneSet.get(linkToMutate).setWeight(random.nextFloat());
+                }
+                else
+                {
+                    double curWeight = linkGeneSet.get(linkToMutate).getWeight();
+                    double newWeight = curWeight + (random.nextDouble() * 2.0 - 1.0) * 0.1;
+                    linkGeneSet.get(linkToMutate).setWeight(newWeight);
+                }
         }
     }
 

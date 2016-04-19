@@ -40,26 +40,6 @@ public class LinkGene implements Serializable
     //Represents the innovation ID
     private int     innovationID;
     
-    public LinkGene()
-    {
-        fromNeuron = -1;
-        toNeuron = -1;
-        linkWeight = 0.0;
-        linkEnabled = false;
-        innovationID = 0;
-    }
-
-    // //Create a LinkGene
-    // public LinkGene(int myID, int fNeuron, int tNeuron, int id, double weight)
-    // {
-    //     linkID        = myID;
-    //     fromNeuron    = fNeuron;
-    //     toNeuron      = tNeuron;
-    //     linkWeight    = weight;
-    //     linkEnabled   = true;
-    //     innovationID  = id;
-    // }
-    
     //Create a LinkGene
     public LinkGene(int myID, int fNeuron, int tNeuron, int id, double weight, boolean enabled)
     {
@@ -69,6 +49,16 @@ public class LinkGene implements Serializable
         linkWeight    = weight;
         innovationID  = id;
         linkEnabled   = enabled;
+    }
+
+    //Create a blank link gene
+    public LinkGene()
+    {
+        fromNeuron = -1;
+        toNeuron = -1;
+        linkWeight = 0.0;
+        linkEnabled = false;
+        innovationID = 0;
     }
 
     //Get the ID of the link
