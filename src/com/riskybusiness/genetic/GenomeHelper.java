@@ -23,8 +23,25 @@ import com.riskybusiness.neural.SigmoidNeuron;
 
 import java.util.ArrayList;
 
+/**
+ * <p>&nbsp&nbsp&nbsp&nbsp&nbsp{@code GenomeHelper} defines a set
+ * of functions that help a {@link com.riskybusiness.genetic.Genome}
+ * operate correctly. These functions are final and should not be
+ * overwritten or modified: their functionality is defined well and
+ * cannot be extended.</p>
+ * @author Kaleb Luse
+ * @author Coved W Oswald
+ * @author Weston Miller
+ * @version 1.0
+ * @since 1.6
+ * @see com.riskybusiness.genetic.Genome
+ */
 public final class GenomeHelper extends Object
 {
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspA private constructor to
+	 * not allow someone to initialize this class.</p>
+	 */
 	private GenomeHelper(){}
 
 	//This function takes in an array of neuron genes and seperates them by layer
