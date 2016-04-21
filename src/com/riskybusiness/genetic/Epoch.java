@@ -35,6 +35,10 @@ import java.util.ArrayList;
 
 public class Epoch
 {
+
+
+
+
 	public static void main(String... arg) throws Exception
 	{
 		/*User Params */
@@ -60,6 +64,8 @@ public class Epoch
 
 		//Represents the size of the population
 		int 	populationSize 			= 50;
+		//Represents the max number of generations without improvement before a species is killed
+		int 	extinctionLimit			= 20;
 		//Represents the number of input neurons
 		int 	numInputNeurons			= 13;
 		//Represents the number of output neurons
@@ -74,6 +80,12 @@ public class Epoch
 		int 	curNeuronID 			= 0;
 		//Represents the current link ID
 		int 	curLinkID 				= 0;
+		//Represents the maximum number of species allowed
+		int 	maxNumSpecies 			= 6;
+		//Represents the species threshold which determines whether a genome will be accepted into a species
+		double speciesThreshold 		= 0.15;
+		//Represents how much we should increase the compatibility threshhold should we exceed the number of species
+		double 	threshholdPerturbation 	= 0.02;
 
 
 
@@ -235,6 +247,14 @@ public class Epoch
 
 		//Represents the newPopulation created from the old one
 		ArrayList<Genome> 	newPopulation 		= new ArrayList<Genome>();
+		//Represents the speciated population
+		ArrayList<Species> 	species 			= new ArrayList<Species>();
+		//Represents the ID of the current species
+		int 				speciesID 			= 0;
+		//Represents the best genome seen so far
+		Genome 				theChosenOne		= new Genome();
+		//Represents the best fitness seen so far
+		double 				bestFitness			= 0.0;
 		//Represents the number of children spawned so far
 		int 				numChildrenSpawned 	= 0;
 		//Represents the number of children to spawn
@@ -255,35 +275,98 @@ public class Epoch
 
 		for (int generation = 1; generation < 5000; generation++)
 		{
-			//Represents the population, but classified into their corresponding species
-			Species 			species 			= new Species(population);
-
-			// theOne = new Genome(species.getBestMember(0).getID(), species.getBestMember(0).getNeurons(), species.getBestMember(0).getLinks(), species.getBestMember(0).getNumInputs(), species.getBestMember(0).getNumOutputs());
-
-			// for (int i = 0; i < population.size(); i++)
-			// {
-			// 	System.out.println("Loop " + i + ": " + theOne.getCompatibilityScore(population.get(i)));
-			// }
-
-			//userInput = input.nextLine();
-
-			// if (species.getBestMember(0).determineFitness() == 4.0)
-			// {
-			// 	skip = true;
-			// 	break;
-			// }
-
 			System.out.println("Generation: " + generation);
 			System.out.println("Innovation Size: " + innovations.getSize());
 
-			//Debug function
-			if (debug)
+			//Loop through the species and kill off species that aren't improving and 
+			//create a new generation for each species
+			for (int speciesIndex = 0; speciesIndex < species.size(); speciesIndex++)
 			{
-				System.out.println("Number of species: " + species.getNumSpecies());
+				//Create the new generation
+				species.get(speciesIndex).newGeneration();
+
+				//Check for extinciont
+				if (species.get(speciesIndex).gensWithNoImprovement() > extinctionLimit)
+				{
+					//Kill off the species
+					species.remove(speciesIndex);
+					//Decrement the species index to account for the loss of a species
+					speciesIndex--;
+				}
 			}
 
+			//Represents the fitenss of the competitor
+			double competitorFitness;
+
+			//Loop through each species and see if any of the alphas has surpassed the best
+			//fitness seen so far
+			for (int speciesIndex = 0; speciesIndex < species.size(); speciesIndex++)
+			{
+				//Find the fitness of the competitor
+				competitorFitness = species.get(speciesIndex).getBestFitness();
+
+				//If the competitor fitness is better than the best so far then do stuff
+				if (competitorFitness > bestFitness)
+				{
+					//Copy the best member into the toCopy genome
+					toCopy = species.get(speciesIndex).getBestMember();
+					//Set the best fitness to the competitor fitness
+					bestFitness = competitorFitness;
+					//Create the chosen one
+					theChosenOne = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
+				}
+			}
+
+			//Check if we have exceeded the number of species
+			if (species.size() > maxNumSpecies)
+			{
+				speciesThreshold += threshholdPerturbation;
+			}
+			else if (species.size() <= 2)
+			{
+				speciesThreshold -= threshholdPerturbation;
+			}
+
+			boolean addedMember = false;
+
+			System.out.println(population.size());
+			System.out.println(species.size());
+
+			//Speciate the new population
+			for (int genomeIndex = 0; genomeIndex < population.size(); genomeIndex++)
+			{
+				for (int speciesIndex = 0; speciesIndex < species.size(); speciesIndex++)
+				{
+					double compatibilityScore = population.get(genomeIndex).getCompatibilityScore(species.get(speciesIndex).getBestMember());
+
+					if (compatibilityScore < speciesThreshold)
+					{
+						//Add member to the species
+						species.get(speciesIndex).addMember(population.get(genomeIndex));
+						//Set the variable to let the function know a member was added
+						addedMember = true;
+						//Break from the loop once a member has been added
+						break;
+					}
+				}
+
+				//If the member wasnt added to any species then we need to create a new species
+				if (!addedMember)
+				{
+					//Create the new species
+					Species speciesToAdd = new Species(++speciesID, population.get(genomeIndex));
+
+					//Add the new species
+					species.add(speciesToAdd);
+				}
+
+				addedMember = false;
+			}
+
+			System.out.println("Main Loop");
+
 			//Loop through each species and spawn genomes from each species
-			for (int speciesID = 0; speciesID < species.getNumSpecies(); speciesID++)
+			for (int speciesIndex = 0; speciesIndex < species.size(); speciesIndex++)
 			{
 				//Check to see if we still need to spawn children
 				//if (numChildrenSpawned < numberToSpawn)
@@ -291,10 +374,13 @@ public class Epoch
 					//Debug function
 					if (debug)
 					{
-						System.out.println("Number of spawns: " + species.getNumSpawns(speciesID));
+						System.out.println("Number of spawns: " + species.get(speciesIndex).getNumSpawns());
 					}
+
+					System.out.println("Num Spawns for species " + speciesID + " is " + species.get(speciesIndex).getNumSpawns());
+
 					//Creates the number of children necassary for the species
-					for (double i = 0.0; i < species.getNumSpawns(speciesID); i++)
+					for (double i = 0.0; i < species.get(speciesIndex).getNumSpawns(); i++)
 					{	
 						//Debug function
 						if (debug)
@@ -311,15 +397,15 @@ public class Epoch
 								System.out.println("Elitism Loop");
 							}
 
-							toCopy = species.getBestMember(speciesID);
+							toCopy = species.get(speciesIndex).getBestMember();
 
-							if (generation % 500 == 0)
-							{
-								toCopy.printFitness();
-								System.out.println("Best Member's Fitness " + toCopy.determineFitness() + "\n");
-								System.out.println(species.getBestMember(speciesID));
-								userInput = input.nextLine();
-							}
+							// if (generation % 500 == 0)
+							// {
+							// 	toCopy.printFitness();
+							// 	System.out.println("Best Member's Fitness " + toCopy.determineFitness() + "\n");
+							// 	System.out.println(species.get(speciesIndex).getBestMember());
+							// 	userInput = input.nextLine();
+							// }
 
 							//toCopy.printFitness();
 							System.out.println("Best Member's Fitness " + toCopy.determineFitness() + "\n");
@@ -330,7 +416,7 @@ public class Epoch
 						}
 						else if (i==1.0)
 						{
-							toCopy = species.getBestMember(speciesID);
+							toCopy = species.get(speciesIndex).getBestMember();
 
 							//Use elitism and always take the best member from the species and mutate it
 							child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
@@ -345,10 +431,10 @@ public class Epoch
 						else
 						{
 							//If the size of the species is only 1 then we can't breed
-							if (species.getNumMembers(speciesID) == 1)
+							if (species.get(speciesIndex).getNumMembers() == 1)
 							{
 								//Grab a member from the species
-								toCopy = species.getMember(speciesID);
+								toCopy = species.get(speciesIndex).getMember();
 
 								child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
 
@@ -361,7 +447,7 @@ public class Epoch
 							else
 							{
 								//Grab a random member to breed with or mutate
-								Genome mom = species.getMember(speciesID);
+								Genome mom = species.get(speciesIndex).getMember();
 
 								//Debug function
 								if (debug)
@@ -373,7 +459,7 @@ public class Epoch
 								if (random.nextDouble() < crossoverRate)
 								{
 									//Grab a random genome to breed with
-									Genome dad = species.getMember(speciesID);
+									Genome dad = species.get(speciesIndex).getMember();
 									
 									//Debug function
 									if (debug)
@@ -395,7 +481,7 @@ public class Epoch
 										}
 
 										//Grab a random genome to breed with
-										dad = species.getMember(speciesID);
+										dad = species.get(speciesIndex).getMember();
 										
 										//Decrement the lcv
 										lcv--;
@@ -465,10 +551,12 @@ public class Epoch
 
 			//Transfer the next generation
 			population.clear();
+
 			for (int i = 0; i < newPopulation.size(); i++)
 			{
 				population.add(new Genome(newPopulation.get(i).getID(), newPopulation.get(i).getNeurons(), newPopulation.get(i).getLinks(), newPopulation.get(i).getNumInputs(), newPopulation.get(i).getNumOutputs()));
 			}
+
 			newPopulation.clear();
 
 			for (int i = 0; i < population.size(); i++)

@@ -152,14 +152,9 @@ public class Genome implements Serializable
         return this.genomeFitness;
     }
 
-    /**
-    Fix this
-    **/
-    //Links theoretically know there innovation ID's, theoretically
-
-    public int getInnovationNum(LinkGene link, InnovationDB innovation)
+    public int getInnovationNum(LinkGene link)
     {
-        return innovation.getInnovationID(link.getFromNeuron(), link.getToNeuron());
+        return link.getInnovationID();
     }
 
     public int getNumLinkGenes()
@@ -583,7 +578,7 @@ public class Genome implements Serializable
                 }
 
                 //Hardcoded the input layer(don't add links to the input layer)
-                if(fromNeuronID <= 13)
+                if(fromNeuronID <= numInputNeurons)
                 {
                     toNeuronID   = -1;
                     fromNeuronID = -1;
@@ -615,6 +610,7 @@ public class Genome implements Serializable
         //Check the database for this innovation, if it exists it returns the ID of the link else returns 0 if new
         int innovationCheck = innovation.addInnovation(InnovationType.NEW_LINK, fromNeuronID, toNeuronID, -1);
         
+        //If new innovation add it to the db else grab the info from the db
         if (innovationCheck == 0)
         {
             //Push the new gene into the array
@@ -655,7 +651,7 @@ public class Genome implements Serializable
         int fromNeuronID;
         
         //This represents the maximum amount of neurons allowed in the genome
-        int sizeThreshold = 300;
+        int sizeThreshold = 35;
 
         //If the random value doesn't exceed the probability threshold then exit by returning
         if (random.nextDouble() > mutationRate)
@@ -669,9 +665,10 @@ public class Genome implements Serializable
             //Loop through and try to find an old link to add a neuron to
             for (int i = numTrysToFindOldLink; i > 0; i--)
             {
-                //Prevents the chaining problem
-                chosenLinkID = random.nextInt(numLinkGenes - 1 - ((int)Math.sqrt(numLinkGenes)) + 169);
+                //Prevents the chaining problem by choosing older genes to replace
+                chosenLinkID = random.nextInt(numLinkGenes - numInputNeurons - 1 - ((int)Math.sqrt(numLinkGenes))) + numInputNeurons;
 
+                //Loop through the linkGeneSet to find the chosen link
                 for (int j = 0; j < linkGeneSet.size(); j++)
                 {
                     if (linkGeneSet.get(j).getID() == chosenLinkID)
@@ -705,12 +702,8 @@ public class Genome implements Serializable
                 fromNeuronID = chosenLink.getFromNeuron();
                 toNeuronID   = chosenLink.getToNeuron();
 
+                //Check to see if the innovation exists already
                 int innovationCheck = innovation.addInnovation(InnovationType.NEW_NEURON, fromNeuronID, toNeuronID, (neuronGeneSet.size() + 1));
-
-                // if (!neuronIDExists(innovationCheck)) 
-                // {
-                //     innovationCheck = 0;
-                // }
 
                 if (innovationCheck != -1)
                 {
@@ -774,8 +767,6 @@ public class Genome implements Serializable
                 }
                 else //the innovation already exists
                 {
-                    System.out.println("special");
-                    //System.out.println(innovation);
                     int newNeuronID = innovation.getNeuronID(innovationCheck);
 
                     System.out.println("New neuron ID: " + newNeuronID);
@@ -829,128 +820,60 @@ public class Genome implements Serializable
 
     public void setAdjustedFitness(double fitness)
     {
+        //Set the adjusted fitness
         this.genomeAdjFitness = fitness;
     }
 
     public double determineFitness()
     {
-        // //For this we will have to create the scenarios we talked about ealier in
-        // //the year and use those scenarios as inputs. We will then input these 
-        // //scenarios into the network and see how the network responds
-        // //We wil use wes' heuristic to give the neural network a fitness score 
-        // //based on the result of its actions
-
-
-        // float[]     result  = new float[]{0};
-
-        // float[][]   inputs  = new float[][]{{0},{0}};
-
-        // float[]     output  = new float[4];
-
-        // int         i       = 0;
-
-        // //Need to create inputs for situations
-
-        // //Turn the genome into a neural net and compare the output to Wes's heuristic
-        // //I think we are to take the output and simulate the output and feed the results
-        // //into the heuristic. Need more info. 
-
-        // //For practice the fitness will essentially be how close the output is to 10.
-        // //Because of the strict and definite nature of the fitness function we should
-        // //see results and the genome conforming to 1.
-        // // result = myNetwork.fire(inputs);
-        // // genomeFitness = 2 - result[0];
-        // // return genomeFitness;
-
+        //Create the phenotype
         this.createPhenotype();
 
-        // for(float x = 0; x < 2; x++)
-        // {
-        //     for(float y = 0; y < 2; y++)
-        //     {
-        //         output[i] = myNetwork.fire(new float[][] {new float[] {x}, new float[] {y}})[0];
-        //         i++;
-        //     }
-        // }
-
-        // genomeFitness = 0;
-        // genomeFitness += 1 - output[0];
-        // genomeFitness += 0 + output[1];
-        // genomeFitness += 0 + output[2];
-        // genomeFitness += 1 - output[3];
-        // // genomeFitness += 0 + output[0];
-        // // genomeFitness += 1 - output[1];
-        // // genomeFitness += 0 + output[2];
-        // // genomeFitness += 1 - output[3];
-
-        // //System.out.println(genomeFitness);
-        // return genomeFitness;
-
-        // //Compare the results to the expected output, in our case we plug the 
-        // //results into wes' heuristic.
-
-
-
-        // //Board States
-        // //10 - 30  static arrays of inputs(will definetly need to be generated by a program)
-
-        // //Input board states into network and get output
-
-        // //Plug output into wes' heuristic function
-
         // The name of the file to open.
-        String fileName = "shorter.txt";
+        String fileName = "inputs.txt";
 
         // This will reference one line at a time
         String line = null;
 
-        String[] inputss = new String[14];
+        //Represents the inputs on the line of the file
+        String[] fileLine = new String[numInputNeurons + 1];
 
-        float[][] inputs = new float[13][1];
+        //Represents the input to the network
+        float[][] inputs = new float[numInputNeurons][1];
+
+        //Represents the expected output from the network
         float expectedOutput = 0.0f;
 
+        //Initialize the genome fitness to 0
         genomeFitness = 0;
 
         try {
             // FileReader reads text files in the default encoding.
-            FileReader fileReader = 
-                new FileReader(fileName);
+            FileReader fileReader = new FileReader(fileName);
 
             // Always wrap FileReader in BufferedReader.
-            BufferedReader bufferedReader = 
-                new BufferedReader(fileReader);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
 
+            //Loop through each line of the file, get the inputs, fire them and then evaluate the results
             while((line = bufferedReader.readLine()) != null) {
-                inputss = line.split("\\t");
-                for (int x = 0; x < inputss.length; x++)
-                    if (x == 13)
+                fileLine = line.split("\\t");
+                //Loop through each input on the line and add it to the input array or expected output
+                for (int x = 0; x < fileLine.length; x++)
+                    //If we are at the last input then store it into the expected results
+                    if (x == numInputNeurons)
                     {
-                        expectedOutput = (float)Integer.parseInt(inputss[x]);
+                        expectedOutput = (float)Integer.parseInt(fileLine[x]);
                     }
                     else
                     {
-                        inputs[x] = new float[]{(float)Integer.parseInt(inputss[x])};
+                        inputs[x] = new float[]{(float)Integer.parseInt(fileLine[x])};
                     }
+                //Calculate the variance and add it to the fitness
                 genomeFitness += Math.pow((this.myNetwork.fire(inputs)[0] * 365) - expectedOutput, 2);
             }   
 
+            //Find the genome fitness by dividing the max variance by the total variance
             genomeFitness = 133225000 / genomeFitness;
-
-
-            // int i = 0;
-            // while (tokenizer.hasMoreTokens()){
-            //     if (i == 13)
-            //     {
-            //         System.out.println("1");
-            //         expectedOutput = Integer.parseInt(tokenizer.nextToken());
-            //     }
-            //     else
-            //     {
-            //         System.out.println("1");
-            //         inputs[i] = Integer.parseInt(tokenizer.nextToken());
-            //         i++;
-            //     }
-            // }
 
             // Always close files.
             bufferedReader.close();         
@@ -964,77 +887,14 @@ public class Genome implements Serializable
             System.out.println(
                 "Error reading file '" 
                 + fileName + "'");                  
-            // Or we could just do this: 
-            // ex.printStackTrace();
         }
         return genomeFitness;
     }
 
     public void printFitness()
     {
-        // //For this we will have to create the scenarios we talked about ealier in
-        // //the year and use those scenarios as inputs. We will then input these 
-        // //scenarios into the network and see how the network responds
-        // //We wil use wes' heuristic to give the neural network a fitness score 
-        // //based on the result of its actions
-
-
-        // float[]     result  = new float[]{0};
-
-        // float[][]   inputs  = new float[][]{{0},{0}};
-
-        // float[]     output  = new float[4];
-
-        // int         i       = 0;
-
-        // //Need to create inputs for situations
-
-        // //Turn the genome into a neural net and compare the output to Wes's heuristic
-        // //I think we are to take the output and simulate the output and feed the results
-        // //into the heuristic. Need more info. 
-
-        // //For practice the fitness will essentially be how close the output is to 10.
-        // //Because of the strict and definite nature of the fitness function we should
-        // //see results and the genome conforming to 1.
-        // // result = myNetwork.fire(inputs);
-        // // genomeFitness = 2 - result[0];
-        // // return genomeFitness;
-
+        //Create the phenotype
         this.createPhenotype();
-
-        // for(float x = 0; x < 2; x++)
-        // {
-        //     for(float y = 0; y < 2; y++)
-        //     {
-        //         output[i] = myNetwork.fire(new float[][] {new float[] {x}, new float[] {y}})[0];
-        //         i++;
-        //     }
-        // }
-
-        // genomeFitness = 0;
-        // genomeFitness += 1 - output[0];
-        // genomeFitness += 0 + output[1];
-        // genomeFitness += 0 + output[2];
-        // genomeFitness += 1 - output[3];
-        // // genomeFitness += 0 + output[0];
-        // // genomeFitness += 1 - output[1];
-        // // genomeFitness += 0 + output[2];
-        // // genomeFitness += 1 - output[3];
-
-        // //System.out.println(genomeFitness);
-        // return genomeFitness;
-
-        // //Compare the results to the expected output, in our case we plug the 
-        // //results into wes' heuristic.
-
-
-
-        // //Board States
-        // //10 - 30  static arrays of inputs(will definetly need to be generated by a program)
-
-        // //Input board states into network and get output
-
-        // //Plug output into wes' heuristic function
 
         // The name of the file to open.
         String fileName = "shorter.txt";
@@ -1042,50 +902,42 @@ public class Genome implements Serializable
         // This will reference one line at a time
         String line = null;
 
-        String[] inputss = new String[14];
+        //Represents the inputs on the line of the file
+        String[] fileLine = new String[numInputNeurons + 1];
 
-        float[][] inputs = new float[13][1];
+        //Represents the input to the network
+        float[][] inputs = new float[numInputNeurons][1];
+
+        //Represents the expected output from the network
         float expectedOutput = 0.0f;
 
+        //Initialize the genome fitness to 0
         genomeFitness = 0;
 
         try {
             // FileReader reads text files in the default encoding.
-            FileReader fileReader = 
-                new FileReader(fileName);
+            FileReader fileReader = new FileReader(fileName);
 
             // Always wrap FileReader in BufferedReader.
-            BufferedReader bufferedReader = 
-                new BufferedReader(fileReader);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
 
+            //Loop through each line of the file, get the inputs, fire them and then evaluate the results
             while((line = bufferedReader.readLine()) != null) {
-                inputss = line.split("\\t");
-                for (int x = 0; x < inputss.length; x++)
-                    if (x == 13)
+                fileLine = line.split("\\t");
+                //Loop through each input on the line and add it to the input array or expected output
+                for (int x = 0; x < fileLine.length; x++)
+                    //If we are at the last input then store it into the expected results
+                    if (x == numInputNeurons)
                     {
-                        expectedOutput = (float)Integer.parseInt(inputss[x]);
+                        expectedOutput = (float)Integer.parseInt(fileLine[x]);
                     }
                     else
                     {
-                        inputs[x] = new float[]{(float)Integer.parseInt(inputss[x])};
+                        inputs[x] = new float[]{(float)Integer.parseInt(fileLine[x])};
                     }
+                //Print the forecasted result
                 System.out.println(this.myNetwork.fire(inputs)[0] * 365);
             }   
-
-            // int i = 0;
-            // while (tokenizer.hasMoreTokens()){
-            //     if (i == 13)
-            //     {
-            //         System.out.println("1");
-            //         expectedOutput = Integer.parseInt(tokenizer.nextToken());
-            //     }
-            //     else
-            //     {
-            //         System.out.println("1");
-            //         inputs[i] = Integer.parseInt(tokenizer.nextToken());
-            //         i++;
-            //     }
-            // }
 
             // Always close files.
             bufferedReader.close();         
@@ -1099,161 +951,189 @@ public class Genome implements Serializable
             System.out.println(
                 "Error reading file '" 
                 + fileName + "'");                  
-            // Or we could just do this: 
-            // ex.printStackTrace();
         }
     }
 
     public Genome crossover(Genome dad, InnovationDB innovation)
     {
-       int best; //0 = Mom, 1 = Dad;
-       int dadIndex = 0;
-       int momIndex = 0;
+        // //Represents which genome has the best fitness
+        // int best; //0 = Mom, 1 = Dad;
+        
+        // //Represents the current index of mom and dads gene counter
+        // int dadIndex = 0;
+        // int momIndex = 0;
 
-       boolean selected = false;
+        // //Represents if a gene has been selected from either mom or dad
+        // boolean selected = false;
 
-       ArrayList<NeuronGene> babyNeuronGenes = new ArrayList<NeuronGene>();
-       ArrayList<LinkGene> babyLinkGenes = new ArrayList<LinkGene>();
-       ArrayList<Integer> neuronIDS = new ArrayList<Integer>();
+        // //Represents the array of neuronGenes for the baby
+        // ArrayList<NeuronGene> babyNeuronGenes = new ArrayList<NeuronGene>();
+        
+        // //Represents the array of linkGenes for the baby
+        // ArrayList<LinkGene> babyLinkGenes = new ArrayList<LinkGene>();
 
-       LinkGene selectedLink = new LinkGene();
+        // //Represents the neuronID's to be added 
+        // ArrayList<Integer> neuronIDS = new ArrayList<Integer>();
 
-       this.determineFitness();
-       dad.determineFitness();
+        // LinkGene selectedLink = new LinkGene();
 
-       //System.out.println(this.getFitness());
-       //System.out.println(dad.getFitness());
+        // this.determineFitness();
+        // dad.determineFitness();
 
-        if (this.getFitness() == dad.getFitness())
-        {
-            if (this.getNumLinkGenes() == dad.getNumLinkGenes())
-            {
-                best = random.nextInt(2);
-                //System.out.println(best);
-            }
-            else
-            {
-                if (this.getNumLinkGenes() < dad.getNumLinkGenes())
-                {
-                    //System.out.println("MOM");
-                    best = 0; //Mom
-                }
-                else
-                {
-                    //System.out.println("DAD");
-                    best = 1; //Dad
-                }
-            }
-        }
-        else
-        {
-            if (this.getFitness() > dad.getFitness())
-            {
-                //System.out.println("Mom has the best fitness");
-                best = 0; //Mom
-            }
-            else
-            {
-                //System.out.println("Dad has the best fitness");
-                best = 1; //Dad
-            }
-        }
+        // if (this.getFitness() == dad.getFitness())
+        // {
+        //     if (this.getNumLinkGenes() == dad.getNumLinkGenes())
+        //     {
+        //         best = random.nextInt(2);
+        //     }
+        //     else
+        //     {
+        //         if (this.getNumLinkGenes() < dad.getNumLinkGenes())
+        //         {
+        //             best = 0; //Mom
+        //         }
+        //         else
+        //         {
+        //             best = 1; //Dad
+        //         }
+        //     }
+        // }
+        // else
+        // {
+        //     if (this.getFitness() > dad.getFitness())
+        //     {
+        //         best = 0; //Mom
+        //     }
+        //     else
+        //     {
+        //         best = 1; //Dad
+        //     }
+        // }
 
-        while(!((momIndex == this.linkGeneSet.size()) && dadIndex == dad.linkGeneSet.size()))
-        {
-            if ((momIndex == this.linkGeneSet.size() && dadIndex != dad.linkGeneSet.size()))
-            {
-                if (best == 1)
-                {
-                    //System.out.println("Selected Dad's genes");
-                    selectedLink = dad.linkGeneSet.get(dadIndex);
-                    selected = true;
-                }
+        // while(!((momIndex == this.linkGeneSet.size()) && dadIndex == dad.linkGeneSet.size()))
+        // {
+        //     if ((momIndex == this.linkGeneSet.size() && dadIndex != dad.linkGeneSet.size()))
+        //     {
+        //         if (best == 1)
+        //         {
+        //             selectedLink = dad.linkGeneSet.get(dadIndex);
+        //             selected = true;
+        //         }
 
-                dadIndex++;
-            }
-            else if ((dadIndex == dad.linkGeneSet.size()) && momIndex != this.linkGeneSet.size())
-            {
-                if (best == 0)
-                {
-                    //System.out.println("Selected Mom's genes");
-                    selectedLink = this.linkGeneSet.get(momIndex);
-                    selected = true;
-                }
+        //         dadIndex++;
+        //     }
+        //     else if ((dadIndex == dad.linkGeneSet.size()) && momIndex != this.linkGeneSet.size())
+        //     {
+        //         if (best == 0)
+        //         {
+        //             selectedLink = this.linkGeneSet.get(momIndex);
+        //             selected = true;
+        //         }
 
-                momIndex++;
-            }
-            else if (this.getInnovationNum(this.linkGeneSet.get(momIndex), innovation) < dad.getInnovationNum(dad.linkGeneSet.get(dadIndex), innovation))
-            {
-                if (best == 0)
-                {
-                    //System.out.println("Selected Mom's genes");
-                    selectedLink = this.linkGeneSet.get(momIndex);
-                    selected = true;
-                }
+        //         momIndex++;
+        //     }
+        //     else if (this.getInnovationNum(this.linkGeneSet.get(momIndex)) < dad.getInnovationNum(dad.linkGeneSet.get(dadIndex)))
+        //     {
+        //         if (best == 0)
+        //         {
+        //             selectedLink = this.linkGeneSet.get(momIndex);
+        //             selected = true;
+        //         }
 
-                momIndex++;
-            }
-            else if (this.getInnovationNum(this.linkGeneSet.get(momIndex), innovation) > dad.getInnovationNum(dad.linkGeneSet.get(dadIndex), innovation))
-            {
-                if (best == 1)
-                {
-                    //System.out.println("Selected Dad's genes");
-                    selectedLink = dad.linkGeneSet.get(dadIndex);
-                    selected = true;
-                }
+        //         momIndex++;
+        //     }
+        //     else if (this.getInnovationNum(this.linkGeneSet.get(momIndex)) > dad.getInnovationNum(dad.linkGeneSet.get(dadIndex)))
+        //     {
+        //         if (best == 1)
+        //         {
+        //             selectedLink = dad.linkGeneSet.get(dadIndex);
+        //             selected = true;
+        //         }
 
-                dadIndex++;
-            }
-            else if (this.getInnovationNum(this.linkGeneSet.get(momIndex), innovation) == dad.getInnovationNum(dad.linkGeneSet.get(dadIndex), innovation))
-            {
-                if (random.nextDouble() < 0.5)
-                {
-                    //System.out.println("Selected Mom's genes");
-                    selectedLink = this.linkGeneSet.get(momIndex);
-                    selected = true;
-                }
-                else
-                {
-                    //System.out.println("Selected Dad's genes");
-                    selectedLink = dad.linkGeneSet.get(dadIndex);
-                    selected = true;
-                }
+        //         dadIndex++;
+        //     }
+        //     else if (this.getInnovationNum(this.linkGeneSet.get(momIndex)) == dad.getInnovationNum(dad.linkGeneSet.get(dadIndex)))
+        //     {
+        //         if (random.nextDouble() < 0.5)
+        //         {
+        //             selectedLink = this.linkGeneSet.get(momIndex);
+        //             selected = true;
+        //         }
+        //         else
+        //         {
+        //             selectedLink = dad.linkGeneSet.get(dadIndex);
+        //             selected = true;
+        //         }
 
-                momIndex++;
-                dadIndex++;
-            }
+        //         momIndex++;
+        //         dadIndex++;
+        //     }
 
-            if (selected)
-            {
-                selected = false;
-                if (babyLinkGenes.size() == 0)
-                {
-                    //System.out.println("Add link");
-                    babyLinkGenes.add(selectedLink);
-                }
-                else
-                {
-                    //if (babyLinkGenes.get(babyLinkGenes.size() - 1) != selectedLink.getInnovationNum())
-                    if(true)
-                    {
-                        //System.out.println("Add link");
-                        babyLinkGenes.add(selectedLink);
-                    }
-                }
+        //     if (selected)
+        //     {
+        //         selected = false;
+        //         if (babyLinkGenes.size() == 0)
+        //         {
+        //             babyLinkGenes.add(selectedLink);
+        //         }
+        //         else
+        //         {
+        //             if (babyLinkGenes.get(babyLinkGenes.size() - 1).getInnovationID() != selectedLink.getInnovationID())
+        //             {
+        //                 babyLinkGenes.add(selectedLink);
+        //             }
+        //         }
 
-                //System.out.println("Adding neurons");
-                neuronIDS.add(selectedLink.getFromNeuron());
-                neuronIDS.add(selectedLink.getToNeuron());
-            }
-        }
+        //         // boolean fromNeuronExists = false;
+        //         // boolean toNeuronExists   = false;
 
-        for (int i = 0; i < babyLinkGenes.size(); i++)
-        {
-            //System.out.println(babyLinkGenes.get(i));
-        }
+        //         // int fromNeuronID = selectedLink.getFromNeuron();
+        //         // int toNeuronID   = selectedLink.getToNeuron();
+
+        //         // for (int i = 0; i < neuronIDS.size(); i++)
+        //         // {
+        //         //     if (neuronIDS.get(i) == fromNeuronID)
+        //         //     {
+        //         //         fromNeuronExists = true;
+        //         //     }
+
+        //         //     if (neuronIDS.get(i) == toNeuronID)
+        //         //     {
+        //         //         toNeuronExists = true;
+        //         //     }
+        //         // }
+
+        //         // if !(fromNeuronExists || toNeuronExists)
+        //         // {
+        //         //     for (int i = 0; i < this.neuronGeneSet.size(); i++)
+        //         //     {
+
+        //         //     }
+        //         // }
+        //         // else if !(toNeuronExists)
+        //         // {
+        //         //     neuronIDS.add(selectedLink.getToNeuron());
+        //         // }
+        //         // else if !(fromNeuronExists)
+        //         // {
+
+        //         // }
+        //     }
+        // }
+
+        // for (int i = 0; i < babyLinkGenes.size(); i++)
+        // {
+        //     //System.out.println(babyLinkGenes.get(i));
+        // }
+
+        // //Add neuronGenes
+        // for (int i = 0; i < this.neuronGeneSet.size();i++)
+        // {
+
+        // }
 
         //sort neurons
+
         //Add to the innovation database?
 
         //create the genome.

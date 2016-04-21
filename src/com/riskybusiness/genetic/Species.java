@@ -28,182 +28,188 @@ import java.util.ArrayList;
 
 public class Species implements Serializable
 {
+	//Represents the species ID
+	private int 				speciesID 			= 0;
 
-	//Represents the item used to create pseudo-random numbers
-	private Random 							random 				= new Random();
+	//Represents the generation 
+	private int 				generation 			= 0;
 
-	private	ArrayList<Genome> 				speciesPop 			= new ArrayList<Genome>();
+	//Represents the members of the species
+	private ArrayList<Genome> 	species 			= new ArrayList<Genome>();
 
-	private ArrayList<ArrayList<Genome>>	myPopulation		= new ArrayList<ArrayList<Genome>>();
+	//Represents the best member of the species
+	private Genome 				alphaGene 			= new Genome();
 
-	private ArrayList<Double>				compatibilityRow	= new ArrayList<Double>();
+	//Represents the fitness of the best member
+	private double 				alphaFitness		= 0;
+	
+	//Represents the number of generations without improvement
+	private int 				gensNoImprovement 	= 0;
 
-	private ArrayList<ArrayList<Double>>	compatibilityTable	= new ArrayList<ArrayList<Double>>();
+	//Represents the package used to supply psuedo-random numbers
+	private Random 				random 				= new Random();
 
-	private double 							speciesThreshold	= 0.12;
-
+	//Represents the ID to make species saveable to a text file
 	private static final long serialVersionUID = -4268206798591932773L;
 
-	public Species(ArrayList<Genome> population)
+	//Creates a new species
+	public Species (int specID, Genome genome)
 	{
+		//Initialize the speciesID
+		speciesID = specID;
 
-		//Clear the old species and add the new population
-		myPopulation.clear();
-		myPopulation.add(population);
+		//Initialize the generation number
+		generation = 1;
 
-		//Determine the adjusted fitness
-		//For now adjusted fitness is simply fitness
-		for (int i = 0; i < this.myPopulation.size(); i++)
+		//Add the newest member to the species
+		species.add(genome);
+
+		//Make the newest member the alpha gene
+		alphaGene = genome;
+
+		//Determine the fitness of the newest gene and make it the alpha fitness
+		alphaFitness = genome.determineFitness();
+
+		//Initilize generations without imporvement
+		gensNoImprovement = 0;
+	}
+
+	public void addMember(Genome genome)
+	{
+		//Represents the fitness of the new member
+		double competitorFitness;
+
+		//Add the new member to the species
+		species.add(genome);
+
+		//Determine the fitness of the new member
+		competitorFitness = genome.determineFitness();
+
+		//If the new member has a higher fitness than the alpha gene
+		//then we should do some things
+		if(competitorFitness > alphaFitness)
 		{
-			for (int j = 0; j < this.myPopulation.get(i).size(); j++)
-			{
-				myPopulation.get(i).get(j).setAdjustedFitness(myPopulation.get(i).get(j).getFitness());
-			}
+			//Change the alpha fitness to the new members fitness
+			alphaFitness = competitorFitness;
+
+			//Change the alpha gene to the new member
+			alphaGene    = genome;
+
+			//Update generations with new improvement
+			gensNoImprovement = 0;
 		}
 	}
 
-	// public Species(ArrayList<Genome> toSpeciate)
-	// {
-	// 	//Clear the old population
-	// 	myPopulation.clear();
-
-	// 	//Represents how many genomes are left to be speciated
-	// 	int numLeft = toSpeciate.size();
-
-	// 	//Represents the index of the first genome to be added to the next species
-	// 	int nextIndex = 0;
-
-	// 	//Represents whether the next index has been set as it should only be set once per species
-	// 	boolean nextIndexSet = true;
-
-	// 	//
-	// 	boolean[] speciated;
-
-	// 	speciated = new boolean[toSpeciate.size()];
-
-	// 	for (int i = 0; i < toSpeciate.size(); i++)
-	// 	{
-	// 		speciated[i] = false;
-	// 	}
-
-	// 	for (int speciesID = 0; numLeft > 0; speciesID++)
-	// 	{
-	// 		//System.out.println(numLeft);
-	// 		//System.out.println("Making a new species!");
-	// 		myPopulation.add(new ArrayList<Genome>());
-	// 		myPopulation.get(speciesID).add(toSpeciate.get(nextIndex));
-	// 		speciated[nextIndex] = true;
-	// 		numLeft--;
-	// 		nextIndexSet = false;
-
-	// 		for(int genomeIndex = 0; genomeIndex < toSpeciate.size() - 1; genomeIndex++)
-	// 		{
-	// 			double compatibility = toSpeciate.get(genomeIndex).getCompatibilityScore(getBestMember(speciesID));
-
-	// 			if (compatibility <= speciesThreshold && !speciated[genomeIndex])
-	// 			{
-	// 				myPopulation.get(speciesID).add(toSpeciate.get(genomeIndex));
-	// 				numLeft--;
-	// 				speciated[genomeIndex] = true;
-	// 			}
-	// 			else if(!nextIndexSet && !speciated[genomeIndex])
-	// 			{
-	// 				nextIndexSet = true;
-	// 				nextIndex = genomeIndex;
-	// 			}
-	// 		}
-	// 	}
-	// }
-
-	//Returns the number of species
-	public int getNumSpecies()
+	//Creates a new generation of species
+	public void newGeneration()
 	{
-		return this.myPopulation.size();
+		//Clear the old species
+		species.clear();
+
+		//Update the generation count
+		generation++;
+
+		//Update the generations without improvement
+		gensNoImprovement++;
+	}
+
+	//Returns the number of generations without improvement
+	public int gensWithNoImprovement()
+	{
+		return this.gensNoImprovement;
+	}
+
+	//Returns the species ID
+	public int getSpeciesID()
+	{
+		return this.speciesID;
+	}
+
+	//Returns the number of members in the species
+	public int getNumMembers()
+	{
+		//Return
+		return this.species.size();
 	}
 
 	//Returns the number of children the given species is supposed to spawn
-	public double getNumSpawns(int speciesID)
+	public double getNumSpawns()
 	{
 		//Represents the number of children to spawn from the given speciesID
 		double numToSpawn = 0;
 
 		//Loop through the genomes in the given species and find the amount each genome
 		//is supposed to spawn and add it to the total for the species
-		for (int genomeID = 0; genomeID < myPopulation.get(speciesID).size(); genomeID++)
+		for (int genomeID = 0; genomeID < species.size(); genomeID++)
 		{
-			numToSpawn += myPopulation.get(speciesID).get(genomeID).getNumSpawns();
+			numToSpawn += species.get(genomeID).getNumSpawns();
 		}
 
 		//Return
 		return numToSpawn;
 	}
 
-	//Returns the size of the given species
-	public int getSize(int speciesID)
+	//Returns the fittest/best member if the given species
+	public Genome getBestMember()
 	{
-		//Return
-		return this.myPopulation.get(speciesID).size();
+		return this.alphaGene;
 	}
 
-	//Returns the fittest/best member if the given species
-	public Genome getBestMember(int speciesID)
+	//Returns the fitness of the best member
+	public double getBestFitness()
 	{
-		//Represents the ID of the fittest genome
-		int fittestGenomeIndex = 0;
-
-		//Loop through the genomes and compare the current genome to the fittest and 
-		//determine the fittest individual
-		for (int genomeIndex = 1; genomeIndex < myPopulation.get(speciesID).size(); genomeIndex++)
-		{
-
-			myPopulation.get(speciesID).get(genomeIndex).createPhenotype();
-
-			if (myPopulation.get(speciesID).get(fittestGenomeIndex).determineFitness() < 
-				   myPopulation.get(speciesID).get(genomeIndex).determineFitness())
-			{
-				fittestGenomeIndex = genomeIndex;
-			}
-		}
-
-		//Return
-		return myPopulation.get(speciesID).get(fittestGenomeIndex);
+		return this.alphaFitness;
 	}
 
 	//Figure out a way to return better people
 	//Returns a random member from the population
-	public Genome getMember(int speciesID)
+	public Genome getMember()
 	{
+		//Represents the list of ID's of the competitors
 		ArrayList<Integer> 	speciesToCompete 	= new ArrayList<Integer>();
 
-		int 				bestFitnessID;
+		//Represents the ID of the best member found so far
+		int 				bestFitnessID 		= 0;
+
+		//Represents the best fitness found so far
+		double 				bestFitness 		= 0.0;
+
+		//Represents the fitness of the competitor
+		double 				competitorFitness	= 0.0;
 
 		//This uses a tournament selection which accomplishes our goal of choosing genomes
 		//with higher fitness at a higher rate and choosing those with lower fitness at a 
 		//lower rate
-  
-		//May need to lower value to 5 or some computer value such as 10% of the species.
 
+		//Grab the random competitors
 		for (int i = 0; i < 3; i++)
 		{
-			speciesToCompete.add(new Integer(random.nextInt((myPopulation.get(speciesID).size() - 1))));
+			//Grab three random members to compete
+			speciesToCompete.add(new Integer(random.nextInt((species.size() - 1))));
 		}
 
+		//Assign the first species as the first competitor
 		bestFitnessID = speciesToCompete.get(0);
 
+		//Start the rounds of the tourney
 		for (int i = 1; i < 3; i++)
 		{
-			if (myPopulation.get(speciesID).get(speciesToCompete.get(i)).getFitness() > myPopulation.get(speciesID).get(bestFitnessID).getFitness())
+			//Calcualte the fitenss of the next competitor
+			competitorFitness = species.get(speciesToCompete.get(i)).determineFitness();
+
+			//Compare the best member to the competitor
+			if (competitorFitness > bestFitness)
 			{
+				//If the competitor was better, set his ID to the best 
 				bestFitnessID = speciesToCompete.get(i);
+
+				//Also set the bestFitness to the winner
+				bestFitness = competitorFitness;
 			}
 		}
 
-		return myPopulation.get(speciesID).get(bestFitnessID);
-	}
-
-	public int getNumMembers(int speciesID)
-	{
-		return myPopulation.get(speciesID).size();
+		//Return the winner of the tourney
+		return species.get(bestFitnessID);
 	}
 
 	@Override
@@ -212,16 +218,15 @@ public class Species implements Serializable
 		//The string to return
         String toReturn = "";
 
-        for (int i = 0; i < myPopulation.size(); i++)
+        //Add the proper elements to the string
+        for (int i = 0; i < species.size(); i++)
         {
-        	toReturn += "Species ID: " + (i + 1) + "\n";
-        	for (int j = 0; j < myPopulation.get(i).size(); j++)
-        	{
-        		toReturn += myPopulation.get(i).get(j).toString();
-        	}
+        	toReturn += "Species ID: " + speciesID + "\n";
+        	toReturn += species.get(i).toString();
         	toReturn += "\n";
         }
 
+        //Return the string
         return toReturn;
 	}
 }
