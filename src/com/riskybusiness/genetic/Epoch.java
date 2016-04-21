@@ -17,6 +17,15 @@
 
 package com.riskybusiness.genetic.test;
 
+//Used for saving genomes
+import java.lang.InterruptedException;
+import java.lang.Object;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+
 import com.riskybusiness.neural.Neuron;
 import com.riskybusiness.neural.Synapse;
 import com.riskybusiness.neural.NeuralNet;
@@ -46,7 +55,7 @@ public class Epoch
 		//Represents whether a user is going to load a genome
 		boolean	loadFile 	= false;
 		//Represents the users input
-		String 	userInput;
+		String 	userInput 	= "";
 		//Represents the debugging option
 		boolean debug 		= false;
 
@@ -65,7 +74,7 @@ public class Epoch
 		//Represents the size of the population
 		int 	populationSize 			= 50;
 		//Represents the max number of generations without improvement before a species is killed
-		int 	extinctionLimit			= 20;
+		int 	extinctionLimit			= 15;
 		//Represents the number of input neurons
 		int 	numInputNeurons			= 13;
 		//Represents the number of output neurons
@@ -107,25 +116,22 @@ public class Epoch
    		ArrayList<Genome>		population 	= new ArrayList<Genome>();
    		//Represents the ID of the genome
    		int 					genomeID 	= 0;
-   		//The chosen one
-   		Genome 					theOne 		= new Genome();
 
 
    		/* Historical Data */	
 
    		//Represents the historical changes of all the previous populations
-   		InnovationDB 			innovations	= new InnovationDB(5);
-   		//Represents the current generation
-   		//int 					generation 	= 1;		
+   		InnovationDB 			innovations	= new InnovationDB(5);	
 
-   		System.out.println("Would you like to load[L] a file or start fresh[S]?");
-   		userInput = input.nextLine();
-
-   		if (loadFile)
+   		//Validate user input and determine if they would like to load a file or start new
+   		while (!(userInput.equals("L") || userInput.equals("S")))
    		{
-   			int temp = 0;
-   		} 
-   		else 
+   			System.out.println("Would you like to load[L] a file or start fresh[S]?");
+   			userInput = input.nextLine();
+   		}
+
+
+   		if (!loadFile) 
    		{
    			//Initialize number of neurons
    			summationNeuronsInLayer[0] = 0;
@@ -236,14 +242,9 @@ public class Epoch
 
 				population.add(new Genome(++genomeID, neuronGenes, linkGenes, numInputNeurons, numOutputNeurons));
 			}
+			System.out.println("Population size: " + population.size());
 		}
 
-		System.out.println("Population size: " + population.size());
-
-		// for (int i = 0; i < population.size(); i++)
-		// {
-		// 	System.out.println(population.get(i));
-		// }
 
 		//Represents the newPopulation created from the old one
 		ArrayList<Genome> 	newPopulation 		= new ArrayList<Genome>();
@@ -266,14 +267,58 @@ public class Epoch
 		//Represents the rate at which a genomes breed
 		double 				crossoverRate 		= 0.3;
 
-		boolean				skip				= false;
+		//If load file then load all the variables from the file
+		if (loadFile)
+		{
+			//Initialize the readers
+			ObjectInputStream populationReader = null;
+			ObjectInputStream speciesReader = null;
+			ObjectInputStream parametersReader = null;
+			//Try reading the data from the files
+			try
+			{
+				//Initialize the readers and their files as well
+				System.out.println("\tAttempting to load the genome file");
+				populationReader = new ObjectInputStream(new FileInputStream("population.txt"));
+				speciesReader 	 = new ObjectInputStream(new FileInputStream("species.txt"));
+				parametersReader = new ObjectInputStream(new FileInputStream("parameters.txt"));
 
-		//Start epoch
-		/* Note:
-		 *   Need to add more when I implement speciation
-		 */
+				//Read in all the data
+				population 		= (ArrayList<Genome>) populationReader.readObject();
+				species 		= (ArrayList<Species>) speciesReader.readObject();
+				genomeID 		= (int) parametersReader.readObject();
+				theChosenOne 	= (Genome) parametersReader.readObject();
+				innovations 	= (InnovationDB) parametersReader.readObject();
+				speciesID 		= (int) parametersReader.readObject();
+				bestFitness 	= (double) parametersReader.readObject();
 
-		for (int generation = 1; generation < 5000; generation++)
+				//Close the readers
+				if(populationReader != null)
+					populationReader.close();
+				if(speciesReader != null)
+					speciesReader.close();
+				if(parametersReader != null)
+					parametersReader.close();
+			}
+			catch(Exception e)
+			{
+				System.out.println("\tError!");
+				e.printStackTrace();
+				System.err.println(e.toString());
+				System.exit(1);
+			}
+			finally
+			{
+				System.out.println("\tInput Successful!");
+			}
+		}
+
+		//Starts the program
+		System.out.println("Hit [Enter] to start!");
+   		userInput = input.nextLine();
+
+
+		for (int generation = 1; generation < 5; generation++)
 		{
 			System.out.println("Generation: " + generation);
 			System.out.println("Innovation Size: " + innovations.getSize());
@@ -565,30 +610,47 @@ public class Epoch
 			}
 		}
 
-		if (skip)
+		//Initialize the object writers
+		ObjectOutputStream populationWriter = null;
+		ObjectOutputStream speciesWriter = null;
+		ObjectOutputStream parametersWriter = null;
+
+		//Try to write to the files
+		try
 		{
-			float[] inputs = new float[] {0,0};
+			//Initialize the writers and their files as well
+			System.out.println("\tCreating a file and saving the parameters");
+			populationWriter = new ObjectOutputStream(new FileOutputStream("population.txt"));
+			speciesWriter = new ObjectOutputStream(new FileOutputStream("species.txt"));
+			parametersWriter = new ObjectOutputStream(new FileOutputStream("parameters.txt"));
+			
+			//Write out all the data
+			populationWriter.writeObject(population);
+			parametersWriter.writeObject(genomeID);
+			parametersWriter.writeObject(theChosenOne);
+			parametersWriter.writeObject(innovations);
+			speciesWriter.writeObject(species);
+			parametersWriter.writeObject(speciesID);
+			parametersWriter.writeObject(bestFitness);
 
-			while(inputs[0] >= 0)
-			{
-				System.out.println(theOne);
-				System.out.println("Congrats on being a genius enter the values you wish to fire!");
-				System.out.println("First: ");
-				inputs[0] = input.nextFloat();
-				System.out.println("Second: ");
-				inputs[1] = input.nextFloat();
-				theOne.createPhenotype();
-				System.out.println("The value fired was: " + theOne.getNetwork().fire(new float[][] {new float[] {inputs[0]}, new float[] {inputs[1]}})[0]);
-
-				// System.out.println("The network responds with: " + theOne.getNetwork().fire(new float[][] {new float[] {inputs[0]}, new float[] {inputs[1]}}));
-
-			}
+			//Close the writers files
+			if(populationWriter != null)
+				populationWriter.close();
+			if(speciesWriter != null)
+				speciesWriter.close();
+			if(parametersWriter != null)
+				parametersWriter.close();
 		}
-		else
+		catch(IOException io)
 		{
-			theOne.createPhenotype();
-			System.out.println(theOne);
+			System.out.println("\tError!");
+			io.printStackTrace();
+			System.err.println(io.toString());
+			System.exit(1);
 		}
-
+		finally
+		{
+			System.out.println("\tSuccessfully wrote to the file");
+		}
 	}
 }
