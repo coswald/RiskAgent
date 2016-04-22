@@ -61,6 +61,9 @@ public class Species implements Serializable
 	//Rpeprsents the age at which a species is still young
 	private int 				youngAge			= 16;
 
+	//Represents the number of children to spawn from species
+	private double 				numSpawns 			= 0.0;
+
 
 	//Represents the ID to make species saveable to a text file
 	private static final long serialVersionUID = -4268206798591932773L;
@@ -124,6 +127,9 @@ public class Species implements Serializable
 
 		//Update the generations without improvement
 		gensNoImprovement++;
+
+		//Reset the number of spawns
+		numSpawns = 0.0;
 	}
 
 	//Returns the number of generations without improvement
@@ -148,18 +154,8 @@ public class Species implements Serializable
 	//Returns the number of children the given species is supposed to spawn
 	public double getNumSpawns()
 	{
-		//Represents the number of children to spawn from the given speciesID
-		double numToSpawn = 0;
-
-		//Loop through the genomes in the given species and find the amount each genome
-		//is supposed to spawn and add it to the total for the species
-		for (int genomeID = 0; genomeID < species.size(); genomeID++)
-		{
-			numToSpawn += species.get(genomeID).getNumSpawns();
-		}
-
 		//Return
-		return numToSpawn;
+		return numSpawns;
 	}
 
 	//Returns the fittest/best member if the given species
@@ -174,10 +170,24 @@ public class Species implements Serializable
 		return this.alphaFitness;
 	}
 
+	public void determineSpawnLevels()
+	{
+		//Loop through the genomes in the given species and find the amount each genome
+		//is supposed to spawn and add it to the total for the species
+		for (int genomeID = 0; genomeID < species.size(); genomeID++)
+		{
+			numSpawns += species.get(genomeID).getNumSpawns();
+		}
+	}
+
 	//Figure out a way to return better people
 	//Returns a random member from the population
 	public Genome getMember()
 	{
+		if (species.size() == 1)
+		{
+			return species.get(0);
+		}
 		//Represents the list of ID's of the competitors
 		ArrayList<Integer> 	speciesToCompete 	= new ArrayList<Integer>();
 
@@ -241,7 +251,7 @@ public class Species implements Serializable
 				fitness *= youthReward;
 			}
 
-			double adjustedFitness = fitness - 5 * species.size();
+			double adjustedFitness = fitness / species.size();
 
 			species.get(speciesIndex).setAdjustedFitness(adjustedFitness);
 		}

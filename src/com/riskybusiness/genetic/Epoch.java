@@ -44,10 +44,6 @@ import java.util.ArrayList;
 
 public class Epoch
 {
-
-
-
-
 	public static void main(String... arg) throws Exception
 	{
 		/*User Params */
@@ -74,7 +70,7 @@ public class Epoch
 		//Represents the size of the population
 		int 	populationSize 			= 50;
 		//Represents the max number of generations without improvement before a species is killed
-		int 	extinctionLimit			= 15;
+		int 	extinctionLimit			= 20;
 		//Represents the number of input neurons
 		int 	numInputNeurons			= 13;
 		//Represents the number of output neurons
@@ -266,6 +262,8 @@ public class Epoch
 		Genome 				child 				= new Genome();
 		//Represents the rate at which a genomes breed
 		double 				crossoverRate 		= 0.3;
+		//Represents the total adjusted fitness of the entire population
+		double 				totalAdjustedFitness = 0.0;
 
 		//If load file then load all the variables from the file
 		if (loadFile)
@@ -402,7 +400,46 @@ public class Epoch
 					species.add(speciesToAdd);
 				}
 
+				//Set the added member to false for the next loop
 				addedMember = false;
+			}
+
+			//Set the adjusted fitnesses of each species
+			for (int speciesIndex = 0; speciesIndex < species.size(); speciesIndex++)
+			{
+				species.get(speciesIndex).setAdjustedFitness();
+			}
+
+			//Reset the total adjusted fitness
+			totalAdjustedFitness = 0;
+
+			//Find the total adjusted fitness of the population
+			for (int genomeIndex = 0; genomeIndex < populationSize; genomeIndex++)
+			{
+				totalAdjustedFitness += population.get(genomeIndex).getAdjustedFitness();
+			}
+
+			//Calculate the average adjusted fitness
+			double avgAdjustedFitness = totalAdjustedFitness / populationSize;
+
+			double total = 0;
+
+			//Calculate spawn levels
+			for (int genomeIndex = 0; genomeIndex < populationSize; genomeIndex++)
+			{
+				double amountToSpawn = population.get(genomeIndex).getAdjustedFitness() / avgAdjustedFitness;
+
+				population.get(genomeIndex).setNumSpawns(amountToSpawn);
+
+				total += amountToSpawn;
+			}
+
+			System.out.println("Total: " + total);
+
+			//Set species spawn levels
+			for (int speciesIndex = 0; speciesIndex < species.size(); speciesIndex++)
+			{
+				species.get(speciesIndex).determineSpawnLevels();
 			}
 
 			System.out.println("Overall best fitness " + bestFitness + "\n");
@@ -439,16 +476,9 @@ public class Epoch
 
 							toCopy = species.get(speciesIndex).getBestMember();
 
-							// if (generation % 500 == 0)
-							// {
-							// 	toCopy.printFitness();
-							// 	System.out.println("Best Member's Fitness " + toCopy.determineFitness() + "\n");
-							// 	System.out.println(species.get(speciesIndex).getBestMember());
-							// 	userInput = input.nextLine();
-							// }
-
 							//toCopy.printFitness();
 							System.out.println("Best Member's Fitness " + toCopy.determineFitness() + "\n");
+							System.out.println("SpeciesID: " + species.get(speciesIndex).getSpeciesID() + " numSpawns: " + species.get(speciesIndex).getNumSpawns());
 							//System.out.println(species.getBestMember(speciesID));
 
 							//Use elitism and always take the best member from the species

@@ -54,7 +54,7 @@ public class Genome implements Serializable
     //Represents the fitness of the genome adjusted for the species of the genome
     private double                  genomeAdjFitness;
     //Represents the amount of children to spawn
-    private double                  amountToSpawn = 1;
+    private double                  amountToSpawn;
     //Represents the number of input Neurons
     private int                     numInputNeurons;
     //Represents the number of output Neurons
@@ -165,6 +165,11 @@ public class Genome implements Serializable
     public double getNumSpawns()
     {
        return this.amountToSpawn;
+    }
+
+    public void setNumSpawns(double spawns)
+    {
+        this.amountToSpawn = spawns;
     }
 
     //Calculates the compatibility score between this genome and another genome
