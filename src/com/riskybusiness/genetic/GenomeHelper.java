@@ -43,8 +43,20 @@ public final class GenomeHelper extends Object
 	 * not allow someone to initialize this class.</p>
 	 */
 	private GenomeHelper(){}
-
-	//This function takes in an array of neuron genes and seperates them by layer
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspThis function takes in an
+	 * array of neuron genes and seperates them by layer. This
+	 * is used for a {@code NeuralNet} in respect to a
+	 * {@code Genome} to allow the {@code Genome} to encode a
+	 * list of {@code NeuronGene}s into the network.</p>
+	 * @param genes The genes to seperate into layers.
+	 * @param numLayers The number of layers needed to seperate into.
+	 * @return A two-dimensional {@code ArrayList}, each inner list
+	 * 			describing a layer, while the outer list
+	 * 			describes the list of these layers.
+	 * @see com.riskybusiness.genetic.Genome
+	 */
 	public static ArrayList<ArrayList<NeuronGene>> seperate(ArrayList<NeuronGene> genes, int numLayers)
 	{
 		//Represents the fill neural network seperated by layers
@@ -75,7 +87,18 @@ public final class GenomeHelper extends Object
 
 		return seperatedNeuronArray;
 	}
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspThis function takes in a
+	 * {@code NeuronGene} set and then sorts them into layers
+	 * using the {@link com.riskybusiness.genetic.GenomeHelper#seperate(ArrayList<NeuronGene>, int)}
+	 * function, returning those sorted values into the one
+	 * dimensional set given.</p>
+	 * @param genes The genes to sort and then get back sorted.
+	 * @param numLayers The number of layers to send to the
+	 * 			seperate function.
+	 * @see com.riskybusiness.genetic.GenomeHelper#seperate(ArrayList<NeuronGene>, int)
+	 */
 	public static void sortNeuronArray(ArrayList<NeuronGene> genes, int numLayers)
 	{
 
@@ -105,10 +128,22 @@ public final class GenomeHelper extends Object
 			genes.add(sortedNeuronArray.get(i));
 		}
 	}
-
-	//Assumes the neuron passed in has the correct layer
-	//This fucntion takes in a recently added neuron and then determines if the neurons that
-	//proceed that added neuron need to be pushed back to a new layer
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspThis function takes in a
+	 * recently added {@code NeuronGene} and determines if
+	 * the {@code NeuronGene} that proceeds the new gene
+	 * needs to be pushed back to a new layer or not. This
+	 * assumes that the {@code NeuronGene} passed in is
+	 * already in a correct layer. The pushing is done via
+	 * the {@link com.riskybusiness.genetic.NeuronGene#pushLayer()}
+	 * function.</p>
+	 * @param neuronGenes The list of {@code NeuronGene}s to
+	 * 			test pushing on.
+	 * @param linkGenes The list of {@code LinkGene}s to
+	 * 			assist the testing of the neurons.
+	 * @param addedNeuron The newest {@code NeuronGene}.
+	 */
 	public static void pushNeurons(ArrayList<NeuronGene> neuronGenes, ArrayList<LinkGene> linkGenes, NeuronGene addedNeuron) 
 	{
 		//Represents the neuron that a link points to
@@ -125,12 +160,12 @@ public final class GenomeHelper extends Object
 			{
 				//Find the neuron gene that the link points to
 				for (int j = 0; j < neuronGenes.size(); j++)
-                {
-                    if (neuronGenes.get(j).getID() == linkGenes.get(i).getToNeuron())
-                    {
-                       toNeuron = neuronGenes.get(j);
-                    }
-                }
+                		{
+                    			if (neuronGenes.get(j).getID() == linkGenes.get(i).getToNeuron())
+                    			{
+                       				toNeuron = neuronGenes.get(j);
+                    			}
+                		}
 
 				//Check the neuron and see if it needs to be pushed back
 				if (toNeuron.getNeuronLayer() == addedNeuron.getNeuronLayer())
@@ -160,6 +195,18 @@ public final class GenomeHelper extends Object
 	//This function requires the incoming neuron genes to be sorted in order to properly sort the links
 	//The function also requires that the push back function was called if a neuron was recently added
 	//This function sorts the array of links by the layer they first appear.
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspThe function sorts
+	 * the array of {@code LinkGene}s by the layer
+	 * they first appear. This function requires the
+	 * incoming {@code NeuronGene}s are sorted in
+	 * order to properly sort the links. This also
+	 * requires that the {@link com.riskybusiness.genetic.NeuronGene#pushLayer}
+	 * function was called if a neron was recently added (the push back function).</p>
+	 * @param neuronGenes The genes to send in to
+	 * 			assist in sorting.
+	 * @param linkGenes The genes to sort.
+	 */
 	public static void sortLinkArray(ArrayList<NeuronGene> neuronGenes, ArrayList<LinkGene> linkGenes)
 	{
 		//Represents the sorted links
@@ -193,7 +240,14 @@ public final class GenomeHelper extends Object
 			linkGenes.add(sortedLinkArray.get(i));
 		}
 	}
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspLoops through the list of
+	 * {@code LinkGene}s and removes the links that have
+	 * been disabled.</p>
+	 * @param linkGenes The list of genes to loop through.
+	 * @return A new list of the "combed" {@code LinkGene}s.
+	 */
 	public static ArrayList<LinkGene> removeDisabledLinks(ArrayList<LinkGene> linkGenes)
 	{
 
