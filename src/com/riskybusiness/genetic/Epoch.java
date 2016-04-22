@@ -318,7 +318,7 @@ public class Epoch
    		userInput = input.nextLine();
 
 
-		for (int generation = 1; generation < 5; generation++)
+		for (int generation = 1; generation < 20000; generation++)
 		{
 			System.out.println("Generation: " + generation);
 			System.out.println("Innovation Size: " + innovations.getSize());
@@ -374,9 +374,6 @@ public class Epoch
 
 			boolean addedMember = false;
 
-			System.out.println(population.size());
-			System.out.println(species.size());
-
 			//Speciate the new population
 			for (int genomeIndex = 0; genomeIndex < population.size(); genomeIndex++)
 			{
@@ -408,7 +405,7 @@ public class Epoch
 				addedMember = false;
 			}
 
-			System.out.println("Main Loop");
+			System.out.println("Overall best fitness " + bestFitness + "\n");
 
 			//Loop through each species and spawn genomes from each species
 			for (int speciesIndex = 0; speciesIndex < species.size(); speciesIndex++)
@@ -421,8 +418,6 @@ public class Epoch
 					{
 						System.out.println("Number of spawns: " + species.get(speciesIndex).getNumSpawns());
 					}
-
-					System.out.println("Num Spawns for species " + speciesID + " is " + species.get(speciesIndex).getNumSpawns());
 
 					//Creates the number of children necassary for the species
 					for (double i = 0.0; i < species.get(speciesIndex).getNumSpawns(); i++)

@@ -49,6 +49,19 @@ public class Species implements Serializable
 	//Represents the package used to supply psuedo-random numbers
 	private Random 				random 				= new Random();
 
+	//Represents the reward for being younger
+	private double				youthReward 		= 1.2;
+
+	//Represents the penalty for being old
+	private double				oldAgePenalty		= 0.8;
+
+	//Represents the age at which a species is old
+	private int 				oldAge 				= 35;
+
+	//Rpeprsents the age at which a species is still young
+	private int 				youngAge			= 16;
+
+
 	//Represents the ID to make species saveable to a text file
 	private static final long serialVersionUID = -4268206798591932773L;
 
@@ -210,6 +223,28 @@ public class Species implements Serializable
 
 		//Return the winner of the tourney
 		return species.get(bestFitnessID);
+	}
+
+	public void setAdjustedFitness()
+	{
+		for (int speciesIndex = 0; speciesIndex < species.size(); speciesIndex++)
+		{
+
+			double fitness = species.get(speciesIndex).determineFitness();
+
+			if (generation > oldAge)
+			{
+				fitness *= oldAgePenalty;
+			}
+			else if (generation < youngAge)
+			{
+				fitness *= youthReward;
+			}
+
+			double adjustedFitness = fitness - 5 * species.size();
+
+			species.get(speciesIndex).setAdjustedFitness(adjustedFitness);
+		}
 	}
 
 	@Override
