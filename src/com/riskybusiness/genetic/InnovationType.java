@@ -18,7 +18,29 @@
 package com.riskybusiness.genetic;
 import java.io.Serializable;
 
+/**
+ * <p>&nbsp&nbsp&nbsp&nbsp&nbspThis enumeration describes the different
+ * types of innovations that can be entered into a database. This
+ * includes, for now, {@link com.riskybusiness.genetic.InnovationType#NEW_LINK}
+ * as well as {@ink com.riskybusiness.genetic.InnovationType#NEW_NEURON}.</p>.
+ * @author Kaleb Luse
+ * @author Coved W Oswald
+ * @author Weston Miller
+ * @version 1.0
+ * @since 1.6
+ * @see com.riskybusiness.genetic.Innovation
+ */
 public enum InnovationType implements Serializable
 {
-	NEW_LINK, NEW_NEURON
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspDescribes a new link added to 
+	 * a {@code Genome}.
+	 */
+	NEW_LINK,
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspDescribes a new neuron added to
+	 * a {@code Genome}.
+	 */
+	NEW_NEURON
 }
