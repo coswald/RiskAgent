@@ -212,23 +212,17 @@ public final class GenomeHelper extends Object
 		//Represents the sorted links
 		ArrayList<LinkGene> sortedLinkArray = new ArrayList<LinkGene>();
 
-		//Represents the unsorted links
-		ArrayList<LinkGene> unsortedLinkArray = linkGenes; //Create a real copy?
-
 		//Loops through the neuron gene set and finds the corresponding links to each neuron
 		for (int i = 0; i < neuronGenes.size(); i++)
 		{
 			//Loops through all the links
-			for (int j = 0; j < unsortedLinkArray.size(); j++)
+			for (int j = 0; j < linkGenes.size(); j++)
 			{
 				//If the links from neuron is equal to the current neuron then add it to the sorted array and remove it from the unsorted list
-				if (neuronGenes.get(i).getID() == unsortedLinkArray.get(j).getFromNeuron())
+				if (neuronGenes.get(i).getID() == linkGenes.get(j).getFromNeuron())
 				{
 					//Add the link to the sorted array
-					sortedLinkArray.add(unsortedLinkArray.get(j));
-
-					//Remove the link from the unsorted array(variable trash doesn't do anything)
-					//LinkGene trash = unsortedLinkArray.remove(j);
+					sortedLinkArray.add(linkGenes.get(j));
 				}
 			}
 		}
@@ -239,32 +233,5 @@ public final class GenomeHelper extends Object
 		{
 			linkGenes.add(sortedLinkArray.get(i));
 		}
-	}
-	
-	/**
-	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspLoops through the list of
-	 * {@code LinkGene}s and removes the links that have
-	 * been disabled.</p>
-	 * @param linkGenes The list of genes to loop through.
-	 * @return A new list of the "combed" {@code LinkGene}s.
-	 */
-	public static ArrayList<LinkGene> removeDisabledLinks(ArrayList<LinkGene> linkGenes)
-	{
-
-		//Represents the link array of only active links
-		ArrayList<LinkGene> activeLinkGenes = linkGenes;
-
-		//Loops through all the links
-		for (int i = 0; i < linkGenes.size(); i++)
-		{
-			if (!(linkGenes.get(i).getEnabled()))
-			{
-				//If the link is disable remove it
-				LinkGene trash = activeLinkGenes.remove(i);
-			}
-		}
-
-		//Return the array of active links
-		return activeLinkGenes;
 	}
 }

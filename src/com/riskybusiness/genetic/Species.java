@@ -28,6 +28,25 @@ import java.util.ArrayList;
 
 public class Species implements Serializable
 {
+	/**********
+	 * Params *
+	 **********/
+		//Represents the reward for being younger
+	private double				youthReward 		= 1.2;
+
+	//Represents the penalty for being old
+	private double				oldAgePenalty		= 0.8;
+
+	//Represents the age at which a species is old
+	private int 				oldAge 				= 35;
+
+	//Rpeprsents the age at which a species is still young
+	private int 				youngAge			= 16;
+
+	/*********************
+	 * Species variables *
+	 *********************/
+
 	//Represents the species ID
 	private int 				speciesID 			= 0;
 
@@ -46,23 +65,11 @@ public class Species implements Serializable
 	//Represents the number of generations without improvement
 	private int 				gensNoImprovement 	= 0;
 
-	//Represents the package used to supply psuedo-random numbers
-	private Random 				random 				= new Random();
-
-	//Represents the reward for being younger
-	private double				youthReward 		= 1.2;
-
-	//Represents the penalty for being old
-	private double				oldAgePenalty		= 0.8;
-
-	//Represents the age at which a species is old
-	private int 				oldAge 				= 35;
-
-	//Rpeprsents the age at which a species is still young
-	private int 				youngAge			= 16;
-
 	//Represents the number of children to spawn from species
 	private double 				numSpawns 			= 0.0;
+
+	//Represents the package used to supply psuedo-random numbers
+	private Random 				random 				= new Random();
 
 
 	//Represents the ID to make species saveable to a text file
@@ -132,6 +139,15 @@ public class Species implements Serializable
 		numSpawns = 0.0;
 	}
 
+	//Sete the training parameters of the species
+	public void setParams(double reward, double penalty, int young, int old)
+	{
+		youthReward = reward;
+		oldAgePenalty = penalty;
+		youngAge = young;
+		oldAge = old;
+	}
+
 	//Returns the number of generations without improvement
 	public int gensWithNoImprovement()
 	{
@@ -147,14 +163,12 @@ public class Species implements Serializable
 	//Returns the number of members in the species
 	public int getNumMembers()
 	{
-		//Return
 		return this.species.size();
 	}
 
 	//Returns the number of children the given species is supposed to spawn
 	public double getNumSpawns()
 	{
-		//Return
 		return numSpawns;
 	}
 
@@ -170,6 +184,7 @@ public class Species implements Serializable
 		return this.alphaFitness;
 	}
 
+	//This calculates the number of spawns each species gets
 	public void determineSpawnLevels()
 	{
 		//Loop through the genomes in the given species and find the amount each genome
@@ -184,10 +199,12 @@ public class Species implements Serializable
 	//Returns a random member from the population
 	public Genome getMember()
 	{
+		//If there is only one member in the species return the member
 		if (species.size() == 1)
 		{
 			return species.get(0);
 		}
+
 		//Represents the list of ID's of the competitors
 		ArrayList<Integer> 	speciesToCompete 	= new ArrayList<Integer>();
 
@@ -237,22 +254,25 @@ public class Species implements Serializable
 
 	public void setAdjustedFitness()
 	{
+		//Loop through the species and calculate the species adjusted fitness
 		for (int speciesIndex = 0; speciesIndex < species.size(); speciesIndex++)
 		{
-
+			//Represents the fitness of the genome taken from the species
 			double fitness = species.get(speciesIndex).determineFitness();
 
+			//If the species generation is greater than what we consider old age then penalize the genome
 			if (generation > oldAge)
 			{
 				fitness *= oldAgePenalty;
 			}
+			//Else if its still considered young reward it
 			else if (generation < youngAge)
 			{
 				fitness *= youthReward;
 			}
 
+			//Determine the final adjusted fitenss and then set the genomes adjusted fitness
 			double adjustedFitness = fitness / species.size();
-
 			species.get(speciesIndex).setAdjustedFitness(adjustedFitness);
 		}
 	}

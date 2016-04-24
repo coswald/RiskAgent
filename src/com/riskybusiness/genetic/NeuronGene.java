@@ -25,9 +25,8 @@ import java.io.Serializable;
 
 public class NeuronGene implements Serializable
 {
-    
+    //Represents the ID to print out a innovation database
     private static final long serialVersionUID = -4444998043311781107L;
-    
     //Represents the ID of the Neuron
     private int     neuronID;
     //Represents the type of the Neuron, sigmoid or step
@@ -60,13 +59,13 @@ public class NeuronGene implements Serializable
         neuronLayer = layer;
         neuronActivationResponse = activate;
     }
-
-    //Get the id of the neuron
+    //Return the id of the neuron
     public int getID()
     {
         return this.neuronID;
     }
 
+    //SEt the id of the neuron
     public void setID(int id)
     {
         neuronID = id;
@@ -75,6 +74,7 @@ public class NeuronGene implements Serializable
     //Get the neuron type
     public String getNeuronType()
     {
+
         return this.neuronType;
     }
 
@@ -108,11 +108,13 @@ public class NeuronGene implements Serializable
         this.neuronLayer = layer;
     }
 
+    //Return the bias weight of the neuron
     public double getBiasWeight()
     {
         return this.biasWeight;
     }
 
+    //Set the bias weight of the neuron
     public void setBiasWeight(double weight)
     {
         this.biasWeight = weight;

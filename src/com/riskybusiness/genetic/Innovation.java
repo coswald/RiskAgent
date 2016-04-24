@@ -35,7 +35,7 @@ import java.io.Serializable;
  * @author Kaleb Luse
  * @author Coved W Oswald
  * @author Weston Miller
- * @ldm 22 April 2016
+ * @ldm 20 February 2016
  * @version 1.0
  * @since 1.6
  * @see com.riskybusiness.genetic.InnovationType
@@ -72,14 +72,6 @@ public class Innovation implements Serializable
 		this.fromNeuron = from;
 		this.toNeuron = to;
 		this.neuronID = id;
-		//this.innovationNum = num;
-	}
-
-	//fix this?
-	//@Override
-	public boolean equals(Innovation innovation)
-	{
-		return (this.type == innovation.type && this.fromNeuron == innovation.fromNeuron && this.toNeuron == innovation.toNeuron && this.neuronID == innovation.neuronID);
 	}
 	
 	/**

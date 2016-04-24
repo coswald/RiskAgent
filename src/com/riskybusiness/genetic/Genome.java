@@ -125,6 +125,16 @@ public class Genome implements Serializable
         return this.numOutputNeurons;
     }
 
+    public void setNumInputs(int numInputs)
+    {
+        this.numInputNeurons = numInputs;
+    }
+
+    public void setNumOutputs(int numOutputs)
+    {
+        this.numOutputNeurons = numOutputs;
+    }
+
     //Get the number of neurons in the genome
     public int getSizeNeuron()
     {
@@ -767,57 +777,6 @@ public class Genome implements Serializable
 
                     //Sort the link genes
                     GenomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
-                    
-                    return;
-                }
-                else //the innovation already exists
-                {
-                    int newNeuronID = innovation.getNeuronID(innovationCheck);
-
-                    System.out.println("New neuron ID: " + newNeuronID);
-
-                    int linkID1 = innovation.getInnovationID(fromNeuronID, neuronGeneSet.size() + 1);
-                    int linkID2 = innovation.getInnovationID(neuronGeneSet.size() + 1, toNeuronID);
-
-                    //Determine Nueron layer
-                    NeuronGene fromNeuron = new NeuronGene();
-
-                    //Find the from neuron
-                    for (int j = 0; j < neuronGeneSet.size(); j++)
-                    {
-                        if (neuronGeneSet.get(j).getID() == fromNeuronID)
-                        {
-                           fromNeuron = neuronGeneSet.get(j);
-                           break;
-                        }
-                    }
-
-                    //Determine the layer of the fromNeuron and add 1 to get the neuron to be added layer
-                    int newNeuronLayer = fromNeuron.getNeuronLayer() + 1;
-
-                    //Add the genes but don't update the innovation database
-                    neuronGeneSet.add(new NeuronGene(neuronGeneSet.size() + 1, "Sigmoid", "Hidden", random.nextDouble(), newNeuronLayer));
-                    linkGeneSet.add(new LinkGene(linkGeneSet.size() + 1, fromNeuronID, newNeuronID, linkID1, 1.0, true));
-                    numLinkGenes++;
-                    linkGeneSet.add(new LinkGene(linkGeneSet.size() + 1, newNeuronID, toNeuronID, linkID2, originalWeight, true));
-                    numLinkGenes++;
-
-                    //Push back any neurons that were affected by the addition
-                    GenomeHelper.pushNeurons(neuronGeneSet, linkGeneSet, neuronGeneSet.get((neuronGeneSet.size() - 1)));
-
-                    for (int j = 0; j < neuronGeneSet.size(); j++)
-                    {
-                        if(neuronGeneSet.get(j).getNeuronLayer() > numLayers)
-                        {
-                            numLayers++;
-                        }
-                    }
-
-                    //Sort the neuron array
-                    GenomeHelper.sortNeuronArray(neuronGeneSet, numLayers);
-
-                    //Sort the link genes
-                    GenomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
                 }
             }
         }
@@ -961,188 +920,213 @@ public class Genome implements Serializable
 
     public Genome crossover(Genome dad, InnovationDB innovation)
     {
-        // //Represents which genome has the best fitness
-        // int best; //0 = Mom, 1 = Dad;
+        //Represents which genome has the best fitness
+        int best; //0 = Mom, 1 = Dad;
         
-        // //Represents the current index of mom and dads gene counter
-        // int dadIndex = 0;
-        // int momIndex = 0;
+        //Represents the current index of mom and dads gene counter
+        int dadIndex = 0;
+        int momIndex = 0;
 
-        // //Represents if a gene has been selected from either mom or dad
-        // boolean selected = false;
+        //Represents if a gene has been selected from either mom or dad
+        boolean selected = false;
 
-        // //Represents the array of neuronGenes for the baby
-        // ArrayList<NeuronGene> babyNeuronGenes = new ArrayList<NeuronGene>();
+        //Represents the array of neuronGenes for the baby
+        ArrayList<NeuronGene> babyNeuronGenes = new ArrayList<NeuronGene>();
         
-        // //Represents the array of linkGenes for the baby
-        // ArrayList<LinkGene> babyLinkGenes = new ArrayList<LinkGene>();
+        //Represents the array of linkGenes for the baby
+        ArrayList<LinkGene> babyLinkGenes = new ArrayList<LinkGene>();
 
-        // //Represents the neuronID's to be added 
-        // ArrayList<Integer> neuronIDS = new ArrayList<Integer>();
+        //Represents the neuronID's to be added 
+        ArrayList<Integer> neuronIDS = new ArrayList<Integer>();
 
-        // LinkGene selectedLink = new LinkGene();
+        LinkGene selectedLink = new LinkGene();
 
-        // this.determineFitness();
-        // dad.determineFitness();
+        this.determineFitness();
+        dad.determineFitness();
 
-        // if (this.getFitness() == dad.getFitness())
-        // {
-        //     if (this.getNumLinkGenes() == dad.getNumLinkGenes())
-        //     {
-        //         best = random.nextInt(2);
-        //     }
-        //     else
-        //     {
-        //         if (this.getNumLinkGenes() < dad.getNumLinkGenes())
-        //         {
-        //             best = 0; //Mom
-        //         }
-        //         else
-        //         {
-        //             best = 1; //Dad
-        //         }
-        //     }
-        // }
-        // else
-        // {
-        //     if (this.getFitness() > dad.getFitness())
-        //     {
-        //         best = 0; //Mom
-        //     }
-        //     else
-        //     {
-        //         best = 1; //Dad
-        //     }
-        // }
+        if (this.getFitness() == dad.getFitness())
+        {
+            if (this.getNumLinkGenes() == dad.getNumLinkGenes())
+            {
+                best = random.nextInt(2);
+            }
+            else
+            {
+                if (this.getNumLinkGenes() < dad.getNumLinkGenes())
+                {
+                    best = 0; //Mom
+                }
+                else
+                {
+                    best = 1; //Dad
+                }
+            }
+        }
+        else
+        {
+            if (this.getFitness() > dad.getFitness())
+            {
+                best = 0; //Mom
+            }
+            else
+            {
+                best = 1; //Dad
+            }
+        }
 
-        // while(!((momIndex == this.linkGeneSet.size()) && dadIndex == dad.linkGeneSet.size()))
-        // {
-        //     if ((momIndex == this.linkGeneSet.size() && dadIndex != dad.linkGeneSet.size()))
-        //     {
-        //         if (best == 1)
-        //         {
-        //             selectedLink = dad.linkGeneSet.get(dadIndex);
-        //             selected = true;
-        //         }
+        while(!((momIndex == this.linkGeneSet.size()) && dadIndex == dad.linkGeneSet.size()))
+        {
+            if ((momIndex == this.linkGeneSet.size() && dadIndex != dad.linkGeneSet.size()))
+            {
+                if (best == 1)
+                {
+                    selectedLink = dad.linkGeneSet.get(dadIndex);
+                    selected = true;
+                }
 
-        //         dadIndex++;
-        //     }
-        //     else if ((dadIndex == dad.linkGeneSet.size()) && momIndex != this.linkGeneSet.size())
-        //     {
-        //         if (best == 0)
-        //         {
-        //             selectedLink = this.linkGeneSet.get(momIndex);
-        //             selected = true;
-        //         }
+                dadIndex++;
+            }
+            else if ((dadIndex == dad.linkGeneSet.size()) && momIndex != this.linkGeneSet.size())
+            {
+                if (best == 0)
+                {
+                    selectedLink = this.linkGeneSet.get(momIndex);
+                    selected = true;
+                }
 
-        //         momIndex++;
-        //     }
-        //     else if (this.getInnovationNum(this.linkGeneSet.get(momIndex)) < dad.getInnovationNum(dad.linkGeneSet.get(dadIndex)))
-        //     {
-        //         if (best == 0)
-        //         {
-        //             selectedLink = this.linkGeneSet.get(momIndex);
-        //             selected = true;
-        //         }
+                momIndex++;
+            }
+            else if (this.getInnovationNum(this.linkGeneSet.get(momIndex)) < dad.getInnovationNum(dad.linkGeneSet.get(dadIndex)))
+            {
+                if (best == 0)
+                {
+                    selectedLink = this.linkGeneSet.get(momIndex);
+                    selected = true;
+                }
 
-        //         momIndex++;
-        //     }
-        //     else if (this.getInnovationNum(this.linkGeneSet.get(momIndex)) > dad.getInnovationNum(dad.linkGeneSet.get(dadIndex)))
-        //     {
-        //         if (best == 1)
-        //         {
-        //             selectedLink = dad.linkGeneSet.get(dadIndex);
-        //             selected = true;
-        //         }
+                momIndex++;
+            }
+            else if (this.getInnovationNum(this.linkGeneSet.get(momIndex)) > dad.getInnovationNum(dad.linkGeneSet.get(dadIndex)))
+            {
+                if (best == 1)
+                {
+                    selectedLink = dad.linkGeneSet.get(dadIndex);
+                    selected = true;
+                }
 
-        //         dadIndex++;
-        //     }
-        //     else if (this.getInnovationNum(this.linkGeneSet.get(momIndex)) == dad.getInnovationNum(dad.linkGeneSet.get(dadIndex)))
-        //     {
-        //         if (random.nextDouble() < 0.5)
-        //         {
-        //             selectedLink = this.linkGeneSet.get(momIndex);
-        //             selected = true;
-        //         }
-        //         else
-        //         {
-        //             selectedLink = dad.linkGeneSet.get(dadIndex);
-        //             selected = true;
-        //         }
+                dadIndex++;
+            }
+            else if (this.getInnovationNum(this.linkGeneSet.get(momIndex)) == dad.getInnovationNum(dad.linkGeneSet.get(dadIndex)))
+            {
+                if (random.nextDouble() < 0.5)
+                {
+                    selectedLink = this.linkGeneSet.get(momIndex);
+                    selected = true;
+                }
+                else
+                {
+                    selectedLink = dad.linkGeneSet.get(dadIndex);
+                    selected = true;
+                }
 
-        //         momIndex++;
-        //         dadIndex++;
-        //     }
+                momIndex++;
+                dadIndex++;
+            }
 
-        //     if (selected)
-        //     {
-        //         selected = false;
-        //         if (babyLinkGenes.size() == 0)
-        //         {
-        //             babyLinkGenes.add(selectedLink);
-        //         }
-        //         else
-        //         {
-        //             if (babyLinkGenes.get(babyLinkGenes.size() - 1).getInnovationID() != selectedLink.getInnovationID())
-        //             {
-        //                 babyLinkGenes.add(selectedLink);
-        //             }
-        //         }
+            if (selected)
+            {
+                selected = false;
+                if (babyLinkGenes.size() == 0)
+                {
+                    babyLinkGenes.add(selectedLink);
+                }
+                else
+                {
+                    if (babyLinkGenes.get(babyLinkGenes.size() - 1).getInnovationID() != selectedLink.getInnovationID())
+                    {
+                        babyLinkGenes.add(selectedLink);
+                    }
+                }
 
-        //         // boolean fromNeuronExists = false;
-        //         // boolean toNeuronExists   = false;
+                //Represents whether the neuron ID exists within the neuronID array
+                boolean found = false;
 
-        //         // int fromNeuronID = selectedLink.getFromNeuron();
-        //         // int toNeuronID   = selectedLink.getToNeuron();
+                for (int i = 0; i < neuronIDS.size(); i++)
+                {
+                    if (selectedLink.getToNeuron() == neuronIDS.get(i))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
 
-        //         // for (int i = 0; i < neuronIDS.size(); i++)
-        //         // {
-        //         //     if (neuronIDS.get(i) == fromNeuronID)
-        //         //     {
-        //         //         fromNeuronExists = true;
-        //         //     }
+                if (!found)
+                {
+                    neuronIDS.add(selectedLink.getToNeuron());
+                }
 
-        //         //     if (neuronIDS.get(i) == toNeuronID)
-        //         //     {
-        //         //         toNeuronExists = true;
-        //         //     }
-        //         // }
+                found = false;
 
-        //         // if !(fromNeuronExists || toNeuronExists)
-        //         // {
-        //         //     for (int i = 0; i < this.neuronGeneSet.size(); i++)
-        //         //     {
+                for (int i = 0; i < neuronIDS.size(); i++)
+                {
+                    if (selectedLink.getFromNeuron() == neuronIDS.get(i))
+                    {
+                        found = true;
+                        break;
+                    }
+                }
 
-        //         //     }
-        //         // }
-        //         // else if !(toNeuronExists)
-        //         // {
-        //         //     neuronIDS.add(selectedLink.getToNeuron());
-        //         // }
-        //         // else if !(fromNeuronExists)
-        //         // {
+                if (!found)
+                {
+                    neuronIDS.add(selectedLink.getFromNeuron());
+                }
+            }
+        }
 
-        //         // }
-        //     }
-        // }
+        if (best == 1)
+        {
+            for (int i = 0; i < neuronIDS.size(); i++)
+            {
+                for (int j = 0; j < dad.getNeurons().size(); j++)
+                {
+                    if (neuronIDS.get(i) == dad.getNeurons().get(j).getID())
+                    {
+                        babyNeuronGenes.add(dad.getNeurons().get(j));
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < neuronIDS.size(); i++)
+            {
+                for (int j = 0; j < this.neuronGeneSet.size(); j++)
+                {
+                    if (neuronIDS.get(i) == this.neuronGeneSet.get(j).getID())
+                    {
+                        babyNeuronGenes.add(this.neuronGeneSet.get(j));
+                    }
+                }
+            }
+        }
 
-        // for (int i = 0; i < babyLinkGenes.size(); i++)
-        // {
-        //     //System.out.println(babyLinkGenes.get(i));
-        // }
+        int babyNumLayers = 0;
 
-        // //Add neuronGenes
-        // for (int i = 0; i < this.neuronGeneSet.size();i++)
-        // {
-
-        // }
+        for (int i = 0; i < babyNeuronGenes.size(); i++)
+        {
+            if (babyNeuronGenes.get(i).getNeuronLayer() > babyNumLayers)
+            {
+                babyNumLayers = babyNeuronGenes.get(i).getNeuronLayer();
+            }
+        }
 
         //sort neurons
+        GenomeHelper.sortNeuronArray(babyNeuronGenes, babyNumLayers);
 
-        //Add to the innovation database?
+        GenomeHelper.sortLinkArray(babyNeuronGenes, babyLinkGenes);
 
         //create the genome.
-        return dad;
+        return new Genome(0, babyNeuronGenes, babyLinkGenes, 0, 0);
 
     }
     

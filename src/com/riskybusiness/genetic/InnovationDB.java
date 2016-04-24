@@ -31,19 +31,39 @@ public class InnovationDB implements Serializable
 	private int 					innovationID;
 	//Represents the neuronID to add
 	private int 					neuronID;
-
+	//Represents the ID to print our a innovation database
 	private static final long serialVersionUID = 141838380522290195L;
 
 
 	public InnovationDB(int start)
 	{
+		//Set the first parameters
 		innovationID = 0;
 		neuronID = start;
 	}
 
 	public int getSize()
 	{
+		//Return the size of the innovation database
 		return innovationDB.size();
+	}
+
+	public int curID()
+	{
+		//Return the current Id of the innovation database
+		return innovationID;
+	}
+
+	public int getNext()
+	{
+		//Return the next neuron ID to be added
+		return neuronID + 1;
+	}
+
+	public int getNeuronID(int index)
+	{
+		//Returns the neuron ID of the last neuron added
+		return innovationDB.get(index - 1).getNeuronID();
 	}
 
 	public int innovationExists(InnovationType type, int from, int to, int id)
@@ -51,16 +71,14 @@ public class InnovationDB implements Serializable
 		//See if the innovation datebase contains the toFind object
 		for (int i = 0; i < innovationDB.size(); i++)
 		{
+			//If the innovation exists then return the innovation ID
 			if (innovationDB.get(i).isEqual(type, from, to, id))
 			{
-				/**
-				Test
-				**/
-				 return i + 1;
+				 return i;
 			}
 		}
-
-		return 0;
+		//If its not in the database return -1
+		return -1;
 	}
 
 	public int innovationExists(InnovationType type, int from, int to)
@@ -68,27 +86,27 @@ public class InnovationDB implements Serializable
 		//See if the innovation datebase contains the toFind object
 		for (int i = 0; i < innovationDB.size(); i++)
 		{
+			//If the innovation exists then return the innovation ID
 			if (innovationDB.get(i).isEqual(type, from, to))
 			{
-				/**
-				Test
-				**/
-				 return i + 1;
+				 return i;
 			}
 		}
-
-		return 0;
+		//If its not in the database return -1
+		return -1;
 	}
 
 	public int addInnovation(InnovationType type, int from, int to, int id)
 	{
+		//Determine the type of innovation and call the proper innovation exists function
 		if (type == InnovationType.NEW_LINK)
 		{
 			int innovationCheck = innovationExists(type, from, to, id);
 
 			//Check to see if innovation exists
-			if (innovationCheck != 0)
+			if (innovationCheck != -1)
 			{
+				//If it does return the innovation ID
 				return innovationCheck;
 			} 
 			else 
@@ -97,7 +115,7 @@ public class InnovationDB implements Serializable
 				innovationDB.add(innovationID, new Innovation(type, from, to, id));
 				//Increment innovationID
 				innovationID++; 
-				return 0;
+				return -1;
 			}
 		}
 		else
@@ -105,8 +123,9 @@ public class InnovationDB implements Serializable
 			int innovationCheck = innovationExists(type, from, to);
 
 			//Check to see if innovation exists
-			if (innovationCheck != 0)
+			if (innovationCheck != -1)
 			{
+				//If it does return the innovation ID
 				return innovationCheck;
 			} 
 			else 
@@ -115,36 +134,23 @@ public class InnovationDB implements Serializable
 				innovationDB.add(innovationID, new Innovation(type, from, to, ++neuronID));
 				//Increment innovationID and neuronID
 				innovationID++; 
-				return 0;
+				return -1;
 			}
 		}
 	}
 
-	public int curID()
-	{
-		return innovationID;
-	}
-
-	public int getNext()
-	{
-		return neuronID + 1;
-	}
-
-	public int getNeuronID(int index)
-	{
-		return innovationDB.get(index - 1).getNeuronID();
-	}
-
 	public int getInnovationID(int fromNeuron, int toNeuron)
 	{
+		//Loop through the innovation database and find the innovation and return its ID
 		for (int i = 0; i < innovationDB.size(); i++)
 		{
+			//Check to see if the passed in link is in the Database
 			if (innovationDB.get(i).isEqual(InnovationType.NEW_LINK, fromNeuron, toNeuron, -1))
 			{
 				return i;
 			}
 		}
-
+		//If its not in the database return -1
 		return -1;
 	}
 
