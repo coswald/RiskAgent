@@ -31,7 +31,8 @@ public class Species implements Serializable
 	/**********
 	 * Params *
 	 **********/
-		//Represents the reward for being younger
+	
+	//Represents the reward for being younger
 	private double				youthReward 		= 1.2;
 
 	//Represents the penalty for being old

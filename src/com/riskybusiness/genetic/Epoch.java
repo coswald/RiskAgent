@@ -42,8 +42,23 @@ import java.util.Random;
 import java.util.Scanner;
 import java.util.ArrayList;
 
-public class Epoch
+public class Epoch implements Runnable
 {
+
+	public void run()
+	{
+		Scanner z = new Scanner(System.in);
+
+		while(true)
+		{
+			String s = z.nextLine();
+			break;
+		}
+		//save stuff too... but maybe not.
+		System.out.println("Stopped!");
+		System.exit(0);
+	}
+
 	public static void main(String... arg) throws Exception
 	{
 		/*User Params */
@@ -78,7 +93,7 @@ public class Epoch
 		//Represents the number of initial hidden layers
 		int 	numHiddenLayers			= 2;
 		//Represents the number of initial neurons in each hidden layer
-		int[]	hiddenLayers 			= {13,1};
+		int[]	hiddenLayers 			= {numInputNeurons, 1};
 		//Represents the number of neurons in the genome up to the given index
 		int[] 	summationNeuronsInLayer	= new int[numHiddenLayers + 3];
 		//Represents the current neuron ID 
@@ -88,10 +103,13 @@ public class Epoch
 		//Represents the maximum number of species allowed
 		int 	maxNumSpecies 			= 6;
 		//Represents the species threshold which determines whether a genome will be accepted into a species
-		double speciesThreshold 		= 0.15;
+		double 	speciesThreshold 		= 0.15;
 		//Represents how much we should increase the compatibility threshhold should we exceed the number of species
 		double 	threshholdPerturbation 	= 0.02;
-
+		//Represents the number of generations to run
+		int 	numGenerations 			= 0;
+		//Represents whether the user has chosen to do an advanced network creation
+		boolean advancedNetCreation 	= false;
 
 
 		/* Helper Items */
@@ -117,15 +135,325 @@ public class Epoch
    		/* Historical Data */	
 
    		//Represents the historical changes of all the previous populations
-   		InnovationDB 			innovations	= new InnovationDB(5);	
+   		InnovationDB 		innovations	= new InnovationDB();	
 
 
    		//Load param file
    		//Throws File Exception: 
 
+   		FileInputStream 	fileObject 	= new FileInputStream("params.txt");
+
+   		Scanner 			z 			= new Scanner(fileObject);
+   		
+   		int 				varIndex 	= 1;
+
+		//Represents the newPopulation created from the old one
+		ArrayList<Genome> 	newPopulation 		= new ArrayList<Genome>();
+		//Represents the speciated population
+		ArrayList<Species> 	species 			= new ArrayList<Species>();
+		//Represents the ID of the current species
+		int 				speciesID 			= 0;
+		//Represents the best genome seen so far
+		Genome 				theChosenOne		= new Genome();
+		//Represents the best fitness seen so far
+		double 				bestFitness			= 0.0;
+		//Represents the genome used to make deep copies
+		Genome 				toCopy 				= new Genome();
+		//Represents the child of a crossover
+		Genome 				child 				= new Genome();
+		//Represents the rate at which a genomes breed
+		double 				crossoverRate 		= 0.3;
+		//Represents the total adjusted fitness of the entire population
+		double 				totalAdjustedFitness = 0.0;
+
+		//Represents the reward for being younger
+		double				youthReward 		= 1.2;
+
+		//Represents the penalty for being old
+		double				oldAgePenalty		= 0.8;
+
+		//Represents the age at which a species is old
+		int 				oldAge 				= 35;
+
+		//Rpeprsents the age at which a species is still young
+		int 				youngAge			= 16;
+
+		int backupGen = 0;
+
+		boolean addNeuron			= true;
+		boolean	addLink				= true;
+		boolean	addLoopedLink		= false;
+		boolean changeNeuronType 	= false;
+		boolean mutateBiasWeight	= true;
+		boolean mutateInputLink 	= true;
+		boolean mutateInputNeuron 	= false;
+		boolean mutateNeuron 		= true;
+		boolean mutateLink 			= true;
+
+		double 	addNeuronRate 		= 0.05;
+		int    	maxCheckForNeuron 	= 20;
+		double  addLinkRate 		= 0.05;
+		int 	maxCheckforLink		= 20;
+		double 	addLoopedLinkRate 	= 0.05;
+		int 	maxCheckForLooped 	= 20;
+		double  chanceOfTypeChange  = 0.10;
+		double  chanceOfSigmoid		= 0.5;
+		double  biasLinkMutateRate 	= 0.2;
+		double 	inLinkMutateRate	= 0.5;
+		double  inNeuronMutateRate 	= 0.1;
 
 
-
+		while(z.hasNext())
+		{
+			String line = z.nextLine();
+			String text = line.replace(" ", "");
+			if(!line.contains("#") && !line.equals(""))
+			{
+				text = text.split("=")[1];
+				switch (varIndex) {
+					case 1: populationSize = Integer.parseInt(text);
+						break;
+					case 2: numGenerations = Integer.parseInt(text);
+						break;
+					case 3: backupGen = Integer.parseInt(text);
+						break;
+					/**
+					case 4: 
+					*/
+					case 5: 
+						if (text.toLowerCase().equals("false"))
+						{
+							advancedNetCreation = false;
+						}
+						else if (text.toLowerCase().equals("true"))
+						{
+							advancedNetCreation = true;
+						}
+						else
+						{
+							throw new RuntimeException("Error 101: Advance Network Creation parameter not set properly");
+						}
+						break;
+					case 6: 
+						if (!advancedNetCreation)
+						{
+							numInputNeurons = Integer.parseInt(text);
+						}
+						break;
+					case 7: 
+						if (!advancedNetCreation)
+						{
+							numOutputNeurons = Integer.parseInt(text);
+						}
+						break;
+					case 8:
+						if (!advancedNetCreation)
+						{
+							numHiddenLayers = Integer.parseInt(text) + 1;
+						}
+						break;
+					case 9: 
+						if (!advancedNetCreation)
+						{
+							hiddenLayers[0] = numInputNeurons;
+							for (int i = 1; i < numHiddenLayers; i++)
+							{
+								hiddenLayers[i] = Integer.parseInt(text);
+							}
+						}
+						break;
+					// case 10:
+					// 	/**
+					// 	Ask Coved
+					// 	*/
+					// 	if (advancedNetCreation)
+					// 	{
+							
+					// 	}
+					case 11: maxNumSpecies = Integer.parseInt(text);
+						break;
+					case 12: speciesThreshold = Double.parseDouble(text);
+						break;
+					case 13: threshholdPerturbation = Double.parseDouble(text);
+						break;
+					case 14: extinctionLimit = Integer.parseInt(text);
+						break;
+					case 15: youthReward = Double.parseDouble(text);
+						break;
+					case 16: oldAgePenalty = Double.parseDouble(text);
+						break;
+					case 17: oldAge = Integer.parseInt(text);
+						break;
+					case 18: youngAge = Integer.parseInt(text);
+						break;
+					case 19: 
+						if (text.toLowerCase().equals("false"))
+						{
+							addNeuron = false;
+						}
+						else if (text.toLowerCase().equals("true"))
+						{
+							addNeuron = true;
+						}
+						else
+						{
+							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
+						}
+						break;
+					case 20: addNeuronRate = Double.parseDouble(text);
+						break;
+					case 21: maxCheckForNeuron = Integer.parseInt(text);
+						break;
+					case 22: 
+						if (text.toLowerCase().equals("false"))
+						{
+							addLink = false;
+						}
+						else if (text.toLowerCase().equals("true"))
+						{
+							addLink = true;
+						}
+						else
+						{
+							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
+						}
+						break;
+					case 23: addLinkRate = Double.parseDouble(text);
+						break;
+					case 24: maxCheckforLink = Integer.parseInt(text);
+						break;
+					case 25:
+						if (text.toLowerCase().equals("false"))
+						{
+							addLoopedLink = false;
+						}
+						else if (text.toLowerCase().equals("true"))
+						{
+							addLoopedLink = true;
+						}
+						else
+						{
+							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
+						}
+						break;
+					case 26: 
+						if(addLoopedLink)
+						{
+							addLoopedLinkRate = Double.parseDouble(text);
+						}
+						else
+						{
+							addLoopedLinkRate = 0.00;
+						}
+						break;
+					case 27: 
+						if(addLoopedLink)
+						{
+							maxCheckForLooped =Integer.parseInt(text);
+						}
+						else
+						{
+							maxCheckForLooped = 0;
+						}
+						break;
+					case 28:
+						if (text.toLowerCase().equals("false"))
+						{
+							changeNeuronType = false;
+						}
+						else if (text.toLowerCase().equals("true"))
+						{
+							changeNeuronType = true;
+						}
+						else
+						{
+							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
+						}
+						break;
+					case 29: chanceOfTypeChange = Double.parseDouble(text);
+						break;
+					case 30: chanceOfSigmoid = Double.parseDouble(text);
+						break;
+					case 31:
+						if (text.toLowerCase().equals("false"))
+						{
+							mutateBiasWeight = false;
+						}
+						else if (text.toLowerCase().equals("true"))
+						{
+							mutateBiasWeight = true;
+						}
+						else
+						{
+							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
+						}
+						break;
+					case 32: biasLinkMutateRate = Double.parseDouble(text);
+						break;						
+					case 33:
+						if (text.toLowerCase().equals("false"))
+						{
+							mutateInputLink = false;
+						}
+						else if (text.toLowerCase().equals("true"))
+						{
+							mutateInputLink = true;
+						}
+						else
+						{
+							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
+						}
+						break;
+					case 34: inLinkMutateRate = Double.parseDouble(text);
+						break;
+					case 35:
+						if (text.toLowerCase().equals("false"))
+						{
+							mutateInputNeuron = false;
+						}
+						else if (text.toLowerCase().equals("true"))
+						{
+							mutateInputNeuron = true;
+						}
+						else
+						{
+							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
+						}
+						break;
+					case 36: inNeuronMutateRate = Double.parseDouble(text);
+						break;
+					case 37:
+						if (text.toLowerCase().equals("false"))
+						{
+							mutateNeuron = false;
+						}
+						else if (text.toLowerCase().equals("true"))
+						{
+							mutateNeuron = true;
+						}
+						else
+						{
+							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
+						}
+						break;
+					case 38:
+						if (text.toLowerCase().equals("false"))
+						{
+							mutateLink = false;
+						}
+						else if (text.toLowerCase().equals("true"))
+						{
+							mutateLink = true;
+						}
+						else
+						{
+							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
+						}
+						break;
+				}
+				varIndex++;
+			}
+		}
 
    		//Validate user input and determine if they would like to load a file or start new
    		while (!(userInput.equals("L") || userInput.equals("S")))
@@ -134,6 +462,11 @@ public class Epoch
    			userInput = input.nextLine();
    		}
 
+
+   		if (userInput.equals("L"))
+   		{
+   			loadFile = true;
+   		}
 
    		if (!loadFile) 
    		{
@@ -248,30 +581,6 @@ public class Epoch
 			}
 		}
 
-
-		//Represents the newPopulation created from the old one
-		ArrayList<Genome> 	newPopulation 		= new ArrayList<Genome>();
-		//Represents the speciated population
-		ArrayList<Species> 	species 			= new ArrayList<Species>();
-		//Represents the ID of the current species
-		int 				speciesID 			= 0;
-		//Represents the best genome seen so far
-		Genome 				theChosenOne		= new Genome();
-		//Represents the best fitness seen so far
-		double 				bestFitness			= 0.0;
-		//Represents the number of children spawned so far
-		int 				numChildrenSpawned 	= 0;
-		//Represents the number of children to spawn
-		int 				numberToSpawn 		= 100;
-		//Represents the genome used to make deep copies
-		Genome 				toCopy 				= new Genome();
-		//Represents the child of a crossover
-		Genome 				child 				= new Genome();
-		//Represents the rate at which a genomes breed
-		double 				crossoverRate 		= 0.3;
-		//Represents the total adjusted fitness of the entire population
-		double 				totalAdjustedFitness = 0.0;
-
 		//If load file then load all the variables from the file
 		if (loadFile)
 		{
@@ -322,8 +631,9 @@ public class Epoch
 		System.out.println("Hit [Enter] to start!");
    		userInput = input.nextLine();
 
-
-		for (int generation = 1; generation < 20000; generation++)
+   		Thread t = new Thread(new Epoch());
+   		t.start();
+		for (int generation = 1; generation <= numGenerations; generation++)
 		{
 			System.out.println("Generation: " + generation);
 
@@ -376,6 +686,7 @@ public class Epoch
 				speciesThreshold -= threshholdPerturbation;
 			}
 
+			//Represents whether a member has been added
 			boolean addedMember = false;
 
 			//Speciate the new population
@@ -495,13 +806,41 @@ public class Epoch
 
 						//Use elitism and always take the best member from the species and mutate it
 						child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
-						
-						child.addNeuron(0.05, innovations, 20);
-						child.addLink(0.05, 0.0, innovations, 10, 20);
-						child.changeBiasWeight(0.2);
-
-						child.mutateNeuronWeights();
-						child.mutateLinkWeights();
+						/**
+						Here
+						*/
+						if(addNeuron)
+						{
+							child.addNeuron(addNeuronRate, innovations, maxCheckForNeuron);
+						}
+						if(addLink)
+						{
+							child.addLink(addLinkRate, addLoopedLinkRate, innovations, maxCheckForLooped, maxCheckforLink);
+						}
+						if(changeNeuronType)
+						{
+							child.changeNeuronType(chanceOfTypeChange, chanceOfSigmoid);
+						}
+						if(mutateBiasWeight)
+						{
+							child.changeBiasWeight(biasLinkMutateRate);
+						}
+						if(mutateInputLink)
+						{
+							child.mutateInputLink(inLinkMutateRate);
+						}
+						if(mutateInputNeuron)
+						{
+							//child.mutateInputNeuron(inNeuronMutateRate);
+						}
+						if(mutateNeuron)
+						{
+							child.mutateNeuronWeights();
+						}
+						if(mutateLink)
+						{
+							child.mutateLinkWeights();
+						}
 					}
 					else
 					{
@@ -529,6 +868,10 @@ public class Epoch
 							{
 								System.out.println("Grabbing mom, ID: " + mom.getID());
 							}
+
+							/**
+							PARAMS!!!!!
+							*/
 
 							//Decide whether to do crossover or not based on the crossover rate
 							if (random.nextDouble() < crossoverRate)
@@ -592,22 +935,43 @@ public class Epoch
 							child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
 						}
 
-						/**
-						* Parameterize
-						*/
-
+						//During a crossover the child can't calculate it's input neurons and thus needs to be set manually
 						child.setNumInputs(numInputNeurons);
 						child.setNumOutputs(numOutputNeurons);
 
-						child.addNeuron(0.05, innovations, 20);
-						child.addLink(0.05, 0.0, innovations, 10, 20);
-						//child.changeNeuronType(0.1, 0.7);
-						child.changeBiasWeight(0.2);
-						child.mutateInputLink(0.8);
-						//child.mutateinputNeuron(0.8, numInputNeurons);
-
-						child.mutateNeuronWeights();
-						child.mutateLinkWeights();
+						//Mutate the genome dependent on pre-set parameters
+						if(addNeuron)
+						{
+							child.addNeuron(addNeuronRate, innovations, maxCheckForNeuron);
+						}
+						if(addLink)
+						{
+							child.addLink(addLinkRate, addLoopedLinkRate, innovations, maxCheckForLooped, maxCheckforLink);
+						}
+						if(changeNeuronType)
+						{
+							child.changeNeuronType(chanceOfTypeChange, chanceOfSigmoid);
+						}
+						if(mutateBiasWeight)
+						{
+							child.changeBiasWeight(biasLinkMutateRate);
+						}
+						if(mutateInputLink)
+						{
+							child.mutateInputLink(inLinkMutateRate);
+						}
+						if(mutateInputNeuron)
+						{
+							//child.mutateInputNeuron(inNeuronMutateRate);
+						}
+						if(mutateNeuron)
+						{
+							child.mutateNeuronWeights();
+						}
+						if(mutateLink)
+						{
+							child.mutateLinkWeights();
+						}
 					}	
 					
 					//Set the id of the child to the next genome ID
@@ -648,6 +1012,9 @@ public class Epoch
 		{
 			//Initialize the writers and their files as well
 			System.out.println("\tCreating a file and saving the parameters");
+			// File f = new File("population.txt");
+			// f.delete();
+
 			populationWriter = new ObjectOutputStream(new FileOutputStream("population.txt"));
 			speciesWriter = new ObjectOutputStream(new FileOutputStream("species.txt"));
 			parametersWriter = new ObjectOutputStream(new FileOutputStream("parameters.txt"));
@@ -680,5 +1047,6 @@ public class Epoch
 		{
 			System.out.println("\tSuccessfully wrote to the file");
 		}
+		System.exit(0);
 	}
 }

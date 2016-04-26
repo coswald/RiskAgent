@@ -41,25 +41,25 @@ public class Tester
 		/* Tester Params */
 		
 		//Represents the debugging option
-		boolean debug 		= false;
+		boolean debug 				= false;
 		//Tester variable
-		boolean testFire 	= false;
+		boolean testFire 			= false;
 		//Tester variable
-		boolean printGenome = false;
+		boolean printGenome 		= true;
 		//Tester variable
-		boolean testAddNeuron = true;
+		boolean testAddNeuron 		= false;
 		//Tester variable
-		boolean testPush 	= false;
+		boolean testPush 			= false;
 		//Tester variable
-		boolean testSortNeurons = false;
+		boolean testSortNeurons 	= false;
 		//Tester variable
-		boolean testAddLink	= false;
+		boolean testAddLink			= false;
 		//Tester variable
 		boolean testFitnessFunction = false;
 		//Tester variable
-		boolean testMutators = false;
+		boolean testMutators 		= false;
 		//Tester variable
-		boolean testCrossover = false;
+		boolean testCrossover 		= false;
 
 
 		/*User Params */
@@ -82,7 +82,7 @@ public class Tester
 		/* Parameters */
 
 		//Represents the size of the population
-		int 	populationSize 			= 20;
+		int 	populationSize 			= 10;
 		//Represents the number of input neurons
 		int 	numInputNeurons			= 2;
 		//Represents the number of output neurons
@@ -122,7 +122,7 @@ public class Tester
    		/* Historical Data */	
 
    		//Represents the historical changes of all the previous populations
-   		InnovationDB 			innovations	= new InnovationDB(5);
+   		InnovationDB 			innovations	= new InnovationDB();
    		//Represents the current generation
    		int 					generation 	= 1;		
 
@@ -226,9 +226,6 @@ public class Tester
 						{
 							int toNeuron = random.nextInt(summationNeuronsInLayer[(i + 2)] - (summationNeuronsInLayer[(i + 1)] + 1) + summationNeuronsInLayer[(i + 1)] + 1); 
 						}
-						/**
-						Need to ensure all neurons connect to output layer too and have a connectionto the input layer
-						**/
 					}
 				}
 
