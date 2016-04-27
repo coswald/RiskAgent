@@ -117,7 +117,7 @@ public class Epoch
    		/* Historical Data */	
 
    		//Represents the historical changes of all the previous populations
-   		InnovationDB 			innovations	= new InnovationDB(5);	
+   		InnovationDB 			innovations	= new InnovationDB();	
 
 
    		//Load param file

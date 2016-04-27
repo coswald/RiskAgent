@@ -122,7 +122,7 @@ public class Tester
    		/* Historical Data */	
 
    		//Represents the historical changes of all the previous populations
-   		InnovationDB 			innovations	= new InnovationDB(5);
+   		InnovationDB 			innovations	= new InnovationDB();
    		//Represents the current generation
    		int 					generation 	= 1;		
 

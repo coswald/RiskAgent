@@ -41,6 +41,7 @@ public class InnovationDB implements Serializable
 	private ArrayList<Innovation> 	innovationDB = new ArrayList<Innovation>();
 	//Represetns the innovationID
 	private int 					innovationID;
+	private int						neuronID = 0;
 	//Represents the ID to print our a innovation database
 	private static final long serialVersionUID = 141838380522290195L;
 
