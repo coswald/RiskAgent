@@ -26,6 +26,20 @@ import java.io.Serializable;
 import java.util.Random;
 import java.util.ArrayList;
 
+/**
+ * <p>&nbsp&nbsp&nbsp&nbsp&nbspDetermines a cluster of similar
+ * {@code Genome}s, effectivly creating new {@code Species} within
+ * a given population. This class will be used by the main method
+ * of this application to assert new species in order to save the
+ * newest outliers within a population. This is because new 
+ * {@code Genome}s may have good topologies, but contain bad
+ * weights initially.</p>
+ * @author Kaleb Luse
+ * @author Coved W Oswald
+ * @author Wetson Miller
+ * @version 1.0
+ * @since 1.6
+ */
 public class Species implements Serializable
 {
 	/**********
@@ -76,7 +90,12 @@ public class Species implements Serializable
 	//Represents the ID to make species saveable to a text file
 	private static final long serialVersionUID = -4268206798591932773L;
 
-	//Creates a new species
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspCreates a new species with the given
+	 * ID and the initial {@code Genome} that started the species.</p>
+	 * @param specID The species ID.
+	 * @param genome The initial individual to start the species.
+	 */
 	public Species (int specID, Genome genome)
 	{
 		//Initialize the speciesID
@@ -97,7 +116,12 @@ public class Species implements Serializable
 		//Initilize generations without imporvement
 		gensNoImprovement = 0;
 	}
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspAdds a new member to the
+	 * {@code Species}.</p>
+	 * @param genome The new {@code Genome} to add.
+	 */
 	public void addMember(Genome genome)
 	{
 		//Represents the fitness of the new member
@@ -125,6 +149,10 @@ public class Species implements Serializable
 	}
 
 	//Creates a new generation of species
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspGenerates a new generation
+	 * of a species.</p>
+	 */
 	public void newGeneration()
 	{
 		//Clear the old species
@@ -140,7 +168,16 @@ public class Species implements Serializable
 		numSpawns = 0.0;
 	}
 
-	//Sete the training parameters of the species
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspChanges the training parameters
+	 * of the species.</p>
+	 * @param reward The new reward.
+	 * @param penalty The new penalty.
+	 * @param young The new age at which the young reward is
+	 * 			received.
+	 * @param old The new age at chich the old penalty is
+	 * 			recieved.
+	 */
 	public void setParams(double reward, double penalty, int young, int old)
 	{
 		youthReward = reward;
@@ -150,42 +187,69 @@ public class Species implements Serializable
 	}
 
 	//Returns the number of generations without improvement
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the number
+	 * of generations without improvement.</p>
+	 * @return The number of generation without improvement.
+	 */
 	public int gensWithNoImprovement()
 	{
 		return this.gensNoImprovement;
 	}
 
-	//Returns the species ID
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the species ID.</p>
+	 * @return The species ID.
+	 */
 	public int getSpeciesID()
 	{
 		return this.speciesID;
 	}
 
-	//Returns the number of members in the species
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the number of
+	 * members in the species.</p>
+	 * @return The number of members in the species.
+	 */
 	public int getNumMembers()
 	{
 		return this.species.size();
 	}
 
-	//Returns the number of children the given species is supposed to spawn
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the number of
+	 * children the given species is supposed to spawn.</p>
+	 * @return The number of given spawns.
+	 */
 	public double getNumSpawns()
 	{
 		return numSpawns;
 	}
 
-	//Returns the fittest/best member if the given species
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the "fittest"
+	 * of best member of this species.</p>
+	 * @return The best member of the species.
+	 */
 	public Genome getBestMember()
 	{
 		return this.alphaGene;
 	}
 
-	//Returns the fitness of the best member
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the fitness
+	 * of the best member of the species.</p>
+	 * @return The best fitness within the species.
+	 */
 	public double getBestFitness()
 	{
 		return this.alphaFitness;
 	}
 
-	//This calculates the number of spawns each species gets
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspDetermines the number
+	 * of spawns this species receives.</p>
+	 */
 	public void determineSpawnLevels()
 	{
 		//Loop through the genomes in the given species and find the amount each genome
@@ -197,7 +261,11 @@ public class Species implements Serializable
 	}
 
 	//Figure out a way to return better people
-	//Returns a random member from the population
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns a random 
+	 * member from the population.</p>
+	 * @return A random member from the population.
+	 */
 	public Genome getMember()
 	{
 		//If there is only one member in the species return the member
@@ -252,7 +320,7 @@ public class Species implements Serializable
 		//Return the winner of the tourney
 		return species.get(bestFitnessID);
 	}
-
+	//?
 	public void setAdjustedFitness()
 	{
 		//Loop through the species and calculate the species adjusted fitness
@@ -277,22 +345,25 @@ public class Species implements Serializable
 			species.get(speciesIndex).setAdjustedFitness(adjustedFitness);
 		}
 	}
-
+	
+	/**
+	 * @inheritDoc
+	 */
 	@Override
 	public String toString()
 	{
 		//The string to return
-        String toReturn = "";
-
-        //Add the proper elements to the string
-        for (int i = 0; i < species.size(); i++)
-        {
-        	toReturn += "Species ID: " + speciesID + "\n";
-        	toReturn += species.get(i).toString();
-        	toReturn += "\n";
-        }
-
-        //Return the string
-        return toReturn;
+        	String toReturn = "";
+		
+        	//Add the proper elements to the string
+        	for (int i = 0; i < species.size(); i++)
+        	{
+        		toReturn += "Species ID: " + speciesID + "\n";
+        		toReturn += species.get(i).toString();
+        		toReturn += "\n";
+        	}
+	
+	        //Return the string
+	        return toReturn;
 	}
 }
