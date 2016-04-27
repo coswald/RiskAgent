@@ -794,7 +794,7 @@ public class Genome implements Serializable
         this.createPhenotype();
 
         // The name of the file to open.
-        String fileName = "shorter.txt";
+        String fileName = "NSDUHData-Short.txt";
 
         // This will reference one line at a time
         String line = null;
@@ -861,7 +861,7 @@ public class Genome implements Serializable
         this.createPhenotype();
 
         // The name of the file to open.
-        String fileName = "shorter.txt";
+        String fileName = "NSDUHData-Short.txt";
 
         // This will reference one line at a time
         String line = null;

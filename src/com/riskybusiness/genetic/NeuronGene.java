@@ -23,6 +23,20 @@ import com.riskybusiness.neural.SigmoidNeuron;
 
 import java.io.Serializable;
 
+/**
+ * <p>&nbsp&nbsp&nbsp&nbsp&nbspThis class represents a {@code Neuron}
+ * as it appears inside of a genetic algorithm context. A
+ * {@code NeuronGene} consists of the metadata used to form many
+ * different kinds of Neurons. This will allow another class to take
+ * advantage of this metadata in order to form an actual
+ * {@code Neuron}.</p>
+ * @author Kaleb Luse
+ * @author Coved W Oswald
+ * @author Weston Miller
+ * @version 1.0
+ * @since 1.6
+ * @see com.riskybusiness.neural.Neuron
+ */
 public class NeuronGene implements Serializable
 {
     //Represents the ID to print out a innovation database
@@ -41,6 +55,12 @@ public class NeuronGene implements Serializable
     private double  biasWeight;
 
     //Create a blank neuron gene
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspCreates a "blank" {@code NeuronGene}.
+     * This "blank" version consists of an invalid neuron id (-1), is a
+     * {@code SigmoidNeuron}, in the hidden layer (with the layer id
+     * equal to 1), and no activation. This neuron will never fire.</p>
+     */
     public NeuronGene()
     {
         neuronID = -1;
@@ -50,7 +70,23 @@ public class NeuronGene implements Serializable
         neuronActivationResponse = 0.0;
     }
 
-    //Create a neuron gene
+    
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspCreates a {@ocde NeuronGene}. This
+     * gene has the correct metadata sent to it from the parameters
+     * given.</p>
+     * @param id The id of this neuron, used for sorting and innovation
+     *              information.
+     * @param type The type of neuron, either "SIGMOID" or "STEP".
+     * @param layterType The type of layer the neuron resides, either
+     *              "Hidden", "Input", or "Output".
+     * @param activate The activation responce for this neuron.
+     * @param layer The layer this neuron resides in, as a number.
+     *              For example, 1 would indicate the input layer,
+     *              2 would indicate the first hidden layer, 3 would
+     *              indicate the second, and maybe 4 would incidate
+     *              the output layer.
+     */
     public NeuronGene(int id, String type, String layerType, double activate, int layer)
     {
         neuronID = id;
@@ -59,85 +95,141 @@ public class NeuronGene implements Serializable
         neuronLayer = layer;
         neuronActivationResponse = activate;
     }
-    //Return the id of the neuron
+    
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the ID number for this
+     * {@code NeuronGene}.
+     * @return The ID for this neuron.
+     */
     public int getID()
     {
         return this.neuronID;
     }
 
-    //SEt the id of the neuron
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspChanges the ID number for this
+     * {@code NeuronGene}.
+     * @param id The new ID number for this neuron.
+     */
     public void setID(int id)
     {
         neuronID = id;
     }
 
-    //Get the neuron type
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the type of id for this
+     * {@code NeuronGene}.
+     * @return The string value of this neuron, either "SIGMOID"
+     *              or "STEP".
+     * @see com.riskybusiness.genetic.NeuronGene#NeuronGene(int, String, String, double, int)
+     */
     public String getNeuronType()
     {
 
         return this.neuronType;
     }
 
-    //Set the neuron type
+    /**
+     * p>&nbsp&nbsp&nbsp&nbsp&nbspChanges the type of neuron.
+     * @param type The new type of neuron, either "SIGMOID",
+     *              or "STEP".
+     */
     public void setNeuronType(String type)
     {
         this.neuronType = type;
     }    
     
-    //Get the activation response of the neuron
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspGets the actvation
+     * response for this neuron.</p>
+     * @return The activation response.
+     */
     public double getActivationResponse()
     {
         return this.neuronActivationResponse;
     }
     
-    //Set the activation response of the neuron
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspSets the activation
+     * response for this neuron.</p>
+     * @param activate The new activation response.
+     */
     public void setActivationResponse(double activate)
     {
         this.neuronActivationResponse = activate;
     }
 
-    //Get the layer of the neuron
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspGets the layer
+     * for this neuron.</p>
+     * @return The layer of this neuron.
+     */
     public int getNeuronLayer()
     {
         return this.neuronLayer;
     }
 
-    //Set the layer of the neuron
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspSet the layer
+     * of this neuron</p>
+     * @params layer The new layer for this neuron.
+     */
     public void setNeuronLayer(int layer)
     {
         this.neuronLayer = layer;
     }
 
-    //Return the bias weight of the neuron
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the
+     * bias weight of this neuron.</p>
+     * @return The current bias wieght.</p>
+     */
     public double getBiasWeight()
     {
         return this.biasWeight;
     }
 
-    //Set the bias weight of the neuron
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspChanges the bias
+     * weight for this neuron.</p>
+     * @param weight The new weight.
+     */
     public void setBiasWeight(double weight)
     {
         this.biasWeight = weight;
     }
 
-    //Gets the type of layer this neuron is (Input, Hidden, or Output)
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspGets the layer type.</p>
+     * @return The laer type of this neuron.
+     */
     public String getLayerType()
     {
         return this.neuronLayerType;
     }
 
-    //Sets the layer type of the neuron
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspChanges the layer type.
+     * This is either "Input", "Hidden", or "Output".</p>
+     * @param layerType The new layer type.
+     */
     public void setLayerType(String layerType)
     {
         neuronLayerType = layerType;
     }
     
-    //Increment the layer by one
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspChanges the neuron's layer
+     * by incrementing it by one.</p>
+     */
     public void pushLayer()
     {
         this.neuronLayer += 1;
     }
-
+    
+    /**
+     * @inheritDoc
+     */
     @Override
     public String toString()
     {
