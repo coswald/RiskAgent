@@ -110,7 +110,45 @@ public class Epoch implements Runnable
 		int 	numGenerations 			= 0;
 		//Represents whether the user has chosen to do an advanced network creation
 		boolean advancedNetCreation 	= false;
+		//Represents the rate at which a genomes breed
+		double 				crossoverRate 		= 0.3;
+		//Represents the total adjusted fitness of the entire population
+		double 				totalAdjustedFitness = 0.0;
+		//Represents the reward for being younger
+		double				youthReward 		= 1.2;
+		//Represents the penalty for being old
+		double				oldAgePenalty		= 0.8;
+		//Represents the age at which a species is old
+		int 				oldAge 				= 35;
+		//Rpeprsents the age at which a species is still young
+		int 				youngAge			= 16;
 
+		//Represents how often the genome is saved to file
+		int backupGen = 0;
+
+		//These are the mutate parameters that determine which mutator operator is used
+		boolean addNeuron			= true;
+		boolean	addLink				= true;
+		boolean	addLoopedLink		= false;
+		boolean changeNeuronType 	= false;
+		boolean mutateBiasWeight	= true;
+		boolean mutateInputLink 	= true;
+		boolean mutateInputNeuron 	= false;
+		boolean mutateNeuron 		= true;
+		boolean mutateLink 			= true;
+
+		//These are all the mutator params
+		double 	addNeuronRate 		= 0.05;
+		int    	maxCheckForNeuron 	= 20;
+		double  addLinkRate 		= 0.05;
+		int 	maxCheckforLink		= 20;
+		double 	addLoopedLinkRate 	= 0.05;
+		int 	maxCheckForLooped 	= 20;
+		double  chanceOfTypeChange  = 0.10;
+		double  chanceOfSigmoid		= 0.5;
+		double  biasLinkMutateRate 	= 0.2;
+		double 	inLinkMutateRate	= 0.5;
+		double  inNeuronMutateRate 	= 0.1;
 
 		/* Helper Items */
 
@@ -131,8 +169,7 @@ public class Epoch implements Runnable
    		//Represents the ID of the genome
    		int 					genomeID 	= 0;
 
-
-   		/* Historical Data */	
+   		/* Historical Data */
 
    		//Represents the historical changes of all the previous populations
    		InnovationDB 		innovations	= new InnovationDB();	
@@ -140,12 +177,22 @@ public class Epoch implements Runnable
 
    		//Load param file
    		//Throws File Exception: 
-
-   		FileInputStream 	fileObject 	= new FileInputStream("params.txt");
-
+   		FileInputStream			fileObject = null;
+   		try
+   		{
+   			fileObject 	= new FileInputStream("params.txt");
+   		}
+   		catch(Exception e)
+   		{
+   			System.err.println("Error: " + e.getMessage());
+   			System.exit(1);
+   		}
+		//Represents the scanner for the params file
    		Scanner 			z 			= new Scanner(fileObject);
-   		
+   		//Represents the index of the variable in the params file
    		int 				varIndex 	= 1;
+		
+		/*Epoch Variables*/
 
 		//Represents the newPopulation created from the old one
 		ArrayList<Genome> 	newPopulation 		= new ArrayList<Genome>();
@@ -161,46 +208,8 @@ public class Epoch implements Runnable
 		Genome 				toCopy 				= new Genome();
 		//Represents the child of a crossover
 		Genome 				child 				= new Genome();
-		//Represents the rate at which a genomes breed
-		double 				crossoverRate 		= 0.3;
-		//Represents the total adjusted fitness of the entire population
-		double 				totalAdjustedFitness = 0.0;
 
-		//Represents the reward for being younger
-		double				youthReward 		= 1.2;
 
-		//Represents the penalty for being old
-		double				oldAgePenalty		= 0.8;
-
-		//Represents the age at which a species is old
-		int 				oldAge 				= 35;
-
-		//Rpeprsents the age at which a species is still young
-		int 				youngAge			= 16;
-
-		int backupGen = 0;
-
-		boolean addNeuron			= true;
-		boolean	addLink				= true;
-		boolean	addLoopedLink		= false;
-		boolean changeNeuronType 	= false;
-		boolean mutateBiasWeight	= true;
-		boolean mutateInputLink 	= true;
-		boolean mutateInputNeuron 	= false;
-		boolean mutateNeuron 		= true;
-		boolean mutateLink 			= true;
-
-		double 	addNeuronRate 		= 0.05;
-		int    	maxCheckForNeuron 	= 20;
-		double  addLinkRate 		= 0.05;
-		int 	maxCheckforLink		= 20;
-		double 	addLoopedLinkRate 	= 0.05;
-		int 	maxCheckForLooped 	= 20;
-		double  chanceOfTypeChange  = 0.10;
-		double  chanceOfSigmoid		= 0.5;
-		double  biasLinkMutateRate 	= 0.2;
-		double 	inLinkMutateRate	= 0.5;
-		double  inNeuronMutateRate 	= 0.1;
 
 
 		while(z.hasNext())
@@ -262,31 +271,50 @@ public class Epoch implements Runnable
 							}
 						}
 						break;
-					// case 10:
-					// 	/**
-					// 	Ask Coved
-					// 	*/
-					// 	if (advancedNetCreation)
-					// 	{
-							
-					// 	}
-					case 11: maxNumSpecies = Integer.parseInt(text);
+					case 10:
+						if (advancedNetCreation)
+						{
+							numHiddenLayers = Integer.parseInt(text);
+						}
 						break;
-					case 12: speciesThreshold = Double.parseDouble(text);
+					case 11:
+						if (advancedNetCreation)
+						{
+							String[] t = text.split(",");
+							for(int i = 0; i < t.length; i++)
+							{
+								if (i == 0)
+								{
+									numInputNeurons = Integer.parseInt(t[i]);
+								}
+								else if (i == t.length)
+								{
+									numOutputNeurons = Integer.parseInt(t[i]);
+								}
+								else
+								{
+									hiddenLayers[i - 1] = Integer.parseInt(t[i]);
+								}
+							}
+						}
 						break;
-					case 13: threshholdPerturbation = Double.parseDouble(text);
+					case 12: maxNumSpecies = Integer.parseInt(text);
 						break;
-					case 14: extinctionLimit = Integer.parseInt(text);
+					case 13: speciesThreshold = Double.parseDouble(text);
 						break;
-					case 15: youthReward = Double.parseDouble(text);
+					case 14: threshholdPerturbation = Double.parseDouble(text);
 						break;
-					case 16: oldAgePenalty = Double.parseDouble(text);
+					case 15: extinctionLimit = Integer.parseInt(text);
 						break;
-					case 17: oldAge = Integer.parseInt(text);
+					case 16: youthReward = Double.parseDouble(text);
 						break;
-					case 18: youngAge = Integer.parseInt(text);
+					case 17: oldAgePenalty = Double.parseDouble(text);
 						break;
-					case 19: 
+					case 18: oldAge = Integer.parseInt(text);
+						break;
+					case 19: youngAge = Integer.parseInt(text);
+						break;
+					case 20: 
 						if (text.toLowerCase().equals("false"))
 						{
 							addNeuron = false;
@@ -300,11 +328,11 @@ public class Epoch implements Runnable
 							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
 						}
 						break;
-					case 20: addNeuronRate = Double.parseDouble(text);
+					case 21: addNeuronRate = Double.parseDouble(text);
 						break;
-					case 21: maxCheckForNeuron = Integer.parseInt(text);
+					case 22: maxCheckForNeuron = Integer.parseInt(text);
 						break;
-					case 22: 
+					case 23: 
 						if (text.toLowerCase().equals("false"))
 						{
 							addLink = false;
@@ -315,14 +343,14 @@ public class Epoch implements Runnable
 						}
 						else
 						{
-							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
+							throw new RuntimeException("Error 103: Add Link parameter not set properly");
 						}
 						break;
-					case 23: addLinkRate = Double.parseDouble(text);
+					case 24: addLinkRate = Double.parseDouble(text);
 						break;
-					case 24: maxCheckforLink = Integer.parseInt(text);
+					case 25: maxCheckforLink = Integer.parseInt(text);
 						break;
-					case 25:
+					case 26:
 						if (text.toLowerCase().equals("false"))
 						{
 							addLoopedLink = false;
@@ -333,10 +361,10 @@ public class Epoch implements Runnable
 						}
 						else
 						{
-							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
+							throw new RuntimeException("Error 104: Add Looped Link parameter not set properly");
 						}
 						break;
-					case 26: 
+					case 27: 
 						if(addLoopedLink)
 						{
 							addLoopedLinkRate = Double.parseDouble(text);
@@ -346,7 +374,7 @@ public class Epoch implements Runnable
 							addLoopedLinkRate = 0.00;
 						}
 						break;
-					case 27: 
+					case 28: 
 						if(addLoopedLink)
 						{
 							maxCheckForLooped =Integer.parseInt(text);
@@ -356,7 +384,7 @@ public class Epoch implements Runnable
 							maxCheckForLooped = 0;
 						}
 						break;
-					case 28:
+					case 29:
 						if (text.toLowerCase().equals("false"))
 						{
 							changeNeuronType = false;
@@ -367,14 +395,14 @@ public class Epoch implements Runnable
 						}
 						else
 						{
-							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
+							throw new RuntimeException("Error 105: Change Neuron Type parameter not set properly");
 						}
 						break;
-					case 29: chanceOfTypeChange = Double.parseDouble(text);
+					case 30: chanceOfTypeChange = Double.parseDouble(text);
 						break;
-					case 30: chanceOfSigmoid = Double.parseDouble(text);
+					case 31: chanceOfSigmoid = Double.parseDouble(text);
 						break;
-					case 31:
+					case 32:
 						if (text.toLowerCase().equals("false"))
 						{
 							mutateBiasWeight = false;
@@ -385,12 +413,12 @@ public class Epoch implements Runnable
 						}
 						else
 						{
-							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
+							throw new RuntimeException("Error 106: Mutate Bias Weight parameter not set properly");
 						}
 						break;
-					case 32: biasLinkMutateRate = Double.parseDouble(text);
+					case 33: biasLinkMutateRate = Double.parseDouble(text);
 						break;						
-					case 33:
+					case 34:
 						if (text.toLowerCase().equals("false"))
 						{
 							mutateInputLink = false;
@@ -401,12 +429,12 @@ public class Epoch implements Runnable
 						}
 						else
 						{
-							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
+							throw new RuntimeException("Error 107: Mutate Input Link parameter not set properly");
 						}
 						break;
-					case 34: inLinkMutateRate = Double.parseDouble(text);
+					case 35: inLinkMutateRate = Double.parseDouble(text);
 						break;
-					case 35:
+					case 36:
 						if (text.toLowerCase().equals("false"))
 						{
 							mutateInputNeuron = false;
@@ -417,12 +445,12 @@ public class Epoch implements Runnable
 						}
 						else
 						{
-							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
+							throw new RuntimeException("Error 108: Mutate Input Neuron parameter not set properly");
 						}
 						break;
-					case 36: inNeuronMutateRate = Double.parseDouble(text);
+					case 37: inNeuronMutateRate = Double.parseDouble(text);
 						break;
-					case 37:
+					case 38:
 						if (text.toLowerCase().equals("false"))
 						{
 							mutateNeuron = false;
@@ -433,10 +461,10 @@ public class Epoch implements Runnable
 						}
 						else
 						{
-							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
+							throw new RuntimeException("Error 109: Mutate Neuron parameter not set properly");
 						}
 						break;
-					case 38:
+					case 39:
 						if (text.toLowerCase().equals("false"))
 						{
 							mutateLink = false;
@@ -447,12 +475,20 @@ public class Epoch implements Runnable
 						}
 						else
 						{
-							throw new RuntimeException("Error 102: Add Neuron parameter not set properly");
+							throw new RuntimeException("Error 110: Mutate Link parameter not set properly");
 						}
 						break;
 				}
 				varIndex++;
 			}
+		}
+		if (varIndex == 1)
+		{
+			throw new RuntimeException("Error 111: File does not exist");
+		}
+		if (varIndex != 40)
+		{
+			throw new RuntimeException("Error 112: Error with file");
 		}
 
    		//Validate user input and determine if they would like to load a file or start new
