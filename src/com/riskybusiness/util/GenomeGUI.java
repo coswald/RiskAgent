@@ -44,6 +44,8 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
+import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 
@@ -72,7 +74,6 @@ public class GenomeGUI extends Object implements Serializable
 	
 	public GenomeGUI()
 	{
-		console.setText("none");
 		this.init();
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
@@ -116,7 +117,7 @@ public class GenomeGUI extends Object implements Serializable
 			{
 				GenomeGUI.this.stop.doClick();
 				JFileChooser chooser = new JFileChooser();
-				FileNameExtensionFilter filter = new FileNameExtensionFilter("Object Output Files", "txt", "gaf");
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Object Output Files", "txt", "gaif");
 				chooser.setFileFilter(filter);
 				if(chooser.showOpenDialog(GenomeGUI.this.frame) == JFileChooser.APPROVE_OPTION)
 				{
@@ -127,13 +128,35 @@ public class GenomeGUI extends Object implements Serializable
 		});
 		this.file.add(open);
 		
-		JMenuItem save = new JMenuItem("Save Population");
+		final JMenuItem save = new JMenuItem("Save Population"); //you'll see why it's final
 		save.setMnemonic(KeyEvent.VK_A);
 		save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
+		save.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				//save File
+			}
+		});
 		this.file.add(save);
 		
 		JMenuItem saveAs = new JMenuItem("Save Population As");
 		saveAs.setAccelerator(KeyStroke.getKeyStroke("control alt S"));
+		saveAs.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				GenomeGUI.this.stop.doClick();
+				JFileChooser chooser = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Object Output Files", "txt", "gaif");
+				chooser.setFileFilter(filter);
+				if(chooser.showSaveDialog(GenomeGUI.this.frame) == JFileChooser.APPROVE_OPTION)
+				{
+					GenomeGUI.this.print("You have chosen to save this file as " + chooser.getSelectedFile().getName());
+					save.doClick();
+				}
+			}
+		});
 		this.file.add(saveAs);
 		
 		JMenuItem print = new JMenuItem("Print Console");
@@ -158,6 +181,13 @@ public class GenomeGUI extends Object implements Serializable
 		
 		JMenuItem exit = new JMenuItem("Exit");
 		exit.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_F4, KeyEvent.ALT_DOWN_MASK));
+		exit.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				System.exit(0);
+			}
+		});
 		this.file.add(exit);
 		
 		this.jmb.add(file);
@@ -196,6 +226,20 @@ public class GenomeGUI extends Object implements Serializable
 		JMenuItem params = new JMenuItem("Load Parameter File");
 		params.setMnemonic(KeyEvent.VK_L);
 		params.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, KeyEvent.CTRL_DOWN_MASK));
+		params.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				JFileChooser chooser = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Object Output Files", "txt", "gapf");
+				chooser.setFileFilter(filter);
+				if(chooser.showOpenDialog(GenomeGUI.this.frame) == JFileChooser.APPROVE_OPTION)
+				{
+					GenomeGUI.this.print("You have chosen to load the param file " + chooser.getSelectedFile().getName());
+					//load params
+				}
+			}
+		});
 		this.settings.add(params);
 		
 		this.jmb.add(settings);
@@ -205,6 +249,17 @@ public class GenomeGUI extends Object implements Serializable
 		this.help.setMnemonic(KeyEvent.VK_H);
 		
 		JMenuItem helpI = new JMenuItem("Help");
+		helpI.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				JPopupMenu jpm = new JPopupMenu("Help");
+				jpm.setPopupSize(new Dimension(200, 124));
+				jpm.add("This is the help menu. Have fun.");
+				jpm.setLightWeightPopupEnabled(false);
+				jpm.show(GenomeGUI.this.frame, GenomeGUI.this.frame.getWidth() / 2 - 100, GenomeGUI.this.frame.getHeight() / 2 - 62);
+			}
+		});
 		this.help.add(helpI);
 		
 		//add and finish up menu bar
@@ -213,7 +268,8 @@ public class GenomeGUI extends Object implements Serializable
 		
 		//Console area
 		this.console.setEditable(false);
-		this.frame.add(console, BorderLayout.CENTER);
+		JScrollPane jsp = new JScrollPane(this.console);
+		this.frame.add(jsp, BorderLayout.CENTER);
 		
 		//buttons
 		JPanel jp = new JPanel();
@@ -250,6 +306,7 @@ public class GenomeGUI extends Object implements Serializable
 	private void append(String msg, Color c)
 	{
 		this.console.setEditable(true);
+		msg = ">: " + msg;
 		msg += "\n";
 		StyleContext sc = StyleContext.getDefaultStyleContext();
 		AttributeSet set = sc.addAttribute(SimpleAttributeSet.EMPTY, StyleConstants.Foreground, c);
