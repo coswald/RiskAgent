@@ -23,6 +23,20 @@ import com.riskybusiness.neural.SigmoidNeuron;
 
 import java.io.Serializable;
 
+/**
+ * <p>&nbsp&nbsp&nbsp&nbsp&nbspThis class represents a {@code Neuron}
+ * as it appears inside of a genetic algorithm context. A
+ * {@code NeuronGene} consists of the metadata used to form many
+ * different kinds of Neurons. This will allow another class to take
+ * advantage of this metadata in order to form an actual
+ * {@code Neuron}.</p>
+ * @author Kaleb Luse
+ * @author Coved W Oswald
+ * @author Weston Miller
+ * @version 1.0
+ * @since 1.6
+ * @see com.riskybusiness.neural.Neuron
+ */
 public class NeuronGene implements Serializable
 {
     //Represents the ID to print out a innovation database
@@ -41,6 +55,12 @@ public class NeuronGene implements Serializable
     private double  biasWeight;
 
     //Create a blank neuron gene
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspCreates a "blank" {@code NeuronGene}.
+     * This "blank" version consists of an invalid neuron id (-1), is a
+     * {@code SigmoidNeuron}, in the hidden layer (with the layer id
+     * equal to 1), and no activation. This neuron will never fire.</p>
+     */
     public NeuronGene()
     {
         neuronID = -1;
@@ -50,7 +70,23 @@ public class NeuronGene implements Serializable
         neuronActivationResponse = 0.0;
     }
 
-    //Create a neuron gene
+    
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspCreates a {@ocde NeuronGene}. This
+     * gene has the correct metadata sent to it from the parameters
+     * given.</p>
+     * @param id The id of this neuron, used for sorting and innovation
+     *              information.
+     * @param type The type of neuron, either "SIGMOID" or "STEP".
+     * @param layterType The type of layer the neuron resides, either
+     *              "Hidden", "Input", or "Output".
+     * @param activate The activation responce for this neuron.
+     * @param layer The layer this neuron resides in, as a number.
+     *              For example, 1 would indicate the input layer,
+     *              2 would indicate the first hidden layer, 3 would
+     *              indicate the second, and maybe 4 would incidate
+     *              the output layer.
+     */
     public NeuronGene(int id, String type, String layerType, double activate, int layer)
     {
         neuronID = id;
@@ -59,19 +95,34 @@ public class NeuronGene implements Serializable
         neuronLayer = layer;
         neuronActivationResponse = activate;
     }
-    //Return the id of the neuron
+    
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the ID number for this
+     * {@code NeuronGene}.
+     * @return The ID for this neuron.
+     */
     public int getID()
     {
         return this.neuronID;
     }
 
-    //SEt the id of the neuron
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspChanges the ID number for this
+     * {@code NeuronGene}.
+     * @param id The new ID number for this neuron.
+     */
     public void setID(int id)
     {
         neuronID = id;
     }
 
-    //Get the neuron type
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the type of id for this
+     * {@code NeuronGene}.
+     * @return The string value of this neuron, either "SIGMOID"
+     *              or "STEP".
+     * @see com.riskybusiness.genetic.NeuronGene#NeuronGene(int, String, String, double, int)
+     */
     public String getNeuronType()
     {
 
