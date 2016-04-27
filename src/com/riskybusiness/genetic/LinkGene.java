@@ -22,6 +22,18 @@ import com.riskybusiness.neural.Synapse;
 
 import java.io.Serializable;
 
+/**
+ * <p>&nbsp&nbsp&nbsp&nbsp&nbspThis class contains the metadata
+ * used to construct a {@code Synapse}. This class also contains
+ * data used to help form and mantain generations within a
+ * population.</p>
+ * @author Kaleb Luse
+ * @author Coved W Oswald
+ * @author Weston Miller
+ * @version 1.0
+ * @since 1.6
+ * @see com.riskybusiness.neural.Synapse
+ */
 public class LinkGene implements Serializable
 {
     
@@ -40,7 +52,17 @@ public class LinkGene implements Serializable
     //Represents the innovation ID
     private int     innovationID;
     
-    //Create a LinkGene
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspCreates a
+	 * {@code LinkGene} with the given ID and
+	 * other metadata.</p>
+	 * @param myID The ID for this gene.
+	 * @param fNeuron The neuron sending data.
+	 * @param tNeuron The neuron receiving the data.
+	 * @param weight The weight on this link.
+	 * @param enabled Tells whether or not this link
+	 * 			works or not.
+	 */
     public LinkGene(int myID, int fNeuron, int tNeuron, int id, double weight, boolean enabled)
     {
         linkID        = myID;
@@ -51,8 +73,14 @@ public class LinkGene implements Serializable
         linkEnabled   = enabled;
     }
 
-    //Create a blank link gene
-    public LinkGene()
+    /**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspCreates a blank
+	 * {@code LinkGene}. This states an invalid
+	 * sending and receiving neuron, with a weight
+	 * of zero that is dissabled.</p>
+	 * @see com.riskybusiness.genetic.LinkGene#LinkGene(int, int, int, int, double, boolean)
+	 */
+	public LinkGene()
     {
         fromNeuron = -1;
         toNeuron = -1;
@@ -61,66 +89,115 @@ public class LinkGene implements Serializable
         innovationID = 0;
     }
 
-    //Get the ID of the link
-    public int getID()
+    /**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspGets the ID
+	 * of the link.</p>
+	 * @return The ID of the link
+	 */
+	public int getID()
     {
         return linkID;
     }
 
     //Get the ID of the link
-    public int getInnovationID()
+    /**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspGets the ID
+	 * corresponding to the {@code Innovation}
+	 * representing this link.</p>
+	 * @return The innovation ID associated with
+	 * 			this link.
+	 */
+	public int getInnovationID()
     {
         return innovationID;
     }
 
-    //Return whether the link is enabled
+    /**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns whether
+	 * the link is enabled or not.</p>
+	 * @returns true if the link is enabled, false
+	 * 			otherwise.
+	 */
     public boolean getEnabled()
     {
         return linkEnabled;
     }
        
-    //Get the weight of the link
-    public double getWeight()
+    /**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the
+	 * weight of the link.</p>
+	 * @return The weight of this link.
+	 */
+	public double getWeight()
     {
         return linkWeight;
     }
     
-    //Get the neuron the link goes to
-    public int getToNeuron()
+    /**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the
+	 * ID of the receiving neuron. This is the
+	 * neuron the link is sending the data to.</p>
+	 * @return The neuron the link goes to.
+	 */
+	public int getToNeuron()
     {
         return toNeuron;
     }
     
-    //Get the neuron the link comes from
-    public int getFromNeuron()
+    /**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the
+	 * ID of the sending neuron. This is the
+	 * neuron the link is sending the data to.</p>
+	 * @return The neuron the link comes from.
+	 */
+	public int getFromNeuron()
     {
         return fromNeuron;
     }
 
-    //Set the link to be enabled or disabled
-    public void setLink(boolean enabled)
+    /**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspChanges whether
+	 * or not the link is enabled.</p>
+	 * @param enabled The new enabled state.
+	 */
+	public void setLink(boolean enabled)
     {
         this.linkEnabled = enabled;
     }
     
-    //Set the weight of the link
-    public void setWeight(double weight)
+    /**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspSets the weight
+	 * of the link.</p>
+	 * @param weight The new weight to change to.
+	 */
+	public void setWeight(double weight)
     {
         this.linkWeight = weight;
     }
     
-    //Set the from Neuron ID
-    public void setFromNeuron(int neuron)
+    /**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspChanges the
+	 * sending neuron of this link.</p>
+	 * @param neuron The new sending neuron.
+	 */
+	public void setFromNeuron(int neuron)
     {
         this.fromNeuron = neuron;
     }
 
-    //Set the to Neuron ID
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspChanges the
+	 * receiving neuron of this link.</p>
+	 * @param neuron The new receiving neuron.
+	 */
     public void setToNeuron(int neuron)
     {
         this.toNeuron = neuron;
     }
-
+	
+	/**
+	 * @inheritDoc
+	 */
     @Override
     public String toString()
     {

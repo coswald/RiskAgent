@@ -47,6 +47,8 @@ import javax.swing.JPanel;
 import javax.swing.JTextPane;
 import javax.swing.KeyStroke;
 
+import javax.swing.filechooser.FileNameExtensionFilter;
+
 import javax.swing.text.AttributeSet;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
@@ -89,11 +91,40 @@ public class GenomeGUI extends Object implements Serializable
 		JMenuItem news = new JMenuItem("New Population");
 		news.setMnemonic(KeyEvent.VK_N);
 		news.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
+		news.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				if(JOptionPane.showConfirmDialog(GenomeGUI.this.frame, "Are you sure you want to make a new population?",
+					"Confirm New Population", JOptionPane.YES_NO_OPTION,
+					JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
+				{
+					GenomeGUI.this.console.setText("");
+					GenomeGUI.this.stop.doClick(); //won't work if disabled anyway.
+					GenomeGUI.this.start.doClick();
+				}
+			}
+		});
 		this.file.add(news);
 		
 		JMenuItem open = new JMenuItem("Open Population");
 		open.setMnemonic(KeyEvent.VK_O);
 		open.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O, KeyEvent.CTRL_DOWN_MASK));
+		open.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				GenomeGUI.this.stop.doClick();
+				JFileChooser chooser = new JFileChooser();
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Object Output Files", "txt", "gaf");
+				chooser.setFileFilter(filter);
+				if(chooser.showOpenDialog(GenomeGUI.this.frame) == JFileChooser.APPROVE_OPTION)
+				{
+					GenomeGUI.this.print("You have chosen to open this file: " + chooser.getSelectedFile().getName());
+					//load GenomeFile
+				}
+			}
+		});
 		this.file.add(open);
 		
 		JMenuItem save = new JMenuItem("Save Population");

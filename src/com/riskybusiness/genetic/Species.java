@@ -320,7 +320,15 @@ public class Species implements Serializable
 		//Return the winner of the tourney
 		return species.get(bestFitnessID);
 	}
-	//?
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspSets the adjusted
+	 * fitness for this species. The adjusted fitness
+	 * describes how many spawns this species will
+	 * receive based on the other species adjusted
+	 * fitness. This is applied to every {@code Genome}
+	 * in the species.</p>
+	 */
 	public void setAdjustedFitness()
 	{
 		//Loop through the species and calculate the species adjusted fitness

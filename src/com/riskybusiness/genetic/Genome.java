@@ -23,22 +23,32 @@ import com.riskybusiness.neural.NeuralNet;
 
 import static java.lang.Math.abs;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.Random;
 import java.util.ArrayList;
-import java.util.*;
-import java.io.*;
 
-
-
+/**
+ * <p>&nbsp&nbsp&nbsp&nbsp&nbspThis class describes a collection of
+ * {@code LinkGene}s and {@code NeuronGene}s to form a {@code NeuralNet}.
+ * This class will form the phenotype in order for an individual to
+ * fire, and trians a neural network based on the N. E. A. T. algorithm.
+ * Of course, this class relies on methods defined in {@code GenomeHelper}
+ * to do this.</p>
+ * @author Kaleb Luse
+ * @author Coved W Oswald
+ * @author Weston Miller
+ * @version 1.0
+ * @since 1.6
+ * @see com.riskybusiness.genetic.GenomeHelper
+ * @see com.riskybusiness.neural.NeuralNet
+ */
 public class Genome implements Serializable
 {
     
-    //Represents the users input
-    private transient String userInput;
-    //Represents the scanner to get user input
-    private transient Scanner input   = new Scanner(System.in);
-
     private static final long serialVersionUID = 2649985816998697033L;
 
     //Represents the ID of the genome
@@ -72,8 +82,18 @@ public class Genome implements Serializable
     //Represents the package to create psuedorandom numbers
     private Random                  random = new Random();
 
-    //This constructor creates a genome from an ArrayList of links, an ArrayList of neurons, an ID number, an innovation database,
-    //and the number of input and output neurons
+    /**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspThis constructor creates
+	 * a genome from an {@code ArrayList} of {@code NeuronGene}s,
+	 * an {@code ArrayList} of {@code NeuronGene}s, and ID number
+	 * for this {@code Genome}, and the number of inputs/outputs
+	 * for the {@code NeuralNet}.
+	 * @param id The ID for this genome.
+	 * @param neurons The list of metadata neurons.
+	 * @param links The list of metadata links.
+	 * @param inputs The amount of inputs to the {@code NeuralNet}.
+	 * @param outputs The amount of outputs from the {@code NeuralNet}.
+	 */
     public Genome(int id, ArrayList<NeuronGene> neurons, ArrayList<LinkGene> links, int inputs, int outputs)
     {
         //Represents the ID of the genome
@@ -99,69 +119,132 @@ public class Genome implements Serializable
         numLinkGenes     = links.size();
         numLayers        = neurons.get((neurons.size() - 1)).getNeuronLayer();
     }
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspCreates a blank {@code Genome}.</p>
+	 */
     public Genome()
     {
         genomeID = -1;
     }
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the {@code NeuronGene}s
+	 * that make up the {@code Genome}.</p>
+	 * @return The list of neurons.
+	 */
     public ArrayList<NeuronGene> getNeurons()
     {
         return this.neuronGeneSet;
     }
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the {@code LinkGene}s
+	 * that make up the {@code Genome}.</p>
+	 * @return The list of links.
+	 */
     public ArrayList<LinkGene> getLinks()
     {
         return this.linkGeneSet;
     }
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the number of inputs
+	 * that is sent into {@code NeuralNet}.</p>
+	 * @return The number of inputs sent to the neural network.
+	 */
     public int getNumInputs()
     {
         return this.numInputNeurons;
     }
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the number of outputs
+	 * that is sent form the {@code NeuralNet}.</p>
+	 * @return The number of outputs sent from the neural network.
+	 */
     public int getNumOutputs()
     {
         return this.numOutputNeurons;
     }
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspChanges the number of inputs
+	 * that are sent to the {@code NeuralNet}.</p>
+	 * @param numInputs The new input number.
+	 */
     public void setNumInputs(int numInputs)
     {
         this.numInputNeurons = numInputs;
     }
 
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspChanges the number of outputs
+	 * that are sent form the {@code NeuralNet}.</p>
+	 * @param numOutputs The new output number.
+	 */
     public void setNumOutputs(int numOutputs)
     {
         this.numOutputNeurons = numOutputs;
     }
 
-    //Get the number of neurons in the genome
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspGets the number of
+	 * neurons in this {@code Genome}.</p>
+	 * @return The number of neurons in this {@code Genome}.
+	 */
     public int getSizeNeuron()
     {
         return neuronGeneSet.size();
     }
 
-    //Get the number of links in the genome
-    public int getSizeLink()
+    /**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspGets the number of
+	 * links in this {@code Genome}.</p>
+	 * @return The number of links in this {@code Genome}.
+	 */
+	public int getSizeLink()
     {
         return linkGeneSet.size();
     }
-     
+    
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the ID of
+	 * this {@code Genome}.</p>
+	 * @return The ID of this {@code Genome}.
+	 */
     public int getID()
     {
        return this.genomeID;
     }
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the adjusted
+	 * fitness of this {@code Genome}. This is determined
+	 * by the species this class belongs to.</p>
+	 * @return The adjusted fitness of this {@code Genome}.
+	 */
     public double getAdjustedFitness()
     {
         return this.genomeAdjFitness;
     }
 
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the actual
+	 * fitness of this {@code Genome}.
+	 * @return The actual fitness of this {@code Genome}.
+	 */
     public double getFitness()
     {
         return this.genomeFitness;
     }
 
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the innovation
+	 * number of the given link provided.
+	 * @param link The link to find the innovation ID of.
+	 * @return The innovation ID of link.
+	 */
     public int getInnovationNum(LinkGene link)
     {
         return link.getInnovationID();
@@ -171,19 +254,36 @@ public class Genome implements Serializable
     {
         return this.numLinkGenes;
     }
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the number of
+	 * spawns this {@code Genome} can have.</p>
+	 * @return The number of children we can have.
+	 */
     public double getNumSpawns()
     {
        return this.amountToSpawn;
     }
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspChanges the number of
+	 * spawns this {@code Genome} can have.</p>
+	 * @param spawns The new spawn number.
+	 */
     public void setNumSpawns(double spawns)
     {
         this.amountToSpawn = spawns;
     }
 
-    //Calculates the compatibility score between this genome and another genome
-    public double getCompatibilityScore(Genome toCompare)
+    /**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspCalculates the
+	 * compatibility number between this {@code Genome}
+	 * and the given one.</p>
+	 * @param toCompare The {@code Genome} to compare to
+	 * 			this one.
+	 * @return The compatibility score between the two {@code Genome}s.
+	 */
+	public double getCompatibilityScore(Genome toCompare)
     {
         //Represents the number of disjoint, excess, and common genes the two
         //genomes share
@@ -278,14 +378,26 @@ public class Genome implements Serializable
         //Return the compatibility score
         return score;
     }
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspSets the ID for
+	 * this {@code Genome}.
+	 * @param id The new ID number.
+	 */
     public void setID(int id)
     {
        this.genomeID = id;
     }
 
     //Returns true if the specified link is already part of the genome
-    public boolean duplicateLink(int neuronIn, int neuronOut)
+    /**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns true if the
+	 * specified link is already part of the {@code Genome}.
+	 * @param neuronIn The link's input neuron.
+	 * @param neuronOut The link's output neuron.
+	 * @return true if the specified link is present, false otherwise.
+	 */
+	public boolean duplicateLink(int neuronIn, int neuronOut)
     {
         //Should I account for the possibility that the link is disabled??
         for (int i = 0; i < linkGeneSet.size() - 1; i++)
@@ -299,8 +411,16 @@ public class Genome implements Serializable
         return false;
     }
 
-    //Creates a nueron from a neuron gene
-    public Neuron createNeuron(NeuronGene neuron)
+    /**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspThis method creates
+	 * a {@code Neuron} from the given {@code NeuronGene}.
+	 * @param neuron The gene to create from.
+	 * @return A {@code Neuron} representative of the
+	 * 			metadata present within the given gene.
+	 * @see com.riskybusiness.neural.Neuron
+	 * @see com.riskybusiness.genetic.NeuronGene
+	 */
+	public Neuron createNeuron(NeuronGene neuron)
     {
         //Represents the number of input links to a neuron
         int numInputs = 0;
@@ -370,8 +490,19 @@ public class Genome implements Serializable
         }
     }
 
-    //Creates a synapse from a synapse gene
-    //Throws an excpetion if the link is disabled
+    /**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspThis method creates
+	 * a {@code Synapse} from the given {@code LinkGene}.
+	 * @param link The gene to create from.
+	 * @param neuronSet The set of {@code Neuron}s needed
+	 * 			for creation of the link.
+	 * @return A {@code Neuron} representative of the
+	 * 			metadata present within the given gene.
+	 * @throws RuntimeException If the link sent in is disabled,
+	 * 			or contains corrupt/invalid metadata.
+	 * @see com.riskybusiness.neural.Synapse
+	 * @see com.riskybusiness.genetic.LinkGene
+	 */
     public Synapse createSynapse(LinkGene link, Neuron[] neuronSet)
     {
         //Represents the neuron the synapse is going to and coming from
@@ -391,9 +522,11 @@ public class Genome implements Serializable
         //Represetns the position of the link in the neuron
         int         linkPos         = 0;
 
-        // if (!link.getEnabled()){
-        //     //Throw error("You dumb idiot. You sent in a disabled link")
-        // }
+        if (!link.getEnabled())
+		{
+			//original message: "You dumb idiot. You sent in a disabled link"
+			throw new RuntimeException("Cannot make a link that is disabled!");
+        }
 
         for (i = 0;i < neuronGeneSet.size(); i++)
         {
@@ -500,7 +633,14 @@ public class Genome implements Serializable
 
         this.myNetwork = new com.riskybusiness.neural.NeuralNet(neuronSet, linkSet);
     }
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspChecks to see
+	 * whether the neuron exists within the {@code Genome}.</p>
+	 * @param id The ID of the neuron in question.
+	 * @return true if the neuron in question is here,
+	 * 			false if not.
+	 */
     public boolean neuronIDExists(int id)
     {
         for (int i = 0; i < neuronGeneSet.size(); i++)
@@ -513,7 +653,18 @@ public class Genome implements Serializable
 
         return false;
     }
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the
+	 * {@code NeurlNet} associated with this
+	 * {@code Genome}. This method will return
+	 * null if {@link com.riskybusiness.genetic.Genome#createPhenotype()}
+	 * has not been called, or the last valid
+	 * phenotype created since the last call of that
+	 * method.</p>
+	 * @return The neural network formed from
+	 * 			this class.
+	 */
     public NeuralNet getNetwork()
     {
         return this.myNetwork;
@@ -530,8 +681,7 @@ public class Genome implements Serializable
      *                         where the all neurons are connected to each other and thus limits
      *                         the amount of times the function will look for the opportunity to add a link
      *
-    **/ 
-    
+     */ 
     public void addLink(double mutationRate, double chanceOfLooped, InnovationDB innovation, int numTrysToFindLoop, int numTrysToAddLink)
     {
         //This variable describes a function to create random numbers
@@ -641,10 +791,14 @@ public class Genome implements Serializable
         }
     }
 
-
-
-    //Add a neuron to the genome dependent upon the mutation rate
-    //I need to find a way to create a pointer to the innovation db
+    /**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspAdds a neuron into the {@code Genome}.
+	 * @param mutationRate The rate at which neurons are added.
+	 * @param innovation The database to check against.
+	 * @param numTrysToFindOldLink A parameter that states how many times
+	 * 			a {@code Genome} is allowed to randomly find a link to 
+	 * 			add this neuron to.
+	 */
     public void addNeuron(double mutationRate, InnovationDB innovation, int numTrysToFindOldLink) 
     {
         //If a valid link is found to add a neuron to then this will be set to true
@@ -781,13 +935,23 @@ public class Genome implements Serializable
             }
         }
     }
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspChanges the adjusted
+	 * fitness for this {@code Genome}.</p>
+	 * @param fitness The new adjusted fitness.
+	 */
     public void setAdjustedFitness(double fitness)
     {
         //Set the adjusted fitness
         this.genomeAdjFitness = fitness;
     }
 
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns a value
+	 * that shows the fitness of this {@code Genome}.
+	 * @return The fitness of this {@code Genome}.
+	 */
     public double determineFitness()
     {
         //Create the phenotype
@@ -855,13 +1019,22 @@ public class Genome implements Serializable
         return genomeFitness;
     }
 
-    public void printFitness()
+	public void printFitness()
+	{
+		this.printFitness("NSDUHData-Short.txt");
+	}
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspPrints the information
+	 * about the fitness to the standard output.</p>
+	 * @param fileName The name of the file to look into
+	 * 				to gather fitness data from.
+	 * @see java.lang.System#out
+	 */
+    public void printFitness(String fileName)
     {
         //Create the phenotype
         this.createPhenotype();
-
-        // The name of the file to open.
-        String fileName = "NSDUHData-Short.txt";
 
         // This will reference one line at a time
         String line = null;
@@ -917,7 +1090,14 @@ public class Genome implements Serializable
                 + fileName + "'");                  
         }
     }
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspMakes a new
+	 * {@code Genome} that has random features present
+	 * within this one and the other {@code Genome}.</p>
+	 * @param dad The other {@code Genome} to mate with.
+	 * @param innovation The database used for changes.
+	 */
     public Genome crossover(Genome dad, InnovationDB innovation)
     {
         //Represents which genome has the best fitness
@@ -1130,7 +1310,16 @@ public class Genome implements Serializable
 
     }
     
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspA method that
+	 * mutates the neuron weights within the
+	 * {@code Genome}.</p>
+	 * @param mutationRate The mutation rate to mutate to.
+	 * @param newMutationRate The rate at which new neurons
+	 * 			are created.
+	 * @param changeWeight The value to modify existing weights by
+	 */
     public void mutateNeuronWeights(double mutationRate, double newMutationRate, double changeWeight)
     {
         for (int i = 0; i < neuronGeneSet.size(); i++)
@@ -1145,31 +1334,33 @@ public class Genome implements Serializable
                 {
                     double curWeight = neuronGeneSet.get(i).getActivationResponse();
                     double newWeight = curWeight + (random.nextDouble() * 2.0 - 1.0) * changeWeight;
+					neuronGeneSet.get(i).setActivationResponse(newWeight);
                 }
             }
         }
     }
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspA method that
+	 * mutates the neuron weights. This will work
+	 * off of the similar method with values of .33,
+	 * .1, and .1 respectively.</p>
+	 * @see com.riskybusiness.genetic.Genome#mutateNeuronWeights(double, double, double)
+	 */
     public void mutateNeuronWeights()
     {
-        for (int i = 0; i < neuronGeneSet.size(); i++)
-        {
-            if (random.nextDouble() < 0.33)
-            {
-                if (random.nextDouble() < 0.1)
-                {
-                    neuronGeneSet.get(i).setActivationResponse(random.nextFloat());
-                }
-                else
-                {
-                    double curWeight = neuronGeneSet.get(i).getActivationResponse();
-                    double newWeight = curWeight + (random.nextDouble() * 2.0 - 1.0) * 0.1;
-                    neuronGeneSet.get(i).setActivationResponse(newWeight);
-                }
-            }
-        }
+        this.mutateNeuronWeights(.33D, .1D, .1D);
     }
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspA method that
+	 * mutates the link weights within the
+	 * {@code Genome}.</p>
+	 * @param mutationRate The mutation rate to mutate to.
+	 * @param newMutationRate The rate at which new links
+	 * 			are created.
+	 * @param changeWeight The value to modify existing weights by.
+	 */
     public void mutateLinkWeights(double mutationRate, double newMutationRate, double changeWeight)
     {
         for (int i = 0; i < linkGeneSet.size(); i++)
@@ -1189,25 +1380,17 @@ public class Genome implements Serializable
             }
         }
     }
-
+	
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspA method that
+	 * mutates the lnk weights. This will work
+	 * off of the similar method with values of .33,
+	 * .1, and .1 respectively.</p>
+	 * @see com.riskybusiness.genetic.Genome#mutateLinkWeights(double, double, double)
+	 */
     public void mutateLinkWeights()
     {
-        for (int i = 0; i < linkGeneSet.size(); i++)
-        {
-            if (random.nextDouble() < 0.33)
-            {
-                if (random.nextDouble() < 0.1)
-                {
-                    linkGeneSet.get(i).setWeight(random.nextFloat());
-                }
-                else
-                {
-                    double curWeight = linkGeneSet.get(i).getWeight();
-                    double newWeight = curWeight + (random.nextDouble() * 2.0 - 1.0) * 0.1;
-                    linkGeneSet.get(i).setWeight(newWeight);
-                }
-            }
-        }
+        this.mutateLinkWeights(.33D, .1D, .1D);
     }
 
     public void changeNeuronType(double mutationRate, double sigmoidRate)
@@ -1228,6 +1411,13 @@ public class Genome implements Serializable
         }
     }
 
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspA method that
+	 * changes the bias weight for every neuron
+	 * based on the mutation rate.</p>
+	 * @param mutationRate The rate to change the
+	 * 			bias weights.
+	 */
     public void changeBiasWeight(double mutationRate)
     {
         for (int i = 0; i < neuronGeneSet.size(); i++)
@@ -1240,6 +1430,12 @@ public class Genome implements Serializable
         }
     }
 
+	/**
+	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspMutates the weights
+	 * on the input layer based on the mutation rate.</p>
+	 * @param mutationRate the rate to change the input
+	 * 			layer weights.
+	 */
     public void mutateInputLink(double mutationRate)
     {
         int linkToMutate = random.nextInt(numInputNeurons);
@@ -1259,6 +1455,9 @@ public class Genome implements Serializable
     }
 
 
+	/**
+	 * @inheritDoc
+	 */
     @Override
     public String toString()
     {
