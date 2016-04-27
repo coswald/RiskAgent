@@ -129,66 +129,107 @@ public class NeuronGene implements Serializable
         return this.neuronType;
     }
 
-    //Set the neuron type
+    /**
+     * p>&nbsp&nbsp&nbsp&nbsp&nbspChanges the type of neuron.
+     * @param type The new type of neuron, either "SIGMOID",
+     *              or "STEP".
+     */
     public void setNeuronType(String type)
     {
         this.neuronType = type;
     }    
     
-    //Get the activation response of the neuron
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspGets the actvation
+     * response for this neuron.</p>
+     * @return The activation response.
+     */
     public double getActivationResponse()
     {
         return this.neuronActivationResponse;
     }
     
-    //Set the activation response of the neuron
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspSets the activation
+     * response for this neuron.</p>
+     * @param activate The new activation response.
+     */
     public void setActivationResponse(double activate)
     {
         this.neuronActivationResponse = activate;
     }
 
-    //Get the layer of the neuron
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspGets the layer
+     * for this neuron.</p>
+     * @return The layer of this neuron.
+     */
     public int getNeuronLayer()
     {
         return this.neuronLayer;
     }
 
-    //Set the layer of the neuron
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspSet the layer
+     * of this neuron</p>
+     * @params layer The new layer for this neuron.
+     */
     public void setNeuronLayer(int layer)
     {
         this.neuronLayer = layer;
     }
 
-    //Return the bias weight of the neuron
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns the
+     * bias weight of this neuron.</p>
+     * @return The current bias wieght.</p>
+     */
     public double getBiasWeight()
     {
         return this.biasWeight;
     }
 
-    //Set the bias weight of the neuron
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspChanges the bias
+     * weight for this neuron.</p>
+     * @param weight The new weight.
+     */
     public void setBiasWeight(double weight)
     {
         this.biasWeight = weight;
     }
 
-    //Gets the type of layer this neuron is (Input, Hidden, or Output)
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspGets the layer type.</p>
+     * @return The laer type of this neuron.
+     */
     public String getLayerType()
     {
         return this.neuronLayerType;
     }
 
-    //Sets the layer type of the neuron
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspChanges the layer type.
+     * This is either "Input", "Hidden", or "Output".</p>
+     * @param layerType The new layer type.
+     */
     public void setLayerType(String layerType)
     {
         neuronLayerType = layerType;
     }
     
-    //Increment the layer by one
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspChanges the neuron's layer
+     * by incrementing it by one.</p>
+     */
     public void pushLayer()
     {
         this.neuronLayer += 1;
     }
-
+    
+    /**
+     * @inheritDoc
+     */
     @Override
     public String toString()
     {
