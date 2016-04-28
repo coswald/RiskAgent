@@ -947,18 +947,21 @@ public class Genome implements Serializable
         this.genomeAdjFitness = fitness;
     }
 
+	public double determineFitness()
+	{
+		return this.determineFitness("NSDUHData-Short.txt");
+	}
+	
 	/**
 	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspReturns a value
 	 * that shows the fitness of this {@code Genome}.
 	 * @return The fitness of this {@code Genome}.
 	 */
-    public double determineFitness()
+    public double determineFitness(String fileName)
     {
         //Create the phenotype
         this.createPhenotype();
 
-        // The name of the file to open.
-        String fileName = "NSDUHData-Short.txt";
 
         // This will reference one line at a time
         String line = null;
@@ -1007,12 +1010,12 @@ public class Genome implements Serializable
             bufferedReader.close();         
         }
         catch(FileNotFoundException ex) {
-            System.out.println(
+            System.err.println(
                 "Unable to open file '" + 
                 fileName + "'");                
         }
         catch(IOException ex) {
-            System.out.println(
+            System.err.println(
                 "Error reading file '" 
                 + fileName + "'");                  
         }
@@ -1080,12 +1083,12 @@ public class Genome implements Serializable
             bufferedReader.close();         
         }
         catch(FileNotFoundException ex) {
-            System.out.println(
+            System.err.println(
                 "Unable to open file '" + 
                 fileName + "'");                
         }
         catch(IOException ex) {
-            System.out.println(
+            System.err.println(
                 "Error reading file '" 
                 + fileName + "'");                  
         }
