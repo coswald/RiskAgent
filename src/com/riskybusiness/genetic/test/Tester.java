@@ -45,7 +45,7 @@ public class Tester
 		//Tester variable
 		boolean testFire 			= false;
 		//Tester variable
-		boolean printGenome 		= true;
+		boolean printGenome 		= false;
 		//Tester variable
 		boolean testAddNeuron 		= false;
 		//Tester variable
