@@ -72,7 +72,7 @@ public class Epoch extends Object implements Runnable, Serializable
 	private transient double oldAgePenalty = 0.8; //Represents the penalty for being old
 	private transient int oldAge = 35; //Represents the age at which a species is old
 	private transient int youngAge = 16; //Represents the age at which a species is still young
-	private transient int backupGen = 500; //Represents how often the genome is saved to file
+	private transient int backupGen = 12; //Represents how often the genome is saved to file
 
 	//These are the mutate parameters that determine which mutator operator is used
 	private transient boolean addNeuron = true;
@@ -489,6 +489,26 @@ public class Epoch extends Object implements Runnable, Serializable
 			throw new RuntimeException("Error 112: Error with file");
 	}
 	
+	public void saveToFile(String fileName) throws IOException
+	{
+		//Initialize the object writer
+		ObjectOutputStream epochWriter = null;
+
+		//Try to write to the file
+		File f = new File(fileName);
+		if(f.exists())
+			f.delete();
+		//Initialize the writer with the given file
+		epochWriter = new ObjectOutputStream(new FileOutputStream(f));
+		
+		//Write out all the data
+		epochWriter.writeObject(this);
+
+		//Close the writers files
+		if(epochWriter != null)
+			epochWriter.close();
+	}
+	
 	@Override
 	public void run()
 	{
@@ -506,7 +526,7 @@ public class Epoch extends Object implements Runnable, Serializable
 		double amountToSpawn = 0.0D;
 		Genome dad, mom; //used for crossover.
 		
-		while(running && generation <= numGenerations)
+		while(running && generation < numGenerations)
 		{
 			if(paused)
 			{
@@ -516,7 +536,15 @@ public class Epoch extends Object implements Runnable, Serializable
 					changedState = !changedState;
 				}
 				else
-					System.err.print("");
+				{
+					try
+					{
+						Thread.sleep(100); //needed so thread won't stop.
+					}
+					catch(InterruptedException ie)
+					{
+					}
+				}
 			}
 			else
 			{
@@ -526,29 +554,14 @@ public class Epoch extends Object implements Runnable, Serializable
 				if(generation % backupGen == 0)
 				{
 					System.out.println("\tBacking up file...");
-					//Initialize the object writer
-					ObjectOutputStream epochWriter = null;
-
-					//Try to write to the file
 					try
 					{
-						File f = new File("epoch.gaif");
-						if(f.exists())
-							f.delete();
-						//Initialize the writer with the given file
-						epochWriter = new ObjectOutputStream(new FileOutputStream(f));
-						
-						//Write out all the data
-						epochWriter.writeObject(this);
-
-						//Close the writers files
-						if(epochWriter != null)
-							epochWriter.close();
+						this.saveToFile("epoch.gaif");
 						System.out.println("\tFile backed up to \'epoch.giaf\'!");
 					}
 					catch(IOException io)
 					{
-						System.exit(1);
+						System.err.println("Error: " + io.getMessage());
 					}
 				}
 				

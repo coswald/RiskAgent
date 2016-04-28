@@ -35,6 +35,7 @@ import java.awt.event.AdjustmentEvent;
 import java.awt.event.AdjustmentListener;
 import java.awt.event.KeyEvent;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -77,6 +78,7 @@ public class GenomeGUI extends Object implements Serializable
 	private final JButton stop = new JButton("Stop");
 	private final JMenuItem resume = new JMenuItem("Start");
 	private final JMenuItem pause = new JMenuItem("Stop");
+	private final File[] saveFile = new File[1];
 	private JMenuBar jmb;
 	private JMenu file;
 	private JMenu edit;
@@ -84,10 +86,12 @@ public class GenomeGUI extends Object implements Serializable
 	private JMenu help;
 	
 	private final Epoch epoch = new Epoch(50, 30, 6, .3D, .15D, .02D);
-	private final Thread t = new Thread(epoch);
+	private final Thread[] t = new Thread[1];
 	
 	public GenomeGUI()
 	{
+		this.saveFile[0] = null;
+		this.t[0] = new Thread(epoch);
 		this.init();
 		this.frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	}
@@ -110,13 +114,16 @@ public class GenomeGUI extends Object implements Serializable
 		{
 			public void actionPerformed(ActionEvent e)
 			{
+				GenomeGUI.this.stop.doClick(); //won't work if disabled anyway.
 				if(JOptionPane.showConfirmDialog(GenomeGUI.this.frame, "Are you sure you want to make a new population?",
 					"Confirm New Population", JOptionPane.YES_NO_OPTION,
 					JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION)
 				{
+					GenomeGUI.this.saveFile[0] = null;
 					GenomeGUI.this.console.setText("");
-					GenomeGUI.this.stop.doClick(); //won't work if disabled anyway.
-					GenomeGUI.this.start.doClick();
+					GenomeGUI.this.epoch.mutateFromOther(new Epoch(50, 30, 6, .3D, .15D, .02D));
+					GenomeGUI.this.epoch.createPopulation(.5D, true);
+					//GenomeGUI.this.start.doClick();
 				}
 			}
 		});
@@ -133,6 +140,7 @@ public class GenomeGUI extends Object implements Serializable
 				JFileChooser chooser = new JFileChooser();
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("Object Output Files", "txt", "gaif");
 				chooser.setFileFilter(filter);
+				chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
 				GenomeGUI.this.stop.doClick();
 				if(chooser.showOpenDialog(GenomeGUI.this.frame) == JFileChooser.APPROVE_OPTION)
 				{
@@ -142,22 +150,24 @@ public class GenomeGUI extends Object implements Serializable
 					{
 						ObjectInputStream oos = new ObjectInputStream(new FileInputStream(chooser.getSelectedFile()));
 						GenomeGUI.this.epoch.mutateFromOther((Epoch)oos.readObject());
+						GenomeGUI.this.epoch.createPopulation(.5D, true);
 						oos.close();
-						GenomeGUI.this.printSucc("Loaded " + chooser.getSelectedFile().getName() + " successfully!");
+						GenomeGUI.this.printSucc("Loaded " + chooser.getSelectedFile().getName() + " successfully!\n");
 					}
 					catch(IOException io)
 					{
-						GenomeGUI.this.printErr("Could not load file: " + io.getMessage());
+						GenomeGUI.this.printErr("Could not load file: " + io.getMessage() + "\n");
 					}
 					catch(ClassNotFoundException cnfe)
 					{
-						GenomeGUI.this.printErr("Class not found: " + cnfe.getMessage());
+						GenomeGUI.this.printErr("Class not found: " + cnfe.getMessage() + "\n");
 					}
 				}
 			}
 		});
 		this.file.add(open);
 		
+		final JMenuItem saveAs = new JMenuItem("Save Population As");
 		final JMenuItem save = new JMenuItem("Save Population"); //you'll see why it's final
 		save.setMnemonic(KeyEvent.VK_A);
 		save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, KeyEvent.CTRL_DOWN_MASK));
@@ -166,11 +176,25 @@ public class GenomeGUI extends Object implements Serializable
 			public void actionPerformed(ActionEvent e)
 			{
 				//save File
+				GenomeGUI.this.stop.doClick();
+				if(saveFile[0] == null)
+					saveAs.doClick();
+				else
+				{
+					try
+					{
+						GenomeGUI.this.epoch.saveToFile(saveFile[0].getAbsolutePath());
+						GenomeGUI.this.printSucc("Saved to file: " + saveFile[0].getName() + "\n");
+					}
+					catch(IOException io)
+					{
+						GenomeGUI.this.printErr("Could not save to file: " + io.getMessage() + "\n");
+					}
+				}					
 			}
 		});
 		this.file.add(save);
 		
-		JMenuItem saveAs = new JMenuItem("Save Population As");
 		saveAs.setAccelerator(KeyStroke.getKeyStroke("control alt S"));
 		saveAs.addActionListener(new ActionListener()
 		{
@@ -180,9 +204,11 @@ public class GenomeGUI extends Object implements Serializable
 				JFileChooser chooser = new JFileChooser();
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("Object Output Files", "txt", "gaif");
 				chooser.setFileFilter(filter);
+				chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
 				if(chooser.showSaveDialog(GenomeGUI.this.frame) == JFileChooser.APPROVE_OPTION)
 				{
-					GenomeGUI.this.print("You have chosen to save this file as " + chooser.getSelectedFile().getName());
+					//GenomeGUI.this.print("You have chosen to save this file as " + chooser.getSelectedFile().getName());
+					GenomeGUI.this.saveFile[0] = chooser.getSelectedFile();
 					save.doClick();
 				}
 			}
@@ -203,7 +229,7 @@ public class GenomeGUI extends Object implements Serializable
 				}
 				catch(Exception f)
 				{
-					GenomeGUI.this.printErr("Cannot print: " + f.getMessage());
+					GenomeGUI.this.printErr("Cannot print: " + f.getMessage() + "\n");
 				}
 			}
 		});
@@ -247,6 +273,17 @@ public class GenomeGUI extends Object implements Serializable
 		});
 		this.edit.add(copy);
 		
+		JMenuItem clear = new JMenuItem("Clear Console");
+		clear.setAccelerator(KeyStroke.getKeyStroke("control alt C"));
+		clear.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				GenomeGUI.this.console.setText("");
+			}
+		});
+		this.edit.add(clear);
+		
 		this.jmb.add(edit);
 		
 		//settings menu
@@ -263,11 +300,23 @@ public class GenomeGUI extends Object implements Serializable
 				JFileChooser chooser = new JFileChooser();
 				FileNameExtensionFilter filter = new FileNameExtensionFilter("Object Output Files", "txt", "gapf");
 				chooser.setFileFilter(filter);
+				chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
 				GenomeGUI.this.stop.doClick();
 				if(chooser.showOpenDialog(GenomeGUI.this.frame) == JFileChooser.APPROVE_OPTION)
 				{
-					GenomeGUI.this.print("You have chosen to load the param file " + chooser.getSelectedFile().getName());
+					//GenomeGUI.this.print("You have chosen to load the param file " + chooser.getSelectedFile().getName());
 					//load params
+					try
+					{
+						GenomeGUI.this.epoch.setParams(chooser.getSelectedFile().getAbsolutePath());
+						GenomeGUI.this.printSucc("Switching population to new params...\n");
+						GenomeGUI.this.epoch.createPopulation(.5D, true);
+						GenomeGUI.this.printSucc("Successfully loaded " + chooser.getSelectedFile().getName() + "\n");
+					}
+					catch(RuntimeException re)
+					{
+						GenomeGUI.this.printErr(re.getMessage() + "\n");
+					}						
 				}
 			}
 		});
@@ -378,7 +427,7 @@ public class GenomeGUI extends Object implements Serializable
 			if(GenomeGUI.this.epoch.isRunning())
 				GenomeGUI.this.epoch.switchPausedState();
 			else
-				GenomeGUI.this.t.start();
+				GenomeGUI.this.t[0].start();
 		}
 	}
 	

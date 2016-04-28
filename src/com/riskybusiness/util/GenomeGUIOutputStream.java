@@ -43,7 +43,7 @@ public class GenomeGUIOutputStream extends OutputStream
 	{
 		try
 		{
-			Thread.sleep(10);
+			Thread.sleep(5);
 		}
 		catch(InterruptedException ie)
 		{
