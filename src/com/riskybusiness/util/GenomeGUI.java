@@ -68,6 +68,9 @@ import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
 import javax.swing.text.StyledDocument;
 
+import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
+import org.apache.poi.xwpf.usermodel.XWPFDocument;
+
 public class GenomeGUI extends Object implements Serializable
 {
 	private static final long serialVersionUID = 5606245947756700803L;
@@ -328,18 +331,55 @@ public class GenomeGUI extends Object implements Serializable
 		this.help = new JMenu("Help");
 		this.help.setMnemonic(KeyEvent.VK_H);
 		
-		JMenuItem helpI = new JMenuItem("Help");
+		JMenuItem userManual = new JMenuItem("Users Manual");
+		userManual.setMnemonic(KeyEvent.VK_U);
+		userManual.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				GenomeGUI.this.console.setText("");
+				File file = null;
+				XWPFWordExtractor extractor = null;
+				try
+				{
+					file = new File("UsersManual.docx");
+					FileInputStream fis = new FileInputStream(file.getAbsolutePath());
+					XWPFDocument document = new XWPFDocument(fis);
+					extractor = new XWPFWordExtractor(document);
+					String fileData = extractor.getText();
+					GenomeGUI.this.print(fileData);
+				}
+				catch(Exception f)
+				{
+					GenomeGUI.this.printErr("Error loading User Manual: " + f.getMessage() + "\n");
+				}
+			}
+		});
+		
+		this.help.add(userManual);
+		
+		JMenuItem helpI = new JMenuItem("About WANT");
 		helpI.setAccelerator(KeyStroke.getKeyStroke("F1"));
 		helpI.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
 			{
 				JPopupMenu jpm = new JPopupMenu("Help");
-				jpm.setPopupSize(new Dimension(200, 124));
-				jpm.add("This is the help menu. Have fun.");
+				jpm.setPopupSize(new Dimension(400, 188));
+				
+				jpm.add("<html><p>&nbsp&nbsp&nbsp&nbsp Welcome to W. A. N. T! This stands for \"What a N. E. A. T. Tool!\", <br>" +  
+												  "a pointer to the origins of the training mechanism of the application, <br>" + 
+												  "the NEAT algorithm. NEAT stands for <b>Neuro-Evolution of Augmenting <br>" + 
+												  "Topologies</b>, a type of genetic algorithm that trains a neural network<br> " + 
+												  "to maintain minimum topology of that network.</p><br>" + 
+							  "<p>&nbsp&nbsp&nbsp&nbsp If there are issues with running, or general questions, visit the <br>" + 
+												  "User Manual under the Help menu.</p><br>" + 
+							  "<p>&nbsp&nbsp&nbsp&nbsp For questions about maintaining the code or contributing, visit the <br>" + 
+												  "System Manual under the Help menu.</p></html>");
+				
 				jpm.setLightWeightPopupEnabled(false);
 				jpm.setBorderPainted(true);
-				jpm.show(GenomeGUI.this.frame, GenomeGUI.this.frame.getWidth() / 2 - 100, GenomeGUI.this.frame.getHeight() / 2 - 62);
+				jpm.show(GenomeGUI.this.frame, GenomeGUI.this.frame.getWidth() / 2 - 190, GenomeGUI.this.frame.getHeight() / 2 - 94);
 			}
 		});
 		this.help.add(helpI);
