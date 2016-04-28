@@ -557,7 +557,7 @@ public class Epoch extends Object implements Runnable, Serializable
 					try
 					{
 						this.saveToFile("epoch.gaif");
-						System.out.println("\tFile backed up to \'epoch.giaf\'!");
+						System.out.println("\tFile backed up to \'epoch.gaif\'!");
 					}
 					catch(IOException io)
 					{
