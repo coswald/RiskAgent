@@ -493,6 +493,8 @@ public class Epoch extends Object implements Runnable, Serializable
 	public void run()
 	{
 		this.running = true;
+		boolean changedState = true;
+		
 		Genome toCopy = new Genome();
 		Genome child = new Genome();
 		double totalAdjustedFitness = 0;
@@ -508,10 +510,17 @@ public class Epoch extends Object implements Runnable, Serializable
 		{
 			if(paused)
 			{
-				//Do nothing!
+				if(changedState)
+				{
+					System.err.println("Paused!");
+					changedState = !changedState;
+				}
+				else
+					System.err.print("");
 			}
 			else
 			{
+				changedState = true;
 				generation++;
 				System.out.println("Generation " + generation);
 				if(generation % backupGen == 0)
@@ -580,7 +589,7 @@ public class Epoch extends Object implements Runnable, Serializable
 						this.theChosenOne = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
 					}
 				}
-
+				System.out.println("\t\tChosen one's Fitness: " + bestFitness);
 				//Check if we have exceeded the number of species
 				System.out.println("\tChanging Species Threshold (with one \"h\")");
 				if (species.size() > maxNumSpecies)
@@ -662,7 +671,7 @@ public class Epoch extends Object implements Runnable, Serializable
 				for (int speciesIndex = 0; speciesIndex < species.size(); speciesIndex++)
 				{
 					//Creates the number of children necassary for the species
-					System.out.println("\t\tCreating Children..." + speciesIndex);
+					//System.out.println("\t\tCreating Children..." + speciesIndex);
 					for (double i = 0.0; i < species.get(speciesIndex).getNumSpawns(); i++)
 					{
 						//If this is our first pass then the first thing we want to do

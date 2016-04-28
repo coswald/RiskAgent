@@ -37,9 +37,9 @@ public class Main extends Object
 			{
 				GenomeGUI ggui = new GenomeGUI();
 				GenomeGUIOutputStream gguios = new GenomeGUIOutputStream(ggui, 0);
-				//GenomeGUIOutputStream gguiose = new GenomeGUIOutputStream(ggui, 1);
+				GenomeGUIOutputStream gguiose = new GenomeGUIOutputStream(ggui, 1);
 				
-				//System.setErr(new PrintStream(gguiose));
+				System.setErr(new PrintStream(gguiose));
 				System.setOut(new PrintStream(gguios));
 				
 				ggui.start();

@@ -61,9 +61,11 @@ import javax.swing.KeyStroke;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import javax.swing.text.StyleContext;
+import javax.swing.text.StyledDocument;
 
 public class GenomeGUI extends Object implements Serializable
 {
@@ -300,13 +302,7 @@ public class GenomeGUI extends Object implements Serializable
 		//Console area
 		this.console.setEditable(false);
 		JScrollPane jsp = new JScrollPane(this.console);
-		jsp.getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener()
-		{
-			public void adjustmentValueChanged(AdjustmentEvent e)
-			{
-				e.getAdjustable().setValue(e.getAdjustable().getMaximum());
-			}
-		});
+		
 		this.frame.add(jsp, BorderLayout.CENTER);
 		
 		//buttons
@@ -344,7 +340,7 @@ public class GenomeGUI extends Object implements Serializable
 	
 	private void append(String msg, Color c)
 	{
-		this.console.setEditable(true);
+		//this.console.setEditable(true);
 		if(msg.length() >= 3)
 			msg = "> " + msg;
 		StyleContext sc = StyleContext.getDefaultStyleContext();
@@ -353,11 +349,21 @@ public class GenomeGUI extends Object implements Serializable
 		set = sc.addAttribute(set, StyleConstants.FontFamily, "Lucida Console");
 		set = sc.addAttribute(set, StyleConstants.Alignment, StyleConstants.ALIGN_JUSTIFIED);
 		
-		int len = this.console.getDocument().getLength();
-		this.console.setCaretPosition(len);
-		this.console.setCharacterAttributes(set, false);
-		this.console.replaceSelection(msg);
-		this.console.setEditable(false);
+		try
+		{
+			StyledDocument doc = this.console.getStyledDocument();
+			doc.insertString(doc.getLength(), msg, set);
+			this.console.setCaretPosition(doc.getLength());
+		}
+		catch(BadLocationException ble)
+		{
+			System.err.println(ble);
+		}
+		//int len = this.console.getDocument().getLength();
+		//this.console.setCaretPosition(len);
+		//this.console.setCharacterAttributes(set, false);
+		//this.console.setText(this.console.getText() + msg);
+		//this.console.setEditable(false);
 	}
 	
 	private class StartAction implements ActionListener
@@ -384,7 +390,6 @@ public class GenomeGUI extends Object implements Serializable
 			GenomeGUI.this.resume.setEnabled(true);
 			GenomeGUI.this.stop.setEnabled(false);
 			GenomeGUI.this.pause.setEnabled(false);
-			//Do the rest
 			
 			epoch.switchPausedState();
 		}
