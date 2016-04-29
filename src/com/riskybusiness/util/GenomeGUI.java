@@ -153,13 +153,20 @@ public class GenomeGUI extends Object implements Serializable
 					try
 					{
 						ObjectInputStream oos = new ObjectInputStream(new FileInputStream(chooser.getSelectedFile()));
-						GenomeGUI.this.epoch.mutateFromOther((Epoch)oos.readObject());
-						GenomeGUI.this.epoch.createPopulation(.5D, true);
+						GenomeGUI.this.epoch.mutateFromOther(GenomeGUI.this.epoch.dontChangeParams((Epoch)oos.readObject()));
 						GenomeGUI.this.epoch.stop();
+						if(GenomeGUI.this.epoch.isPaused())
+							GenomeGUI.this.epoch.switchPausedState();
 						GenomeGUI.this.t[0] = new Thread(GenomeGUI.this.epoch);
-						GenomeGUI.this.t[0].start();
 						oos.close();
 						GenomeGUI.this.printSucc("Loaded " + chooser.getSelectedFile().getName() + " successfully!\n");
+						
+						//thread issues
+						GenomeGUI.this.start.setEnabled(false);
+						GenomeGUI.this.resume.setEnabled(false);
+						Thread.sleep(150);
+						GenomeGUI.this.start.setEnabled(true);
+						GenomeGUI.this.resume.setEnabled(true);
 					}
 					catch(IOException io)
 					{
@@ -168,6 +175,9 @@ public class GenomeGUI extends Object implements Serializable
 					catch(ClassNotFoundException cnfe)
 					{
 						GenomeGUI.this.printErr("Class not found: " + cnfe.getMessage() + "\n");
+					}
+					catch(InterruptedException ie)
+					{
 					}
 				}
 			}
@@ -317,12 +327,20 @@ public class GenomeGUI extends Object implements Serializable
 					{
 						GenomeGUI.this.epoch.setParams(chooser.getSelectedFile().getAbsolutePath());
 						GenomeGUI.this.printSucc("Switching population to new params...\n");
+						GenomeGUI.this.epoch.stop();
+						if(GenomeGUI.this.epoch.isPaused())
+							GenomeGUI.this.epoch.switchPausedState();
+						GenomeGUI.this.t[0] = new Thread(GenomeGUI.this.epoch);
 						GenomeGUI.this.epoch.createPopulation(.5D, true);
+						
 						GenomeGUI.this.printSucc("Successfully loaded " + chooser.getSelectedFile().getName() + "\n");
 					}
 					catch(RuntimeException re)
 					{
 						GenomeGUI.this.printErr(re.getMessage() + "\n");
+						GenomeGUI.this.printSucc("Switching population to default params...\n");
+						GenomeGUI.this.epoch.mutateFromOther(new Epoch(50, 30, 6, .3D, .15D, .02D));
+						GenomeGUI.this.epoch.createPopulation(.5D, true);
 					}						
 				}
 			}

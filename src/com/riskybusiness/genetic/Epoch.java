@@ -146,6 +146,47 @@ public class Epoch extends Object implements Runnable, Serializable
 		this.theChosenOne = other.theChosenOne;
 	}
 	
+	public Epoch dontChangeParams(Epoch e)
+	{
+		e.numGenerations = this.numGenerations;
+		e.advancedNetCreation = this.advancedNetCreation;
+		e.totalAdjustedFitness = this.totalAdjustedFitness;
+		e.youthReward = this.youthReward;
+		e.oldAgePenalty = this.oldAgePenalty;
+		e.oldAge = this.oldAge;
+		e.youngAge = this.youngAge;
+		e.backupGen = this.backupGen;
+
+		e.addNeuron = this.addNeuron;
+		e.addLink = this.addLink;
+		e.addLoopedLink = this.addLoopedLink;
+		e.changeNeuronType = this.changeNeuronType;
+		e.mutateBiasWeight = this.mutateBiasWeight;
+		e.mutateInputLink = this.mutateInputLink;
+		e.mutateInputNeuron = this.mutateInputNeuron;
+		e.mutateNeuron = this.mutateNeuron;
+		e.mutateLink = this.mutateLink;
+
+		e.addNeuronRate = this.addNeuronRate;
+		e.maxCheckForNeuron = this.maxCheckForNeuron;
+		e.addLinkRate = this.addLinkRate;
+		e.maxCheckforLink = this.maxCheckforLink;
+		e.addLoopedLinkRate = this.addLoopedLinkRate;
+		e.maxCheckForLooped = this.maxCheckForLooped;
+		e.chanceOfTypeChange = this.chanceOfTypeChange;
+		e.chanceOfSigmoid = this.chanceOfSigmoid;
+		e.biasLinkMutateRate = this.biasLinkMutateRate;
+		e.inLinkMutateRate = this.inLinkMutateRate;
+		e.inNeuronMutateRate = this.inNeuronMutateRate;
+		
+		e.numInputNeurons = this.numInputNeurons;
+		e.numOutputNeurons = this.numOutputNeurons;
+		e.numHiddenLayers = this.numHiddenLayers;
+		e.hiddenLayers = this.hiddenLayers;
+			
+		return e;
+	}
+	
 	
 	public void createPopulation(double chanceOfLink, boolean fullLink, int[] layers)
 	{
@@ -299,11 +340,21 @@ public class Epoch extends Object implements Runnable, Serializable
 				text = text.split("=")[1];
 				switch (varIndex)
 				{
-					case 1: population = new Genome[Integer.parseInt(text)];
+					case 1: 
+						int size = Integer.parseInt(text);
+						if(size <= 0)
+							throw new RuntimeException("Error 100: Invalid Population size!");
+						population = new Genome[size];
 						break;
-					case 2: numGenerations = Integer.parseInt(text);
+					case 2:
+						numGenerations = Integer.parseInt(text);
+						if(numGenerations <= 0)
+							throw new RuntimeException("Error 99: Invalid Generation number!");
 						break;
-					case 3: backupGen = Integer.parseInt(text);
+					case 3:
+						backupGen = Integer.parseInt(text);
+						if(backupGen <= 0)
+							throw new RuntimeException("Error 98: Invalid backup number!");
 						break;
 					case 4: 
 						break;
@@ -317,15 +368,27 @@ public class Epoch extends Object implements Runnable, Serializable
 						break;
 					case 6: 
 						if (!advancedNetCreation)
+						{
 							numInputNeurons = Integer.parseInt(text);
+							if(numInputNeurons <= 0)
+								throw new RuntimeException("Error 97: Input Neuron number Invalid!");
+						}
 						break;
 					case 7: 
 						if (!advancedNetCreation)
+						{
 							numOutputNeurons = Integer.parseInt(text);
+							if(numOutputNeurons <= 0)
+								throw new RuntimeException("Error 96: Output Neuron number Invalid!");
+						}
 						break;
 					case 8:
 						if (!advancedNetCreation)
+						{
 							numHiddenLayers = Integer.parseInt(text);
+							if(numHiddenLayers <= 0)
+								throw new RuntimeException("Error 95: Hidden Neuron number Invalid!");
+						}
 						hiddenLayers = new int[numHiddenLayers + 1];
 						break;
 					case 9: 
@@ -788,5 +851,6 @@ public class Epoch extends Object implements Runnable, Serializable
 				System.out.println("\tDone!");
 			}
 		}
+		this.running = false;
 	}
 }
