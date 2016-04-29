@@ -18,6 +18,7 @@
 package com.riskybusiness.util;
 
 import com.riskybusiness.genetic.Epoch;
+import com.riskybusiness.genetic.Predictions;
 import com.riskybusiness.util.PrinterHelper;
 
 import java.awt.BorderLayout;
@@ -125,6 +126,7 @@ public class GenomeGUI extends Object implements Serializable
 					GenomeGUI.this.saveFile[0] = null;
 					GenomeGUI.this.console.setText("");
 					GenomeGUI.this.settings.getItem(0).setEnabled(true);
+					GenomeGUI.this.settings.getItem(1).setEnabled(false);
 					GenomeGUI.this.epoch.mutateFromOther(new Epoch(50, 30, 6, .3D, .15D, .02D));
 					GenomeGUI.this.epoch.createPopulation(.5D, true);
 					//GenomeGUI.this.start.doClick();
@@ -347,6 +349,29 @@ public class GenomeGUI extends Object implements Serializable
 		});
 		this.settings.add(params);
 		
+		JMenuItem predictions = new JMenuItem("Test Predictions");
+		predictions.setEnabled(false);
+		predictions.setMnemonic(KeyEvent.VK_T);
+		predictions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_T, KeyEvent.CTRL_DOWN_MASK));
+		predictions.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				JFileChooser chooser = new JFileChooser();
+				chooser.setDialogTitle("Select Prediction File...");
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Prediction File", "txt");
+				chooser.setFileFilter(filter);
+				chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+				GenomeGUI.this.stop.doClick();
+				if(chooser.showOpenDialog(GenomeGUI.this.frame) == JFileChooser.APPROVE_OPTION)
+				{
+					Predictions p = new Predictions(GenomeGUI.this.epoch, chooser.getSelectedFile().getAbsolutePath(), 13, 1);
+					p.runPredictions();
+				}
+			}
+		});
+		this.settings.add(predictions);
+		
 		this.jmb.add(settings);
 		
 		//help menu
@@ -515,6 +540,7 @@ public class GenomeGUI extends Object implements Serializable
 			GenomeGUI.this.stop.setEnabled(true);
 			GenomeGUI.this.pause.setEnabled(true);
 			GenomeGUI.this.settings.getItem(0).setEnabled(false); //disable load parameters
+			GenomeGUI.this.settings.getItem(1).setEnabled(true); //enable prediction testing.
 			if(GenomeGUI.this.epoch.isRunning())
 				GenomeGUI.this.epoch.switchPausedState();
 			else

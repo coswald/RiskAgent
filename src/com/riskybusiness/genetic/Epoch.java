@@ -314,6 +314,71 @@ public class Epoch extends Object implements Runnable, Serializable
 		this.paused = !this.paused;
 	}
 	
+	public int getGenomeID()
+	{
+		return this.genomeID;
+	}
+	
+	public void setGenomeID(int genomeID)
+	{
+		this.genomeID = genomeID;
+	}
+	
+	public void setTheChosenOne(Genome theChosenOne)
+	{
+		this.theChosenOne = theChosenOne;
+	}
+	
+	public InnovationDB getInnovations()
+	{
+		return this.innovations;
+	}
+	
+	public void setInnovations(InnovationDB innovations)
+	{
+		this.innovations = innovations;
+	}
+	
+	public int getSpeciesID()
+	{
+		return this.speciesID;
+	}
+	
+	public void setSpeciesID(int speciesID)
+	{
+		this.speciesID = speciesID;
+	}
+	
+	public double getBestFitness()
+	{
+		return this.bestFitness;
+	}
+	
+	public void setBestFitness(double bestFitness)
+	{
+		this.bestFitness = bestFitness;
+	}
+	
+	public Genome[] getPopulation()
+	{
+		return this.population;
+	}
+	
+	public void setPopulation(Genome[] population)
+	{
+		this.population = population;
+	}
+	
+	public ArrayList<Species> getSpecies()
+	{
+		return this.species;
+	}
+	
+	public void setSpecies(ArrayList<Species> species)
+	{
+		this.species = species;
+	}
+	
 	public void setParams(String paramFile) throws RuntimeException
 	{
 		FileInputStream	fileObject = null;
@@ -573,6 +638,34 @@ public class Epoch extends Object implements Runnable, Serializable
 			epochWriter.close();
 	}
 	
+	public Genome getTheChosenOne()
+	{
+		this.findTheChosenOne();
+		return this.theChosenOne;
+	}
+	
+	public void findTheChosenOne()
+	{
+		double competitorFitness; //represents the fitenss of the competitor.
+		Genome toCopy = new Genome();
+		for (int speciesIndex = 0; speciesIndex < species.size(); speciesIndex++)
+		{
+			//Find the fitness of the competitor
+			competitorFitness = species.get(speciesIndex).getBestFitness();
+
+			//If the competitor fitness is better than the best so far then do stuff
+			if (competitorFitness > bestFitness)
+			{
+				//Copy the best member into the toCopy genome
+				toCopy = species.get(speciesIndex).getBestMember();
+				//Set the best fitness to the competitor fitness
+				bestFitness = competitorFitness;
+				//Create the chosen one
+				this.theChosenOne = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
+			}
+		}
+	}
+	
 	@Override
 	public void run()
 	{
@@ -583,7 +676,6 @@ public class Epoch extends Object implements Runnable, Serializable
 		Genome child = new Genome();
 		double totalAdjustedFitness = 0;
 		
-		double competitorFitness; //represents the fitenss of the competitor.
 		boolean addedMember = false; //represents whether or not a member has been added.
 		double avgAdjustedFitness = 0.0D; //demonstrates the average fitness for the population.
 		double compatibilityScore = 0.0D; //used to calculate compatibility score.
@@ -651,22 +743,7 @@ public class Epoch extends Object implements Runnable, Serializable
 				//Loop through each species and see if any of the alphas has surpassed the best
 				//fitness seen so far
 				System.out.println("\tLooping through to find the Chosen One...");
-				for (int speciesIndex = 0; speciesIndex < species.size(); speciesIndex++)
-				{
-					//Find the fitness of the competitor
-					competitorFitness = species.get(speciesIndex).getBestFitness();
-
-					//If the competitor fitness is better than the best so far then do stuff
-					if (competitorFitness > bestFitness)
-					{
-						//Copy the best member into the toCopy genome
-						toCopy = species.get(speciesIndex).getBestMember();
-						//Set the best fitness to the competitor fitness
-						bestFitness = competitorFitness;
-						//Create the chosen one
-						this.theChosenOne = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
-					}
-				}
+				this.findTheChosenOne();
 				System.out.println("\t\tChosen one's Fitness: " + bestFitness);
 				//Check if we have exceeded the number of species
 				System.out.println("\tChanging Species Threshold (with one \"h\")");
