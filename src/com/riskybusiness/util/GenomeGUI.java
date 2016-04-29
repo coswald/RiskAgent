@@ -124,6 +124,7 @@ public class GenomeGUI extends Object implements Serializable
 				{
 					GenomeGUI.this.saveFile[0] = null;
 					GenomeGUI.this.console.setText("");
+					GenomeGUI.this.settings.getItem(0).setEnabled(true);
 					GenomeGUI.this.epoch.mutateFromOther(new Epoch(50, 30, 6, .3D, .15D, .02D));
 					GenomeGUI.this.epoch.createPopulation(.5D, true);
 					//GenomeGUI.this.start.doClick();
@@ -154,6 +155,9 @@ public class GenomeGUI extends Object implements Serializable
 						ObjectInputStream oos = new ObjectInputStream(new FileInputStream(chooser.getSelectedFile()));
 						GenomeGUI.this.epoch.mutateFromOther((Epoch)oos.readObject());
 						GenomeGUI.this.epoch.createPopulation(.5D, true);
+						GenomeGUI.this.epoch.stop();
+						GenomeGUI.this.t[0] = new Thread(GenomeGUI.this.epoch);
+						GenomeGUI.this.t[0].start();
 						oos.close();
 						GenomeGUI.this.printSucc("Loaded " + chooser.getSelectedFile().getName() + " successfully!\n");
 					}
@@ -211,7 +215,7 @@ public class GenomeGUI extends Object implements Serializable
 				if(chooser.showSaveDialog(GenomeGUI.this.frame) == JFileChooser.APPROVE_OPTION)
 				{
 					//GenomeGUI.this.print("You have chosen to save this file as " + chooser.getSelectedFile().getName());
-					GenomeGUI.this.saveFile[0] = chooser.getSelectedFile();
+					GenomeGUI.this.saveFile[0] = new File(chooser.getSelectedFile().getAbsolutePath() + ".gaif");
 					save.doClick();
 				}
 			}
@@ -333,6 +337,7 @@ public class GenomeGUI extends Object implements Serializable
 		
 		JMenuItem userManual = new JMenuItem("Users Manual");
 		userManual.setMnemonic(KeyEvent.VK_U);
+		userManual.setAccelerator(KeyStroke.getKeyStroke("F2"));
 		userManual.addActionListener(new ActionListener()
 		{
 			public void actionPerformed(ActionEvent e)
@@ -357,6 +362,34 @@ public class GenomeGUI extends Object implements Serializable
 		});
 		
 		this.help.add(userManual);
+		
+		JMenuItem systemManual = new JMenuItem("System Manual");
+		systemManual.setMnemonic(KeyEvent.VK_Y);
+		systemManual.setAccelerator(KeyStroke.getKeyStroke("F3"));
+		systemManual.addActionListener(new ActionListener()
+		{
+			public void actionPerformed(ActionEvent e)
+			{
+				GenomeGUI.this.console.setText("");
+				File file = null;
+				XWPFWordExtractor extractor = null;
+				try
+				{
+					file = new File("SystemManual.docx");
+					FileInputStream fis = new FileInputStream(file.getAbsolutePath());
+					XWPFDocument document = new XWPFDocument(fis);
+					extractor = new XWPFWordExtractor(document);
+					String fileData = extractor.getText();
+					GenomeGUI.this.print(fileData);
+				}
+				catch(Exception f)
+				{
+					GenomeGUI.this.printErr("Error loading System Manual: " + f.getMessage() + "\n");
+				}
+			}
+		});
+		
+		this.help.add(systemManual);
 		
 		JMenuItem helpI = new JMenuItem("About WANT");
 		helpI.setAccelerator(KeyStroke.getKeyStroke("F1"));
@@ -463,11 +496,13 @@ public class GenomeGUI extends Object implements Serializable
 			GenomeGUI.this.resume.setEnabled(false);
 			GenomeGUI.this.stop.setEnabled(true);
 			GenomeGUI.this.pause.setEnabled(true);
-			
+			GenomeGUI.this.settings.getItem(0).setEnabled(false); //disable load parameters
 			if(GenomeGUI.this.epoch.isRunning())
 				GenomeGUI.this.epoch.switchPausedState();
 			else
 				GenomeGUI.this.t[0].start();
+			for(int i = 0; i < GenomeGUI.this.help.getItemCount() - 1; i++)
+				GenomeGUI.this.help.getItem(i).setEnabled(false);
 		}
 	}
 	
@@ -481,6 +516,9 @@ public class GenomeGUI extends Object implements Serializable
 			GenomeGUI.this.pause.setEnabled(false);
 			
 			epoch.switchPausedState();
+			
+			for(int i = 0; i < GenomeGUI.this.help.getItemCount() - 1; i++)
+				GenomeGUI.this.help.getItem(i).setEnabled(true);
 		}
 	}
 }
