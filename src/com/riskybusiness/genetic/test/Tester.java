@@ -41,13 +41,11 @@ public class Tester
 		/* Tester Params */
 		
 		//Tester variable
-		boolean testFire 			= false;
-		//Tester variable
 		boolean printGenome 		= false;
 		//Tester variable
-		boolean testAddNeuron 		= false;
+		boolean testFire 			= false;
 		//Tester variable
-		boolean testSortNeurons 	= false;
+		boolean testAddNeuron 		= false;
 		//Tester variable
 		boolean testAddLink			= false;
 		//Tester variable
