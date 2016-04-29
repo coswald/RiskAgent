@@ -1475,6 +1475,7 @@ public class Genome implements Serializable
             toReturn += "   Neuron ID: " + neuronGeneSet.get(i).getID() + " Neuron Layer: " + neuronGeneSet.get(i).getNeuronLayer() + " has an activation response of " + neuronGeneSet.get(i).getActivationResponse() + "\n";
         }
         toReturn += "The links inside this genome are: \n";
+        toReturn += "The link gene size is " + linkGeneSet.size();
         for (int i = 0; i < linkGeneSet.size(); i++)
         {
             toReturn += "   Link ID & InnovID: " + linkGeneSet.get(i).getID() + " & " + linkGeneSet.get(i).getInnovationID() + " comes from Neuron: " + linkGeneSet.get(i).getFromNeuron() + " and goes to Neuron: " + linkGeneSet.get(i).getToNeuron() + " and is " + ((linkGeneSet.get(i).getEnabled()) ? "enabled"  : "disabled") + " and has a weight of " + linkGeneSet.get(i).getWeight() + "\n";

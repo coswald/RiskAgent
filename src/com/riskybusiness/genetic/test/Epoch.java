@@ -181,7 +181,7 @@ public class Epoch implements Runnable
    		FileInputStream			fileObject = null;
    		try
    		{
-   			fileObject 	= new FileInputStream("params.txt");
+   			fileObject 	= new FileInputStream("params.gapf");
    		}
    		catch(Exception e)
    		{
@@ -968,7 +968,7 @@ public class Epoch implements Runnable
 
 								}
 							}
-							toCopy = child;
+							toCopy = mom;
 							child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
 						}
 

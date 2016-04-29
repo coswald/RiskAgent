@@ -90,7 +90,7 @@ public class Epoch extends Object implements Runnable, Serializable
 	private transient int maxCheckForNeuron = 20;
 	private transient double addLinkRate = 0.05;
 	private transient int maxCheckforLink = 20;
-	private transient double addLoopedLinkRate = 0.05;
+	private transient double addLoopedLinkRate = 0.00;
 	private transient int maxCheckForLooped = 20;
 	private transient double chanceOfTypeChange = 0.10;
 	private transient double chanceOfSigmoid = 0.5;
@@ -100,8 +100,8 @@ public class Epoch extends Object implements Runnable, Serializable
 	
 	private transient int numInputNeurons = 13;
 	private transient int numOutputNeurons = 1;
-	private transient int numHiddenLayers = 2;
-	private transient int[] hiddenLayers = new int[numHiddenLayers + 3];
+	private transient int numHiddenLayers = 1;
+	private transient int[] hiddenLayers = new int[] {13,1};
 	
 	private transient boolean running = false;
 	private transient boolean paused = false;
@@ -150,16 +150,18 @@ public class Epoch extends Object implements Runnable, Serializable
 	public void createPopulation(double chanceOfLink, boolean fullLink, int[] layers)
 	{
 		System.out.println("Creating a new population...");
-		int[] summationNeuronsInLayer = new int[layers.length + 1];
+		int[] summationNeuronsInLayer = new int[layers.length + 2];
 		
 		//Initialize number of neurons
 		summationNeuronsInLayer[0] = 0;
 		summationNeuronsInLayer[1] = layers[0];
 
-		for (int i = 2; i < layers.length + 1; i++)
+		for (int i = 0; i < layers.length - 1; i++)
 		{
-			summationNeuronsInLayer[i] = summationNeuronsInLayer[i - 1] + layers[i - 1];
+			System.out.println(summationNeuronsInLayer[i + 1] + layers[i]);
+			summationNeuronsInLayer[i + 2] = summationNeuronsInLayer[i + 1] + layers[i];
 		}
+		summationNeuronsInLayer[layers.length + 1] = layers[layers.length - 1] + summationNeuronsInLayer[layers.length];
 
 		//Create the initial genomes
 		for (int lcv = 0; lcv < population.length; lcv++)
@@ -175,31 +177,28 @@ public class Epoch extends Object implements Runnable, Serializable
 			double dweight = 0.0D;
 			for (int i = 0; i < layers[0]; i++)
 			{
-				dweight = random.nextDouble();
 				innovations.addInnovation(InnovationType.NEW_NEURON, -1, -1, ++curNeuronID);
-				neuronGenes.add(new NeuronGene(curNeuronID, "Sigmoid", "Input", dweight, 1)); 
+				neuronGenes.add(new NeuronGene(curNeuronID, "Sigmoid", "Input", random.nextDouble(), 1)); 
 			}
-			for (int i = 1; i < layers.length - 1; i++)
+			for (int i = 0; i < layers.length - 1; i++)
 			{
 				for (int j = summationNeuronsInLayer[i + 1]; j < summationNeuronsInLayer[i + 2]; j++)
 				{
-					dweight = random.nextDouble();
 					innovations.addInnovation(InnovationType.NEW_NEURON, -1, -1, ++curNeuronID);
-					neuronGenes.add(new NeuronGene(curNeuronID, "Sigmoid", "Hidden", dweight, (i + 2)));
+					neuronGenes.add(new NeuronGene(curNeuronID, "Sigmoid", "Hidden", random.nextDouble(), (i + 2)));
 				}
 			}
 			for (int i = 0; i < layers[layers.length - 1]; i++)
 			{
-				dweight = random.nextDouble();
 				innovations.addInnovation(InnovationType.NEW_NEURON, -1, -1, ++curNeuronID);
-				neuronGenes.add(new NeuronGene(curNeuronID, "Sigmoid", "Output", dweight, (layers.length)));
+				neuronGenes.add(new NeuronGene(curNeuronID, "Sigmoid", "Output", random.nextDouble(), (layers.length + 1)));
 			}
 			
 			//Create the link genes
 			//This behemoth of a triple nested loop inside a loop simply goes creates the links between all the neurons
 			//The first loop increments the active layer
 			int linksCreated = 0;
-			for (int i = 0; i < layers.length - 1; i++)
+			for (int i = 0; i < layers.length; i++)
 			{
 				//This loop goes through each neuron in the active layer
 				for (int j = summationNeuronsInLayer[i]; j < summationNeuronsInLayer[(i + 1)]; j++)
@@ -238,7 +237,6 @@ public class Epoch extends Object implements Runnable, Serializable
 					}
 				}
 			}
-
 			population[lcv] = new Genome(++genomeID, neuronGenes, linkGenes, layers[0], layers[layers.length - 1]);
 		}
 		System.out.println("The new population has been created.");
@@ -250,7 +248,7 @@ public class Epoch extends Object implements Runnable, Serializable
 		layers[0] = numInputNeurons;
 		layers[layers.length - 1] = numOutputNeurons;
 		for(int i = 1; i < layers.length - 1; i++)
-			layers[i] = hiddenLayers[i - 1];
+			layers[i] = hiddenLayers[i];
 		this.createPopulation(chanceOfLink, fullLink, layers);
 	}
 	
@@ -524,7 +522,8 @@ public class Epoch extends Object implements Runnable, Serializable
 		double avgAdjustedFitness = 0.0D; //demonstrates the average fitness for the population.
 		double compatibilityScore = 0.0D; //used to calculate compatibility score.
 		double amountToSpawn = 0.0D;
-		Genome dad, mom; //used for crossover.
+		Genome dad; 
+		Genome mom; //used for crossover.
 		
 		while(running && generation < numGenerations)
 		{
@@ -679,7 +678,7 @@ public class Epoch extends Object implements Runnable, Serializable
 					species.get(speciesIndex).determineSpawnLevels();
 				
 				//Loop through each species and spawn genomes from each species
-				System.out.println("\tSpawning...");
+				System.out.println("\tSpawning..." + species.size());
 				int populationIndex = 0;
 				for (int speciesIndex = 0; speciesIndex < species.size(); speciesIndex++)
 				{
@@ -721,6 +720,7 @@ public class Epoch extends Object implements Runnable, Serializable
 								child.mutateNeuronWeights();
 							if(mutateLink)
 								child.mutateLinkWeights();
+
 						}
 						else
 						{
@@ -741,20 +741,23 @@ public class Epoch extends Object implements Runnable, Serializable
 									//Grab a random genome to breed with
 									dad = species.get(speciesIndex).getMember();
 									
+									int lcv = 10;
+
 									//If the dad is the same as the mom then loop and try to find a
 									//new dad.
-									while (dad.getID() == mom.getID())
+									while (dad.getID() == mom.getID() && lcv > 0)
+									{
 										dad = species.get(speciesIndex).getMember(); //Grab a random genome to breed with
+										lcv--;
+									}
 
 									//Breed the mom with the dad
 									child = mom.crossover(dad, innovations);
 								}
-								//These next lines were in here, and they literally say, "Don't actually crossover. Just...you know...copy the mom.
-								toCopy = child;
+								toCopy = mom;
 								child = new Genome(toCopy.getID(), toCopy.getNeurons(), toCopy.getLinks(), toCopy.getNumInputs(), toCopy.getNumOutputs());
 							}
 							
-							//Mutate the genome dependent on pre-set parameters
 							if(addNeuron)
 								child.addNeuron(addNeuronRate, innovations, maxCheckForNeuron);
 							if(addLink)
