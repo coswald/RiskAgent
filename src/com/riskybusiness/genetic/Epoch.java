@@ -156,9 +156,13 @@ public class Epoch extends Object implements Runnable, Serializable
 		summationNeuronsInLayer[0] = 0;
 		summationNeuronsInLayer[1] = layers[0];
 
+		for (int i = 0; i < layers.length; i++)
+		{
+			System.out.println(layers[i]);
+		}
+
 		for (int i = 0; i < layers.length - 1; i++)
 		{
-			System.out.println(summationNeuronsInLayer[i + 1] + layers[i]);
 			summationNeuronsInLayer[i + 2] = summationNeuronsInLayer[i + 1] + layers[i];
 		}
 		summationNeuronsInLayer[layers.length + 1] = layers[layers.length - 1] + summationNeuronsInLayer[layers.length];
@@ -237,6 +241,7 @@ public class Epoch extends Object implements Runnable, Serializable
 					}
 				}
 			}
+
 			population[lcv] = new Genome(++genomeID, neuronGenes, linkGenes, layers[0], layers[layers.length - 1]);
 		}
 		System.out.println("The new population has been created.");
@@ -244,11 +249,15 @@ public class Epoch extends Object implements Runnable, Serializable
 	
 	public void createPopulation(double chanceOfLink, boolean fullLink)
 	{
+		System.out.println("Hello");
 		int[] layers = new int[2 + numHiddenLayers];
 		layers[0] = numInputNeurons;
 		layers[layers.length - 1] = numOutputNeurons;
+		System.out.println("Hello");
+		System.out.println(hiddenLayers[0]);
 		for(int i = 1; i < layers.length - 1; i++)
-			layers[i] = hiddenLayers[i];
+			layers[i] = hiddenLayers[i - 1];
+		System.out.println("Hello");
 		this.createPopulation(chanceOfLink, fullLink, layers);
 	}
 	
@@ -326,8 +335,8 @@ public class Epoch extends Object implements Runnable, Serializable
 						break;
 					case 8:
 						if (!advancedNetCreation)
-							numHiddenLayers = Integer.parseInt(text) + 1;
-						hiddenLayers = new int[numHiddenLayers];
+							numHiddenLayers = Integer.parseInt(text);
+						hiddenLayers = new int[numHiddenLayers + 1];
 						break;
 					case 9: 
 						if (!advancedNetCreation)
@@ -339,8 +348,10 @@ public class Epoch extends Object implements Runnable, Serializable
 						break;
 					case 10:
 						if (advancedNetCreation)
+						{
 							numHiddenLayers = Integer.parseInt(text) + 1;
-						hiddenLayers = new int[numHiddenLayers];
+							hiddenLayers = new int[numHiddenLayers];
+						}
 						break;
 					case 11:
 						if (advancedNetCreation)
