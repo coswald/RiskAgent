@@ -156,11 +156,6 @@ public class Epoch extends Object implements Runnable, Serializable
 		summationNeuronsInLayer[0] = 0;
 		summationNeuronsInLayer[1] = layers[0];
 
-		for (int i = 0; i < layers.length; i++)
-		{
-			System.out.println(layers[i]);
-		}
-
 		for (int i = 0; i < layers.length - 1; i++)
 		{
 			summationNeuronsInLayer[i + 2] = summationNeuronsInLayer[i + 1] + layers[i];
@@ -249,15 +244,11 @@ public class Epoch extends Object implements Runnable, Serializable
 	
 	public void createPopulation(double chanceOfLink, boolean fullLink)
 	{
-		System.out.println("Hello");
 		int[] layers = new int[2 + numHiddenLayers];
 		layers[0] = numInputNeurons;
 		layers[layers.length - 1] = numOutputNeurons;
-		System.out.println("Hello");
-		System.out.println(hiddenLayers[0]);
 		for(int i = 1; i < layers.length - 1; i++)
 			layers[i] = hiddenLayers[i - 1];
-		System.out.println("Hello");
 		this.createPopulation(chanceOfLink, fullLink, layers);
 	}
 	
@@ -314,9 +305,8 @@ public class Epoch extends Object implements Runnable, Serializable
 						break;
 					case 3: backupGen = Integer.parseInt(text);
 						break;
-					/**
 					case 4: 
-					*/
+						break;
 					case 5: 
 						if (text.toLowerCase().equals("false"))
 							advancedNetCreation = false;
