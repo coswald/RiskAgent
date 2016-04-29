@@ -1,0 +1,125 @@
+##################
+#  Epoch Params  #
+##################
+
+ Population Size = 50
+
+ Number of Generations = 12
+
+ Backup Every Nth Generation = 10
+
+
+#####################
+#  Data Set Params  #
+#####################
+
+
+ ## File Name and network creation ##
+
+ Dataset file name = "NSDUHData-Long.txt"
+
+ Advanced Network Creation = False
+
+
+
+ ## Simple Network Creations ## ## Weston- NO TOUCHY!!!!!! ##
+
+ Number of Inputs = 13
+
+ Number of Outputs = 1
+
+ Number of Hidden Layers = 1
+
+ Number of Neurons in each Hidden Layer = 1
+
+
+ ## Advanced Network Creation ## ## Weston- NO TOUCHY!!!!!! ##
+
+ Number of Hidden Layers = 1
+
+ Neural Network = 13, 1, 1
+
+
+####################
+#  Species Params  #
+####################
+
+
+ Maximum number of Species = 10
+
+ Species Threshold = 0.15
+
+ Threshold Perturbation = 0.02
+
+ Extinction Limit = 20
+
+ Reward for Youth = 1.2
+
+ Penalty for Old Age = 0.8
+
+ Old Age = 35
+
+ Young Age = 16
+
+
+####################
+#  Mutator Params  #
+####################
+
+ ## Adding Neurons ##
+
+ Add Neuron = True
+
+ Add Neuron Rate = 0.05
+
+ Maximum Checks for Neurons = 20
+
+ ## Adding Links ##
+
+ Add Link = True
+
+ Add Link Rate = 0.05
+
+ Maximum Checks for Links = 20
+
+ ## Adding Looped Links ##
+
+ Add Looped Link = False
+
+ Add Looped Link Rate = 0.10
+
+ Maximum check for Loop Link = 10
+
+ ## Changing Neuron Type ##
+
+ Change Type = True
+
+ Chance of Changing Type = 0.1
+
+ Chance of Changing to Sigmoid = 0.5
+
+ ## Changing Bias Weight ## 
+
+ Change Bias = True
+
+ Chance of Changing Bias = 0.2
+
+ ## Change Input Links ##
+
+ Change Input Link = True
+
+ Chance of Changing Link Weight = 0.8
+
+ ## Change Input Neurons ##
+
+ Change Input Neurons = True
+
+ Chance of Changing Input Neurons = 0.5
+
+ ## Mutate Neurons Weights ##
+
+ Mutate Neuron Weights = True
+
+ ## Mutate Link Weights ##
+
+ Mutate Link Weights = True

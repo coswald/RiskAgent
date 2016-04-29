@@ -1,16 +1,13 @@
 /bin/
-/src/com/sillysoft/
-/src/org/
 /javadocs/
 sources
-makeDoc
 *.class
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
 # Package Files #
-*.jar
+#*.jar
 *.war
 *.ear
 

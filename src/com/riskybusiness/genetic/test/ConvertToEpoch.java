@@ -8,7 +8,7 @@ public class ConvertToEpoch
 {
 	public static void main(String... args)
 	{
-		Epoch e = new Epoch(50, 30, 6, .3D, .15D, .02D);
+		com.riskybusiness.genetic.Epoch e = new com.riskybusiness.genetic.Epoch(50, 30, 6, .3D, .15D, .02D);
 		//Initialize the reader
 		ObjectInputStream parametersReader = null;
 		ObjectInputStream populationReader = null;

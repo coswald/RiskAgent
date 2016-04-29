@@ -317,7 +317,7 @@ public class GenomeGUI extends Object implements Serializable
 			public void actionPerformed(ActionEvent e)
 			{
 				JFileChooser chooser = new JFileChooser();
-				FileNameExtensionFilter filter = new FileNameExtensionFilter("Object Output Files", "txt", "gapf");
+				FileNameExtensionFilter filter = new FileNameExtensionFilter("Paremeter Files", "txt", "gapf");
 				chooser.setFileFilter(filter);
 				chooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
 				GenomeGUI.this.stop.doClick();
@@ -390,7 +390,7 @@ public class GenomeGUI extends Object implements Serializable
 				XWPFWordExtractor extractor = null;
 				try
 				{
-					file = new File("UsersManual.docx");
+					file = new File("saves/UsersManual.docx");
 					FileInputStream fis = new FileInputStream(file.getAbsolutePath());
 					XWPFDocument document = new XWPFDocument(fis);
 					extractor = new XWPFWordExtractor(document);
@@ -418,7 +418,7 @@ public class GenomeGUI extends Object implements Serializable
 				XWPFWordExtractor extractor = null;
 				try
 				{
-					file = new File("SystemManual.docx");
+					file = new File("saves/SystemManual.docx");
 					FileInputStream fis = new FileInputStream(file.getAbsolutePath());
 					XWPFDocument document = new XWPFDocument(fis);
 					extractor = new XWPFWordExtractor(document);

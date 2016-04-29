@@ -46,7 +46,7 @@ import java.util.ArrayList;
 
 public class Epoch extends Object implements Runnable, Serializable
 {
-	public static String dataFile = System.getProperty("user.dir") + "\\NSDUHData-Short.txt";
+	public static String dataFile = System.getProperty("user.dir") + "/saves/NSDUHData-Short.txt";
 	private static Random random = new Random(); //doesn't need to be declared transient apparently...
 	
 	private ArrayList<NeuronGene> neuronGenes;
@@ -423,7 +423,7 @@ public class Epoch extends Object implements Runnable, Serializable
 							throw new RuntimeException("Error 98: Invalid backup number!");
 						break;
 					case 4:
-						dataFile = System.getProperty("user.dir") + "\\" + text.replace("\"", "");
+						dataFile = System.getProperty("user.dir") + "/saves/" + text.replace("\"", "");
 						break;
 					case 5: 
 						if (text.toLowerCase().equals("false"))
@@ -713,7 +713,7 @@ public class Epoch extends Object implements Runnable, Serializable
 					System.out.println("\tBacking up file...");
 					try
 					{
-						this.saveToFile("epoch.gaif");
+						this.saveToFile("saves/epoch.gaif");
 						System.out.println("\tFile backed up to \'epoch.gaif\'!");
 					}
 					catch(IOException io)
