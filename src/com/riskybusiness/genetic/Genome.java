@@ -17,6 +17,8 @@
 
 package com.riskybusiness.genetic;
 
+import com.riskybusiness.genetic.Epoch;
+
 import com.riskybusiness.neural.Neuron;
 import com.riskybusiness.neural.Synapse;
 import com.riskybusiness.neural.NeuralNet;
@@ -742,7 +744,7 @@ public class Genome implements Serializable
                     toNeuronID   = neuronGeneSet.get(neuronIndexFrom).getID();
                 }
 
-                //Hardcoded the input layer(don't add links to the input layer)
+                //Don't add links to the input layer
                 if(fromNeuronID <= numInputNeurons)
                 {
                     toNeuronID   = -1;
@@ -820,7 +822,7 @@ public class Genome implements Serializable
         int fromNeuronID;
         
         //This represents the maximum amount of neurons allowed in the genome
-        int sizeThreshold = 35;
+        int sizeThreshold = 60;
 
         //If the random value doesn't exceed the probability threshold then exit by returning
         if (random.nextDouble() > mutationRate)
@@ -931,6 +933,7 @@ public class Genome implements Serializable
 
                     //Sort the link genes
                     GenomeHelper.sortLinkArray(neuronGeneSet, linkGeneSet);
+                    break;
                 }
             }
         }
@@ -949,7 +952,7 @@ public class Genome implements Serializable
 
 	public double determineFitness()
 	{
-		return this.determineFitness("NSDUHData-Short.txt");
+	   return this.determineFitness(Epoch.dataFile);
 	}
 	
 	/**
@@ -961,7 +964,6 @@ public class Genome implements Serializable
     {
         //Create the phenotype
         this.createPhenotype();
-
 
         // This will reference one line at a time
         String line = null;
@@ -1024,9 +1026,9 @@ public class Genome implements Serializable
 
 	public void printFitness()
 	{
-		this.printFitness("NSDUHData-Short.txt");
+		this.printFitness(Epoch.dataFile);
 	}
-	
+    
 	/**
 	 * <p>&nbsp&nbsp&nbsp&nbsp&nbspPrints the information
 	 * about the fitness to the standard output.</p>
@@ -1445,18 +1447,41 @@ public class Genome implements Serializable
         if(random.nextDouble() < mutationRate)
         {
             if (random.nextDouble() < 0.1)
-                {
-                    linkGeneSet.get(linkToMutate).setWeight(random.nextFloat());
-                }
-                else
-                {
-                    double curWeight = linkGeneSet.get(linkToMutate).getWeight();
-                    double newWeight = curWeight + (random.nextDouble() * 2.0 - 1.0) * 0.1;
-                    linkGeneSet.get(linkToMutate).setWeight(newWeight);
-                }
+            {
+                linkGeneSet.get(linkToMutate).setWeight(random.nextFloat());
+            }
+            else
+            {
+                double curWeight = linkGeneSet.get(linkToMutate).getWeight();
+                double newWeight = curWeight + (random.nextDouble() * 2.0 - 1.0) * 0.1;
+                linkGeneSet.get(linkToMutate).setWeight(newWeight);
+            }
         }
     }
 
+    /**
+     * <p>&nbsp&nbsp&nbsp&nbsp&nbspMutates the weights
+     * on the input layer based on the mutation rate.</p>
+     * @param mutationRate the rate to change the input
+     *          layer weights.
+     */
+    public void mutateInputNeuron(double mutationRate)
+    {
+        int neuronToMutate = random.nextInt(numInputNeurons);
+        if(random.nextDouble() < mutationRate)
+        {
+            if (random.nextDouble() < 0.1)
+            {
+                neuronGeneSet.get(neuronToMutate).setActivationResponse(random.nextDouble());
+            }
+            else
+            {
+                double curWeight = neuronGeneSet.get(neuronToMutate).getActivationResponse();
+                double newWeight = curWeight + (random.nextDouble() * 2.0 - 1.0) * 0.1;
+                neuronGeneSet.get(neuronToMutate).setActivationResponse(newWeight);
+            }
+        }
+    }
 
 	/**
 	 * @inheritDoc
@@ -1468,7 +1493,7 @@ public class Genome implements Serializable
         String toReturn = "";
 
         //Add all the information to the string
-        toReturn += "Genome ID: " + genomeID + " Genome has " + numLayers + " layers, has " + numInputNeurons + " input neurons, has " + numOutputNeurons + " and has " + numLinkGenes + " total Genes!\n";
+        toReturn += "Genome ID: " + genomeID + " Genome has " + numLayers + " layers, has " + numInputNeurons + " input neurons, has " + numOutputNeurons + " output neurons and has " + numLinkGenes + " total Genes!\n";
         toReturn += "The neurons inside this genome are: \n";
         for (int i = 0; i < neuronGeneSet.size(); i++)
         {
@@ -1477,7 +1502,7 @@ public class Genome implements Serializable
         toReturn += "The links inside this genome are: \n";
         for (int i = 0; i < linkGeneSet.size(); i++)
         {
-            toReturn += "   Link ID & InnovID: " + linkGeneSet.get(i).getID() + " & " + linkGeneSet.get(i).getInnovationID() + " comes from Neuron: " + linkGeneSet.get(i).getFromNeuron() + " and goes to Neuron: " + linkGeneSet.get(i).getToNeuron() + " and is " + ((linkGeneSet.get(i).getEnabled()) ? "enabled"  : "disabled") + " and has a weight of " + linkGeneSet.get(i).getWeight() + "\n";
+            toReturn += "   Link ID: " + linkGeneSet.get(i).getID() + " comes from Neuron: " + linkGeneSet.get(i).getFromNeuron() + " and goes to Neuron: " + linkGeneSet.get(i).getToNeuron() + " and is " + ((linkGeneSet.get(i).getEnabled()) ? "enabled"  : "disabled") + " and has a weight of " + linkGeneSet.get(i).getWeight() + "\n";
         }
         toReturn += "\n";
 

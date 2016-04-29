@@ -46,6 +46,7 @@ import java.util.ArrayList;
 
 public class Epoch extends Object implements Runnable, Serializable
 {
+	public static String dataFile = System.getProperty("user.dir") + "\\NSDUHData-Short.txt";
 	private static Random random = new Random(); //doesn't need to be declared transient apparently...
 	
 	private ArrayList<NeuronGene> neuronGenes;
@@ -356,7 +357,8 @@ public class Epoch extends Object implements Runnable, Serializable
 						if(backupGen <= 0)
 							throw new RuntimeException("Error 98: Invalid backup number!");
 						break;
-					case 4: 
+					case 4:
+						dataFile = System.getProperty("user.dir") + "\\" + text.replace("\"", "");
 						break;
 					case 5: 
 						if (text.toLowerCase().equals("false"))

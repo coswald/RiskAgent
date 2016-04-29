@@ -130,7 +130,7 @@ public class InnovationDB implements Serializable
 			}
 		}
 		//If its not in the database return -1
-		return -1;
+		return 0;
 	}
 	
 	
@@ -165,7 +165,7 @@ public class InnovationDB implements Serializable
 				innovationDB.add(innovationID, new Innovation(type, from, to, id));
 				//Increment innovationID
 				innovationID++; 
-				return -1;
+				return 0;
 			}
 		}
 		else
@@ -184,7 +184,7 @@ public class InnovationDB implements Serializable
 				innovationDB.add(innovationID, new Innovation(type, from, to, ++neuronID));
 				//Increment innovationID and neuronID
 				innovationID++; 
-				return -1;
+				return 0;
 			}
 		}
 	}

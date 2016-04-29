@@ -40,8 +40,6 @@ public class Tester
 	{
 		/* Tester Params */
 		
-		//Represents the debugging option
-		boolean debug 				= false;
 		//Tester variable
 		boolean testFire 			= false;
 		//Tester variable
@@ -49,48 +47,25 @@ public class Tester
 		//Tester variable
 		boolean testAddNeuron 		= false;
 		//Tester variable
-		boolean testPush 			= false;
-		//Tester variable
 		boolean testSortNeurons 	= false;
 		//Tester variable
 		boolean testAddLink			= false;
 		//Tester variable
-		boolean testFitnessFunction = false;
-		//Tester variable
-		boolean testMutators 		= false;
-		//Tester variable
-		boolean testCrossover 		= false;
+		boolean testMutators 		= false;	
 
-
-		/*User Params */
-		
-		//Represents whether a user is going to load a genome
-		boolean	loadFile 	= false;
-		//Represents the users input
-		String 	userInput;
-
-
-		/* Link Initialization Params */
-
-		//Represents the chance of a link spawning
-		double 	chanceOfLink	= 0.5;
-		//Represents whether the links will be full or partial
-		boolean fullLink		= true;
-		//Represents the number of links created for the active neuron
-		int 	linksCreated	= 0;
 
 		/* Parameters */
 
 		//Represents the size of the population
-		int 	populationSize 			= 10;
+		int 	populationSize 			= 1;
 		//Represents the number of input neurons
-		int 	numInputNeurons			= 2;
+		int 	numInputNeurons			= 3;
 		//Represents the number of output neurons
-		int 	numOutputNeurons		= 1;
+		int 	numOutputNeurons		= 3;
 		//Represents the number of initial hidden layers
-		int 	numHiddenLayers			= 1;
+		int 	numHiddenLayers			= 3;
 		//Represents the number of initial neurons in each hidden layer
-		int[]	hiddenLayers 			= {2};
+		int[]	hiddenLayers 			= {2, 2, 2};
 		//Represents the number of neurons in the genome up to the given index
 		int[] 	summationNeuronsInLayer	= new int[numHiddenLayers + 3];
 		//Represents the current neuron ID 
@@ -101,13 +76,14 @@ public class Tester
 		int 	curGenomeID 			= 0;
 
 
-
 		/* Helper Items */
 
 		//Represents the item used to create pseudo-random numbers
 		Random 	random 	= new Random();
 		//Represents the scanner to get user input
 		Scanner input 	= new Scanner(System.in);
+		//Represents users input
+		String 	userInput;
 
 
 		/* Population Items */
@@ -118,6 +94,9 @@ public class Tester
    		ArrayList<LinkGene>   	linkGenes  	= new ArrayList<LinkGene>();
    		//Represents the genomes of the population
    		ArrayList<Genome>		population 	= new ArrayList<Genome>();
+		//Represents the number of links created for the active neuron
+		int 					linksCreated = 0;
+
 
    		/* Historical Data */	
 
@@ -126,124 +105,73 @@ public class Tester
    		//Represents the current generation
    		int 					generation 	= 1;		
 
-   		System.out.println("Would you like to load[L] a file or start fresh[S]?");
+   		System.out.println("Hit [Enter] to start");
    		userInput = input.nextLine();
-   		/*
-   		while (!(userInput == "S" || userInput == "L"))
-   		{
-   			System.out.println("You need to enter either 'L' or 'S' to begin!");
-   			System.out.println("Would you like to load[L] a file or start fresh[S]?");
-   			userInput = input.nextLine();
-   		}
-   		
-   		if (userInput == "L") loadFile = true;
-		*/
-   		if (loadFile)
-   		{
-   			int temp = 0;
-   		} 
-   		else 
-   		{
-   			//Initialize number of neurons
-   			summationNeuronsInLayer[0] = 0;
-   			summationNeuronsInLayer[1] = numInputNeurons;
 
-   			for (int i = 0; i < numHiddenLayers; i++)
-   			{
-   				summationNeuronsInLayer[i + 2] = summationNeuronsInLayer[i + 1] + hiddenLayers[i];
-   			}
-   			summationNeuronsInLayer[numHiddenLayers + 2] = numOutputNeurons + summationNeuronsInLayer[numHiddenLayers + 1];
+		//Initialize number of neurons
+		summationNeuronsInLayer[0] = 0;
+		summationNeuronsInLayer[1] = numInputNeurons;
+
+		for (int i = 0; i < numHiddenLayers; i++)
+		{
+			summationNeuronsInLayer[i + 2] = summationNeuronsInLayer[i + 1] + hiddenLayers[i];
+		}
+		summationNeuronsInLayer[numHiddenLayers + 2] = numOutputNeurons + summationNeuronsInLayer[numHiddenLayers + 1];
 
 
-			//Create the initial genomes
-			for (int lcv = 0; lcv < populationSize; lcv++)
+		//Create the initial genomes
+		for (int lcv = 0; lcv < populationSize; lcv++)
+		{
+			//Reset the genes for the new population
+			neuronGenes.clear();
+			linkGenes.clear();
+			curNeuronID = 0;
+			curLinkID = 0;
+
+			//The next three loops will create the neurons
+			//Currently, there is no need to seperate into three loops, but I am working on implementing different neuron types
+			for (int i = 0; i < numInputNeurons; i++)
 			{
-				//Reset the genes for the new population
-				neuronGenes.clear();
-				linkGenes.clear();
-				curNeuronID = 0;
-				curLinkID = 0;
-
-				if (debug)
-				{
-					System.out.println("Creating Neurons...");
-				}
-
-				//The next three loops will create the neurons
-				//Currently, there is no need to seperate into three loops, but I am working on implementing different neuron types
-				for (int i = 0; i < numInputNeurons; i++)
-				{
-					double dweight = random.nextDouble();
-					neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", "Input", dweight, 1)); 
-				}
-				for (int i = 0; i < numHiddenLayers; i++)
-				{
-					for (int j = summationNeuronsInLayer[i + 1]; j < summationNeuronsInLayer[i + 2]; j++)
-					{
-						double dweight = random.nextDouble();
-						neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", "Hidden", dweight, (i + 2)));
-					}
-				}
-				for (int i = 0; i < numOutputNeurons; i++)
-				{
-					double dweight = random.nextDouble();
-					neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", "Output", dweight, (numHiddenLayers + 2)));
-				}
-				
-				if (testPush)
-				{
-					neuronGenes.add(new NeuronGene(21, "Sigmoid", "Hidden", 1.0, 2));
-    			}
-
-				if (debug)
-				{
-					System.out.println("Creating Links...");
-				}
-
-				//Create the link genes
-				//This behemoth of a triple nested loop inside a loop simply goes creates the links between all the neurons
-				//The first loop increments the active layer
-				for (int i = 0; i < numHiddenLayers + 1; i++)
-				{
-					//This loop goes through each neuron in the active layer
-					for (int j = summationNeuronsInLayer[i]; j < summationNeuronsInLayer[(i + 1)]; j++)
-					{
-						linksCreated = 0;
-						//This loop goes through each neuron in the layer that comes after the active layer
-						for (int k = summationNeuronsInLayer[(i + 1)]; k < summationNeuronsInLayer[(i + 2)]; k++)
-						{
-							if (fullLink || random.nextDouble() <= chanceOfLink)
-							{
-								linksCreated++;
-								//Create random weight
-								double dweight = random.nextDouble();
-								//Add the link to the link gene array
-				 				linkGenes.add(new LinkGene(linkGenes.size() + 1, neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), ++curLinkID, dweight, true));
-							}
-						}
-						//Still have to deal with the fact that this way results in some neurons not getting links
-						if (linksCreated == 0)
-						{
-							int toNeuron = random.nextInt(summationNeuronsInLayer[(i + 2)] - (summationNeuronsInLayer[(i + 1)] + 1) + summationNeuronsInLayer[(i + 1)] + 1); 
-						}
-					}
-				}
-
-				if (testPush)
-				{
-					//Represents the added links
-    				linkGenes.add(new LinkGene(1, 1, 21, 56, 1.0, true));
-    				linkGenes.add(new LinkGene(1, 21, 4, 57, 1.0,true));
-    			}
-
-				if (debug)
-				{
-					System.out.println("Adding genome to population");
-				}
-
-				population.add(new Genome(++curGenomeID, neuronGenes, linkGenes, numInputNeurons, numOutputNeurons));
-
+				double dweight = random.nextDouble();
+				neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", "Input", dweight, 1)); 
 			}
+			for (int i = 0; i < numHiddenLayers; i++)
+			{
+				for (int j = summationNeuronsInLayer[i + 1]; j < summationNeuronsInLayer[i + 2]; j++)
+				{
+					double dweight = random.nextDouble();
+					neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", "Hidden", dweight, (i + 2)));
+				}
+			}
+			for (int i = 0; i < numOutputNeurons; i++)
+			{
+				double dweight = random.nextDouble();
+				neuronGenes.add(new NeuronGene(++curNeuronID, "Sigmoid", "Output", dweight, (numHiddenLayers + 2)));
+			}
+
+			//Create the link genes
+			//This behemoth of a triple nested loop inside a loop simply goes creates the links between all the neurons
+			//The first loop increments the active layer
+			for (int i = 0; i < numHiddenLayers + 1; i++)
+			{
+				//This loop goes through each neuron in the active layer
+				for (int j = summationNeuronsInLayer[i]; j < summationNeuronsInLayer[(i + 1)]; j++)
+				{
+					linksCreated = 0;
+					//This loop goes through each neuron in the layer that comes after the active layer
+					for (int k = summationNeuronsInLayer[(i + 1)]; k < summationNeuronsInLayer[(i + 2)]; k++)
+					{
+						linksCreated++;
+						//Create random weight
+						double dweight = random.nextDouble();
+						//Add the link to the link gene array
+		 				linkGenes.add(new LinkGene(linkGenes.size() + 1, neuronGenes.get(j).getID(), neuronGenes.get(k).getID(), ++curLinkID, dweight, true));
+					}
+				}
+			}
+
+			population.add(new Genome(++curGenomeID, neuronGenes, linkGenes, numInputNeurons, numOutputNeurons));
+
 		}
 
 		if (printGenome)
@@ -261,6 +189,7 @@ public class Tester
 
 		if (testFire)
 		{
+			System.out.println("Testing Fire");
 			for (int i = 0; i <  population.size(); i++)
 			{
 				for(float x = 0; x < 2; x++)
@@ -284,13 +213,17 @@ public class Tester
 						System.out.println("Output 1: " + population.get(i).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
 					}
 				}
+				System.out.println("Hit [Enter] to see the old genome");
+				userInput = input.nextLine();
+				System.out.println(population.get(i));
 			}
 
+			System.out.println("Attempting to add some neurons.");
 			for (int i = 0; i < population.size(); i++)
 			{
-				for (int j = 0; j < 10; j++)
+				for (int j = 0; j < 5; j++)
 				{
-					population.get(i).addNeuron(1, innovations, 20);
+					population.get(i).addNeuron(1.0, innovations, 10);
 					population.get(i).createPhenotype();
 				}
 			}
@@ -304,6 +237,7 @@ public class Tester
 						System.out.println("Output 2: " + population.get(i).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
 					}
 				}
+				System.out.println("Hit [Enter] to see the new genome");
 				userInput = input.nextLine();
 				System.out.println(population.get(i));
 			}
@@ -311,99 +245,64 @@ public class Tester
 
 		if (testAddLink)
 		{
-    		//System.out.println(population.get(0));
-			for (int i = 0; i < 10; i++)
+			for (int i = 0; i < population.size(); i++)
 			{
-				population.get(0).addLink(1.0, 0.0, innovations, 10, 20);
+				for(float x = 0; x < 2; x++)
+				{
+					for(float y = 0; y < 2; y++)
+					{
+						System.out.println("Output 1: " + population.get(i).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
+					}
+				}
+				System.out.println("Hit [Enter] to see the old genome");
+				userInput = input.nextLine();
+				System.out.println(population.get(i));
+			}
+			for (int i = 0; i < 100; i++)
+			{
+				population.get(0).addLink(1.0, 0.0, innovations, 10, 10);
 			}			
-    		//System.out.println(population.get(0));
 			for (int i = 0; i <  population.size(); i++)
 			{
 				for(float x = 0; x < 2; x++)
 				{
 					for(float y = 0; y < 2; y++)
 					{
-						//System.out.println("Output 2: " + population.get(i).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
+						System.out.println("Output 2: " + population.get(i).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
 					}
 				}
-			}
-			for (int i = 0; i < 10; i++)
-			{
-				population.get(1).addLink(1.0, 0.0, innovations, 10, 20);
-			}
-		}
-
-		if (testPush)
-		{
-    		//Represents the neuron to be added
-    		NeuronGene neuronToAdd = new NeuronGene(21, "Sigmoid", "Hidden", 0.0, 2);
-
-
-
-    		System.out.println(population.get(0));
-			GenomeHelper.pushNeurons(population.get(0).getNeurons(), population.get(0).getLinks(), neuronToAdd);
-    		System.out.println(population.get(0));
-
-			if (testSortNeurons)
-			{
-			
-    			System.out.println(population.get(0));
-				GenomeHelper.sortNeuronArray(population.get(0).getNeurons(), 8);
-    			System.out.println(population.get(0));
-			}
-		}
-
-		if (printGenome)
-		{
-			for (int i = 0; i <  population.size(); i++)
-			{
-    			System.out.println(population.get(i));
-			}
-		}
-
-		if(testFitnessFunction)
-		{
-			for (int i = 0; i < population.size(); i++)
-			{
-				population.get(i).determineFitness();
+				System.out.println("Hit [Enter] to see the new genome");
+				userInput = input.nextLine();
+				System.out.println(population.get(i));
 			}
 		}
 
 		if (testMutators)
 		{
-			for (int i = 0; i <  population.size(); i++)
-			{
-				for(float x = 0; x < 2; x++)
-				{
-					for(float y = 0; y < 2; y++)
-					{
-						System.out.println("Output 2: " + population.get(0).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
-					}
-				}
-			}
+			System.out.println("Hit [Enter] to see the old genome");
+			userInput = input.nextLine();
+			System.out.println(population.get(0));
 			for (int i = 0; i < population.size(); i++)
 			{
+				System.out.println("Testing mutateInputLink");
+				population.get(i).mutateInputLink(1.0);
+				System.out.println("Success");
+				System.out.println("Testing mutateInputNeuron");
+				population.get(i).mutateInputNeuron(1.0);
+				System.out.println("Success");
+				System.out.println("Testing mutateLinkWeights");
 				population.get(i).mutateLinkWeights();
+				System.out.println("Success");
+				System.out.println("Testing mutateNeuronWeights");
 				population.get(i).mutateNeuronWeights();
+				System.out.println("Success");
 				population.get(i).createPhenotype();
 			}
-			for (int i = 0; i <  population.size(); i++)
-			{
-				for(float x = 0; x < 2; x++)
-				{
-					for(float y = 0; y < 2; y++)
-					{
-						System.out.println("Output 2: " + population.get(0).getNetwork().fire(new float[][] {new float[] {x}, new float[] {y}})[0]);
-					}
-				}
-			}
+			System.out.println("Hit [Enter] to see the new genome");
+			userInput = input.nextLine();
+			System.out.println(population.get(0));
+
 		}
 
-		if (testCrossover)
-		{
-			population.get(0).crossover(population.get(1), innovations);
-		}
-
-		//System.out.println("Population size: " + population.size());
 	}
 }
