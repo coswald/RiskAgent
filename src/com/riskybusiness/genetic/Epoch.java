@@ -53,6 +53,7 @@ public class Epoch extends Object implements Runnable, Serializable
 	private ArrayList<LinkGene> linkGenes;
 	private ArrayList<Species> species;
 	private Genome[] population;
+	private Genome[] newPopulation;
 	private int speciesID; //can't be declared static due to the transient property of static...
 	private int genomeID; //can't be declared static due to transient property of static...
 	private InnovationDB innovations;
@@ -121,6 +122,7 @@ public class Epoch extends Object implements Runnable, Serializable
 		this.linkGenes = new ArrayList<LinkGene>();
 		this.species = new ArrayList<Species>();
 		this.population = new Genome[populationSize];
+		this.newPopulation = new Genome[populationSize];
 		this.genomeID = 0;
 		this.speciesID = 0;
 		this.generation = 0;
@@ -724,7 +726,6 @@ public class Epoch extends Object implements Runnable, Serializable
 				
 				//Loop through the species and kill off species that aren't improving and 
 				//create a new generation for each species
-				System.out.println("\tLooping through to create and destroy species!");
 				for (int speciesIndex = 0; speciesIndex < species.size(); speciesIndex++)
 				{
 					//Create the new generation
@@ -742,11 +743,10 @@ public class Epoch extends Object implements Runnable, Serializable
 
 				//Loop through each species and see if any of the alphas has surpassed the best
 				//fitness seen so far
-				System.out.println("\tLooping through to find the Chosen One...");
 				this.findTheChosenOne();
 				System.out.println("\t\tChosen one's Fitness: " + bestFitness);
 				//Check if we have exceeded the number of species
-				System.out.println("\tChanging Species Threshold (with one \"h\")");
+				System.out.println("\tChanging Species Threshold");
 				if (species.size() > maxNumSpecies)
 				{
 					this.speciesThreshold += this.thresholdPerturbation;
@@ -821,7 +821,7 @@ public class Epoch extends Object implements Runnable, Serializable
 					species.get(speciesIndex).determineSpawnLevels();
 				
 				//Loop through each species and spawn genomes from each species
-				System.out.println("\tSpawning..." + species.size());
+				System.out.println("\tSpawning...");
 				int populationIndex = 0;
 				for (int speciesIndex = 0; speciesIndex < species.size(); speciesIndex++)
 				{
@@ -856,9 +856,7 @@ public class Epoch extends Object implements Runnable, Serializable
 							if(mutateInputLink)
 								child.mutateInputLink(inLinkMutateRate);
 							if(mutateInputNeuron)
-							{
-								//child.mutateInputNeuron(inNeuronMutateRate);
-							}
+								child.mutateInputNeuron(inNeuronMutateRate);
 							if(mutateNeuron)
 								child.mutateNeuronWeights();
 							if(mutateLink)
@@ -912,21 +910,24 @@ public class Epoch extends Object implements Runnable, Serializable
 							if(mutateInputLink)
 								child.mutateInputLink(inLinkMutateRate);
 							if(mutateInputNeuron)
-							{
-								//child.mutateInputNeuron(inNeuronMutateRate);
-							}
+								child.mutateInputNeuron(inNeuronMutateRate);
 							if(mutateNeuron)
 								child.mutateNeuronWeights();
 							if(mutateLink)
 								child.mutateLinkWeights();
-							
-							//Set the id of the child to the next genome ID
-							child.setID(++this.genomeID);
-							//Add the child to the new population
-							population[populationIndex++] = new Genome(child.getID(), child.getNeurons(), child.getLinks(), child.getNumInputs(), child.getNumOutputs());
 						}
+						//Set the id of the child to the next genome ID
+			            child.setID(++this.genomeID);
+			            if (!(populationIndex >= population.length))
+			            {
+			                newPopulation[populationIndex++] = new Genome(child.getID(), child.getNeurons(), child.getLinks(), child.getNumInputs(), child.getNumOutputs());
+			            }
 					}
 				}
+				for (int i = 0; i < population.length; i++)
+                {
+                    population[i] = new Genome(newPopulation[i].getID(), newPopulation[i].getNeurons(), newPopulation[i].getLinks(), newPopulation[i].getNumInputs(), newPopulation[i].getNumOutputs());
+                }
 				System.out.println("\tDone!");
 			}
 		}
